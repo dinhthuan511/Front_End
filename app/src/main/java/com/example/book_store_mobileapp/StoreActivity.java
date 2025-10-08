@@ -1,5 +1,6 @@
 package com.example.book_store_mobileapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
@@ -45,12 +46,25 @@ public class StoreActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Initialize views
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
 
         // Initialize book adapter with an empty list
         bookAdapter = new BookAdapter(this, bookList);
         gridView.setAdapter(bookAdapter);
+
+        // Item click listener to open book detail
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
+            // 1. Get chosen book
+            Book selectedBook = bookList.get(position);
+            // 2. Create Intent to open BookDetailActivity
+            Intent intent = new Intent(StoreActivity.this, BookDetailActivity.class);
+            // 3. Pass selected book to activity
+            intent.putExtra("SELECTED_BOOK", selectedBook);
+            // 4. Start activity
+            startActivity(intent);
+        });
 
         fetchBooks();
     }
@@ -63,10 +77,8 @@ public class StoreActivity extends AppCompatActivity {
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         // 2. Create API service instance
         ApiService apiService = retrofit.create(ApiService.class);
-
         // 3. Make API call
         Call<List<Book>> call = apiService.getBooks();
         call.enqueue(new Callback<List<Book>>() {
