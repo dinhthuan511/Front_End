@@ -3,7 +3,9 @@ package com.example.book_store_mobileapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -45,6 +47,12 @@ public class StoreActivity extends AppCompatActivity {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        ImageButton btnCart = findViewById(R.id.btnCart);
+        btnCart.setOnClickListener(v -> {
+            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
+
 
         // Initialize views
         gridView = findViewById(R.id.grid_view);
@@ -103,4 +111,5 @@ public class StoreActivity extends AppCompatActivity {
             }
         });
     }
+
 }

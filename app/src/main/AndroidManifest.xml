@@ -17,6 +17,9 @@
             android:name=".BookDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+        <activity
             android:name=".StoreActivity"
             android:exported="true">
             <intent-filter>
