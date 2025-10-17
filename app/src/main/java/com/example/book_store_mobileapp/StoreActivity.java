@@ -79,12 +79,12 @@ public class StoreActivity extends AppCompatActivity {
         txtSearchName.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-
+                // not needed
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                //not needed
             }
 
             @Override
@@ -169,6 +169,7 @@ public class StoreActivity extends AppCompatActivity {
         bookAdapter.notifyDataSetChanged();
     }
 
+    // Get book from API
     private void fetchBooks(){
         progressBar.setVisibility(View.VISIBLE); //Show loading
 
