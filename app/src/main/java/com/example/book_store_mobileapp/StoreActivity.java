@@ -32,18 +32,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
+import com.google.firebase.auth.FirebaseAuth;
 public class StoreActivity extends AppCompatActivity {
 
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnCart, btnFilter, btnSort;
+    private ImageButton btnCart, btnFilter, btnSort, btnLogout; // ✅ thêm btnLogout
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
     private List<Book> displayedBookList = new ArrayList<>();
-    private String currentSearchQuery = ""; // 1. To store the current search text
+    private String currentSearchQuery = "";
     private int activePriceFilter = -1;
     private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
 
@@ -53,88 +53,79 @@ public class StoreActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_store);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) ->{
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // ✅ Khởi tạo các nút
         btnCart = findViewById(R.id.btnCart);
+        btnLogout = findViewById(R.id.btnLogout);
+        btnFilter = findViewById(R.id.btnFilter);
+        btnSort = findViewById(R.id.btnSort);
+        txtSearchName = findViewById(R.id.txtSearchName);
+        gridView = findViewById(R.id.grid_view);
+        progressBar = findViewById(R.id.progressBar);
+
+        // ✅ Nút Logout
+        btnLogout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        // ✅ Nút Giỏ hàng
         btnCart.setOnClickListener(v -> {
             Intent intent = new Intent(StoreActivity.this, CartActivity.class);
             startActivity(intent);
         });
 
-
-        // Initialize views
-        gridView = findViewById(R.id.grid_view);
-        progressBar = findViewById(R.id.progressBar);
-        txtSearchName = findViewById(R.id.txtSearchName);
-        btnFilter = findViewById(R.id.btnFilter);
-        btnSort = findViewById(R.id.btnSort);
-
-        // Call Book filter
+        // --- phần dưới giữ nguyên ---
         bookFilter = new BookFilter();
-        // Search
         txtSearchName.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-
+            public void afterTextChanged(Editable s) { }
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                List<Book> filteredBooks = bookFilter.searchBooks(initialBookList, s.toString());
-//                updateDisplayedBooks(filteredBooks);
                 currentSearchQuery = s.toString();
                 applyFiltersAndSearch();
             }
         });
-        // Sort
+
         btnSort.setOnClickListener(v -> {
             final CharSequence[] options = {"Default", "Price: Low to High", "Price: High to Low"};
             new AlertDialog.Builder(StoreActivity.this)
                     .setTitle("Sort By")
                     .setItems(options, (dialog, item) -> {
                         bookFilter.sortBooksByPrice(displayedBookList, item);
-                        bookAdapter.notifyDataSetChanged(); // Refresh the grid view
+                        bookAdapter.notifyDataSetChanged();
                     })
                     .show();
         });
-        // Filter
+
         btnFilter.setOnClickListener(v -> {
             final CharSequence[] options = {"Under 100,000 VNĐ", "100,000 - 200,000 VNĐ", "Over 200,000 VNĐ", "Clear Filter"};
             new AlertDialog.Builder(StoreActivity.this)
                     .setTitle("Filter by Price Range")
                     .setItems(options, (dialog, item) -> {
-                        if (item == 3) { // "Clear Filter"
-                            activePriceFilter = -1;
-                        } else {
-                            activePriceFilter = item; // Update the price filter state
-                        }
+                        if (item == 3) activePriceFilter = -1;
+                        else activePriceFilter = item;
                         applyFiltersAndSearch();
                     })
                     .show();
         });
 
-        // Initialize book adapter with an empty list
         bookAdapter = new BookAdapter(this, displayedBookList);
         gridView.setAdapter(bookAdapter);
-
-        // Item click listener to open book detail
         gridView.setOnItemClickListener((parent, view, position, id) -> {
-            // 1. Get chosen book
             Book selectedBook = displayedBookList.get(position);
-            // 2. Create Intent to open BookDetailActivity
             Intent intent = new Intent(StoreActivity.this, BookDetailActivity.class);
-            // 3. Pass selected book to activity
             intent.putExtra("SELECTED_BOOK", selectedBook);
-            // 4. Start activity
             startActivity(intent);
         });
 

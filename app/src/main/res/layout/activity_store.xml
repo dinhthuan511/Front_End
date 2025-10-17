@@ -2,19 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".StoreActivity" >
+    tools:context=".StoreActivity">
 
+    <!-- Thanh trên cùng chứa nút Logout và Giỏ hàng -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp"
-        android:gravity="right">
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:gravity="end"
+        android:background="#F5F5F5">
+
+        <ImageButton
+            android:id="@+id/btnLogout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:src="@drawable/outline_exit_to_app_24"
+            android:contentDescription="@string/logout"
+            app:tint="@color/black" />
 
         <ImageButton
             android:id="@+id/btnCart"
@@ -22,24 +34,26 @@
             android:layout_height="40dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_add_shopping_cart_black_24dp"
-            android:contentDescription="Cart"
+            android:contentDescription="@string/cart"
             app:tint="@color/black" />
     </LinearLayout>
 
-
-
+    <!-- Thanh tìm kiếm -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:gravity="center_vertical">
+
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search for:"
+            android:text="@string/search_for"
             android:textColor="@color/black"
             android:layout_margin="5dp"
-            android:paddingRight="10dp"
             android:textSize="16sp" />
 
         <EditText
@@ -47,33 +61,39 @@
             style="@style/Widget.AppCompat.EditText"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:ems="10"
-            android:hint="Enter book name..."
-            android:inputType="text" />
+            android:hint="@string/enter_book_name"
+            android:inputType="text"
+            android:autofillHints="username" />
     </LinearLayout>
 
+    <!-- Thanh bộ lọc -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#F1F1F1"
         android:orientation="horizontal"
-        android:gravity="right">
+        android:gravity="end"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
         <ImageButton
             android:id="@+id/btnFilter"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="#F1F1F1"
-            android:src="@drawable/filter_alt_24px" />
+            android:src="@drawable/filter_alt_24px"
+            android:contentDescription="@string/filter" />
 
         <ImageButton
             android:id="@+id/btnSort"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="#F1F1F1"
-            app:srcCompat="@drawable/swap_vert_24px" />
+            app:srcCompat="@drawable/swap_vert_24px"
+            android:contentDescription="@string/sort" />
     </LinearLayout>
 
+    <!-- Loading -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
@@ -82,6 +102,7 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
+    <!-- Danh sách sách -->
     <GridView
         android:id="@+id/grid_view"
         android:layout_width="match_parent"
