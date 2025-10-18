@@ -16,7 +16,7 @@ public class CartManager {
 
     public void addToCart(Book book) {
         for (CartItem item : cartItems) {
-            if (item.getBook().getBookId().equals(book.getBookId())) {
+            if (item.getBook().getId().equals(book.getId())) {
                 item.setQuantity(item.getQuantity() + 1);
                 return;
             }
@@ -27,7 +27,7 @@ public class CartManager {
     public void addToCart(Book book, int quantity) {
         for (CartItem item : cartItems) {
             // if item already in cart, update quantity
-            if (item.getBook().getBookId().equals(book.getBookId())) {
+            if (item.getBook().getId().equals(book.getId())) {
                 item.setQuantity(item.getQuantity() + quantity);
                 return;
             }
@@ -37,7 +37,7 @@ public class CartManager {
     }
 
     public void removeFromCart(String bookId) {
-        cartItems.removeIf(item -> item.getBook().getBookId().equals(bookId));
+        cartItems.removeIf(item -> item.getBook().getId().equals(bookId));
     }
 
     public void clearCart() {

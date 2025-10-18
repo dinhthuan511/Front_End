@@ -56,11 +56,11 @@ public class CartAdapter extends BaseAdapter {
         Button btnMinus = convertView.findViewById(R.id.btnMinus);
         ImageButton btnRemove = convertView.findViewById(R.id.btnRemove);
 
-        txtBookName.setText(book.getName());
+        txtBookName.setText(book.getProductName());
         txtAuthor.setText("by " + book.getAuthor());
         txtPrice.setText("Total: $" + String.format("%.2f", item.getTotalPrice()));
         txtQuantity.setText(String.valueOf(item.getQuantity()));
-        Glide.with(context).load(book.getImageUrl()).into(imgBook);
+        Glide.with(context).load(book.getImageURL()).into(imgBook);
 
         btnPlus.setOnClickListener(v -> {
             item.setQuantity(item.getQuantity() + 1);
@@ -77,7 +77,7 @@ public class CartAdapter extends BaseAdapter {
         });
 
         btnRemove.setOnClickListener(v -> {
-            CartManager.getInstance().removeFromCart(book.getBookId());
+            CartManager.getInstance().removeFromCart(book.getId());
             onCartUpdated.run();
             notifyDataSetChanged();
         });

@@ -17,6 +17,13 @@
         android:gravity="right">
 
         <ImageButton
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/common_full_open_on_phone" />
+
+        <ImageButton
             android:id="@+id/btnCart"
             android:layout_width="40dp"
             android:layout_height="40dp"

@@ -1,45 +1,96 @@
+// D:/Project/Front_End/app/src/main/java/com/example/book_store_mobileapp/data/Book.java
+
 package com.example.book_store_mobileapp.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+// Triển khai Parcelable để có thể gửi đối tượng này qua Intent (ví dụ: sang BookDetailActivity)
 public class Book implements Parcelable {
-    private String bookId;
-    private String name;
+
+    // 1. ✅ TÊN THUỘC TÍNH ĐÃ KHỚP VỚI JSON TRÊN FIREBASE
+    private String id; // Dùng để lưu key của sản phẩm
+    private String productName;
+    private String briefDescription;
+    private String fullDescription;
+    private String technicalSpecifications;
+    private double price;
+    private String imageURL;
     private String author;
-    private String description;
-    private String imageUrl;
-    private Double price;
+    private String publisher;
+    private String isbn;
+    private int stock;
+    private int categoryID;
+    private int quantity; // Dùng cho giỏ hàng
 
-    // Constructor
-    public Book(String name, String bookId, String author, String description, String imageUrl, Double price) {
-        this.name = name;
-        this.bookId = bookId;
-        this.author = author;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.price = price;
+    // 2. ✅ BẮT BUỘC: CONSTRUCTOR RỖNG CHO FIREBASE
+    public Book() {
     }
 
-    // Parcelable constructor to read data from Parcel
-    protected Book(Parcel in){
-        bookId = in.readString();
-        name = in.readString();
+    // Constructor để đọc từ Parcelable (giữ nguyên)
+    protected Book(Parcel in) {
+        id = in.readString();
+        productName = in.readString();
+        briefDescription = in.readString();
+        fullDescription = in.readString();
+        technicalSpecifications = in.readString();
+        price = in.readDouble();
+        imageURL = in.readString();
         author = in.readString();
-        description = in.readString();
-        imageUrl = in.readString();
-        if(in.readByte() == 0){
-            price = null;
-        } else {
-            price = in.readDouble();
-        }
+        publisher = in.readString();
+        isbn = in.readString();
+        stock = in.readInt();
+        categoryID = in.readInt();
+        quantity = in.readInt();
     }
 
-    // Creator for Parcelable
+    // 3. ✅ GETTERS và SETTERS CHO TẤT CẢ CÁC THUỘC TÍNH
+    // Firebase cần chúng để đọc/ghi dữ liệu vào đối tượng
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
+
+    public String getBriefDescription() { return briefDescription; }
+    public void setBriefDescription(String briefDescription) { this.briefDescription = briefDescription; }
+
+    public String getFullDescription() { return fullDescription; }
+    public void setFullDescription(String fullDescription) { this.fullDescription = fullDescription; }
+
+    public String getTechnicalSpecifications() { return technicalSpecifications; }
+    public void setTechnicalSpecifications(String technicalSpecifications) { this.technicalSpecifications = technicalSpecifications; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    public String getImageURL() { return imageURL; }
+    public void setImageURL(String imageURL) { this.imageURL = imageURL; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public String getPublisher() { return publisher; }
+    public void setPublisher(String publisher) { this.publisher = publisher; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
+
+    public int getCategoryID() { return categoryID; }
+    public void setCategoryID(int categoryID) { this.categoryID = categoryID; }
+
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    // --- CÁC PHƯƠNG THỨC CỦA PARCELABLE (giữ nguyên) ---
+
     public static final Creator<Book> CREATOR = new Creator<Book>() {
         @Override
-        public Book createFromParcel(Parcel source) {
-            return new Book(source);
+        public Book createFromParcel(Parcel in) {
+            return new Book(in);
         }
 
         @Override
@@ -48,75 +99,25 @@ public class Book implements Parcelable {
         }
     };
 
-    // Describe content
     @Override
     public int describeContents() {
         return 0;
     }
 
-    // Write data to Parcel
     @Override
-    public void writeToParcel(Parcel dest, int flags){
-        dest.writeString(bookId);
-        dest.writeString(name);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(productName);
+        dest.writeString(briefDescription);
+        dest.writeString(fullDescription);
+        dest.writeString(technicalSpecifications);
+        dest.writeDouble(price);
+        dest.writeString(imageURL);
         dest.writeString(author);
-        dest.writeString(description);
-        dest.writeString(imageUrl);
-        if(price == null){
-            dest.writeByte((byte)0);
-        } else {
-            dest.writeByte((byte)1);
-            dest.writeDouble(price);
-        }
-    }
-
-    // Getters and setters
-
-    public String getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
+        dest.writeString(publisher);
+        dest.writeString(isbn);
+        dest.writeInt(stock);
+        dest.writeInt(categoryID);
+        dest.writeInt(quantity);
     }
 }

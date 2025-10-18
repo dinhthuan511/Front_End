@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -33,6 +34,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class StoreActivity extends AppCompatActivity {
 
     private GridView gridView;
@@ -45,7 +52,11 @@ public class StoreActivity extends AppCompatActivity {
     private List<Book> displayedBookList = new ArrayList<>();
     private String currentSearchQuery = "";
     private int activePriceFilter = -1;
-    private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
+//  private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
+
+    // Khai báo biến Firebase
+    private FirebaseAuth mAuth;
+    private DatabaseReference productsRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +70,10 @@ public class StoreActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Khởi tạo Firebase
+        mAuth = FirebaseAuth.getInstance();
+        productsRef = FirebaseDatabase.getInstance().getReference("products"); // Hướng tới bảng Products trên Realtime DB
+
         // ✅ Khởi tạo các nút
         btnCart = findViewById(R.id.btnCart);
         btnLogout = findViewById(R.id.btnLogout);
@@ -69,13 +84,13 @@ public class StoreActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         // ✅ Nút Logout
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        });
+//        btnLogout.setOnClickListener(v -> {
+//            FirebaseAuth.getInstance().signOut();
+//            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+//            finish();
+//        });
 
         // ✅ Nút Giỏ hàng
         btnCart.setOnClickListener(v -> {
@@ -170,35 +185,62 @@ public class StoreActivity extends AppCompatActivity {
     private void fetchBooks(){
         progressBar.setVisibility(View.VISIBLE); //Show loading
 
-        // 1. Initialize retrofit
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        // 2. Create API service instance
-        ApiService apiService = retrofit.create(ApiService.class);
-        // 3. Make API call
-        Call<List<Book>> call = apiService.getBooks();
-        call.enqueue(new Callback<List<Book>>() {
+        productsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
-                progressBar.setVisibility(View.GONE);
-                if(response.isSuccessful() && response.body() != null){
-                    //Clear old initial list and add new list
-                    initialBookList.clear();
-                    initialBookList.addAll(response.body());
-                    //Default displayed books
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                progressBar.setVisibility(View.GONE); // Ẩn loading
+                initialBookList.clear(); // Xóa danh sách cũ
+
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Book book = snapshot.getValue(Book.class);
+                        if (book != null) {
+                            book.setId(snapshot.getKey()); // Quan trọng: Lấy ID của sách từ key của snapshot
+                            initialBookList.add(book);
+                        }
+                    }
+                    // Cập nhật danh sách hiển thị mặc định
                     updateDisplayedBooks(initialBookList);
                 } else {
-                    Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StoreActivity.this, "Không tìm thấy sản phẩm nào.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Book>> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(StoreActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressBar.setVisibility(View.GONE); // Ẩn loading
+                Toast.makeText(StoreActivity.this, "Lỗi tải dữ liệu: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
+
+//        // 1. Initialize retrofit
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        // 2. Create API service instance
+//        ApiService apiService = retrofit.create(ApiService.class);
+//        // 3. Make API call
+//        Call<List<Book>> call = apiService.getBooks();
+//        call.enqueue(new Callback<List<Book>>() {
+//            @Override
+//            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+//                progressBar.setVisibility(View.GONE);
+//                if(response.isSuccessful() && response.body() != null){
+//                    //Clear old initial list and add new list
+//                    initialBookList.clear();
+//                    initialBookList.addAll(response.body());
+//                    //Default displayed books
+//                    updateDisplayedBooks(initialBookList);
+//                } else {
+//                    Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Book>> call, Throwable t) {
+//                progressBar.setVisibility(View.GONE);
+//                Toast.makeText(StoreActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
         });
     }
 
