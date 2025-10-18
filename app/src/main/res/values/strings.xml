@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Book_Store_MobileApp</string>
+    <string name="app_name">Book Store</string>
+    <string name="logout">Logout</string>
+    <string name="cart">Cart</string>
+    <string name="search_for">Search for:</string>
+    <string name="enter_book_name">Enter book name...</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
 </resources>
