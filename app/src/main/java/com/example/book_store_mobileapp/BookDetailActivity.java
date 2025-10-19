@@ -49,23 +49,23 @@ public class BookDetailActivity extends AppCompatActivity {
         // Check if book is not null
         if(book != null){
             // Set book data
-            detailBookName.setText(book.getName());
+            detailBookName.setText(book.getProductName());
             detailBookAuthor.setText("Author: " + book.getAuthor());
-            detailBookDescription.setText(book.getDescription());
+            detailBookDescription.setText(book.getFullDescription());
             // Format the price
             NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = format.format(book.getPrice());
             detailBookPrice.setText(formattedPrice + " VNĐ");
             // Set image with Glide
             Glide.with(this)
-                    .load(book.getImageUrl())
+                    .load(book.getImageURL())
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
             // Set event listener for Add to cart button
             btnAddToCart.setOnClickListener(v -> {
                 // Do Add to cart logic
-                Toast.makeText(this, book.getName() + " added to cart(to be implemented)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, book.getProductName() + " added to cart(to be implemented)", Toast.LENGTH_SHORT).show();
             });
         } else {
             // Handle book data null
