@@ -33,6 +33,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 public class StoreActivity extends AppCompatActivity {
 
     private GridView gridView;
@@ -45,7 +48,9 @@ public class StoreActivity extends AppCompatActivity {
     private List<Book> displayedBookList = new ArrayList<>();
     private String currentSearchQuery = "";
     private int activePriceFilter = -1;
-    private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+//    private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,10 @@ public class StoreActivity extends AppCompatActivity {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Khởi tạo Firebase
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         // ✅ Khởi tạo các nút
         btnCart = findViewById(R.id.btnCart);
@@ -163,36 +172,53 @@ public class StoreActivity extends AppCompatActivity {
     private void fetchBooks(){
         progressBar.setVisibility(View.VISIBLE); //Show loading
 
-        // 1. Initialize retrofit
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        // 2. Create API service instance
-        ApiService apiService = retrofit.create(ApiService.class);
-        // 3. Make API call
-        Call<List<Book>> call = apiService.getBooks();
-        call.enqueue(new Callback<List<Book>>() {
-            @Override
-            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
-                progressBar.setVisibility(View.GONE);
-                if(response.isSuccessful() && response.body() != null){
-                    //Clear old initial list and add new list
-                    initialBookList.clear();
-                    initialBookList.addAll(response.body());
-                    //Default displayed books
-                    updateDisplayedBooks(initialBookList);
-                } else {
-                    Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
-                }
-            }
+        db.collection("products")
+                .get()
+                .addOnCompleteListener(task -> {
+                    progressBar.setVisibility(View.GONE);
+                    if(task.isSuccessful()){
+                        initialBookList.clear(); // Xóa danh sách cũ
+                        for(QueryDocumentSnapshot document : task.getResult()){
+                            Book book = document.toObject(Book.class);
+                            book.setId(document.getId());
+                            initialBookList.add(book);
+                        }
+                        updateDisplayedBooks(initialBookList);
+                    } else {
+                        Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-            @Override
-            public void onFailure(Call<List<Book>> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(StoreActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        // 1. Initialize retrofit
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        // 2. Create API service instance
+//        ApiService apiService = retrofit.create(ApiService.class);
+//        // 3. Make API call
+//        Call<List<Book>> call = apiService.getBooks();
+//        call.enqueue(new Callback<List<Book>>() {
+//            @Override
+//            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+//                progressBar.setVisibility(View.GONE);
+//                if(response.isSuccessful() && response.body() != null){
+//                    //Clear old initial list and add new list
+//                    initialBookList.clear();
+//                    initialBookList.addAll(response.body());
+//                    //Default displayed books
+//                    updateDisplayedBooks(initialBookList);
+//                } else {
+//                    Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Book>> call, Throwable t) {
+//                progressBar.setVisibility(View.GONE);
+//                Toast.makeText(StoreActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 }

@@ -77,32 +77,32 @@ public class CartActivity extends AppCompatActivity {
     private void addDemoData() {
         ArrayList<Book> demoBooks = new ArrayList<>();
 
-        demoBooks.add(new Book(
-                "1",
-                "Clean Code",
-                "Robert C. Martin",
-                "Cuốn sách kinh điển giúp lập trình viên viết code sạch, dễ đọc và bảo trì.",
-                "https://images-na.ssl-images-amazon.com/images/I/41xShlnTZTL._SX374_BO1,204,203,200_.jpg",
-                15.99
-        ));
-
-        demoBooks.add(new Book(
-                "2",
-                "Effective Java",
-                "Joshua Bloch",
-                "Tổng hợp hơn 70 hướng dẫn thực tiễn giúp bạn viết Java hiệu quả và an toàn hơn.",
-                "https://m.media-amazon.com/images/I/41zoxjP9lcL.jpg",
-                22.50
-        ));
-
-        demoBooks.add(new Book(
-                "3",
-                "Android Programming: Big Nerd Ranch Guide",
-                "Big Nerd Ranch",
-                "Hướng dẫn toàn diện về lập trình Android cho cả người mới và chuyên nghiệp.",
-                "https://m.media-amazon.com/images/I/51W9E4EupvL._SX260_.jpg",
-                30.00
-        ));
+//        demoBooks.add(new Book(
+//                "1",
+//                "Clean Code",
+//                "Robert C. Martin",
+//                "Cuốn sách kinh điển giúp lập trình viên viết code sạch, dễ đọc và bảo trì.",
+//                "https://images-na.ssl-images-amazon.com/images/I/41xShlnTZTL._SX374_BO1,204,203,200_.jpg",
+//                15.99
+//        ));
+//
+//        demoBooks.add(new Book(
+//                "2",
+//                "Effective Java",
+//                "Joshua Bloch",
+//                "Tổng hợp hơn 70 hướng dẫn thực tiễn giúp bạn viết Java hiệu quả và an toàn hơn.",
+//                "https://m.media-amazon.com/images/I/41zoxjP9lcL.jpg",
+//                22.50
+//        ));
+//
+//        demoBooks.add(new Book(
+//                "3",
+//                "Android Programming: Big Nerd Ranch Guide",
+//                "Big Nerd Ranch",
+//                "Hướng dẫn toàn diện về lập trình Android cho cả người mới và chuyên nghiệp.",
+//                "https://m.media-amazon.com/images/I/51W9E4EupvL._SX260_.jpg",
+//                30.00
+//        ));
 
         for (Book book : demoBooks) {
             CartManager.getInstance().addToCart(book);

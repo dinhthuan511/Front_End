@@ -39,14 +39,14 @@ public class BookAdapter extends ArrayAdapter<Book> {
         TextView bookPrice = listItemView.findViewById(R.id.book_price);
 
         // Set book data
-        bookName.setText(currentBook.getName());
+        bookName.setText(currentBook.getProductName());
         // Format the price
         NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
         String formattedPrice = format.format(currentBook.getPrice());
         bookPrice.setText(formattedPrice + " VNĐ");
         // Set image with Glide
         Glide.with(getContext())
-                .load(currentBook.getImageUrl())
+                .load(currentBook.getImageURL())
                 .placeholder(android.R.drawable.dark_header)
                 .error(android.R.drawable.dark_header)
                 .into(bookImage);
