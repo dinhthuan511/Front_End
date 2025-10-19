@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.book_store_mobileapp.adapter.CartAdapter;
-import com.example.book_store_mobileapp.data.CartManager;
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -15,7 +18,10 @@ public class CartActivity extends AppCompatActivity {
     private ListView listView;
     private TextView txtTotal;
     private Button btnClear, btnCheckout;
+    private ImageButton btnBack;
     private CartAdapter adapter;
+    private ArrayList<Book> cartItems = new ArrayList<>();
+    private FirebaseCartService cartService; // ✅
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,91 +33,98 @@ public class CartActivity extends AppCompatActivity {
         txtTotal = findViewById(R.id.txtTotal);
         btnClear = findViewById(R.id.btnClear);
         btnCheckout = findViewById(R.id.btnCheckout);
+        btnBack = findViewById(R.id.btnBack);
 
-        ImageButton btnBack = findViewById(R.id.btnBack);
+        // Khởi tạo service Firebase
+        cartService = new FirebaseCartService();
+
+        // Quay lại StoreActivity
         btnBack.setOnClickListener(v -> {
-            // Quay lại StoreActivity
-            Intent intent = new Intent(CartActivity.this, StoreActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(CartActivity.this, StoreActivity.class));
             finish();
         });
 
-        // 🟢 THÊM DỮ LIỆU MẪU NẾU GIỎ HÀNG ĐANG TRỐNG
-        if (CartManager.getInstance().getCartItems().isEmpty()) {
-            addDemoData();
-        }
-
-        // Gắn adapter
-        adapter = new CartAdapter(
-                this,
-                CartManager.getInstance().getCartItems(),
-                this::updateTotal
-        );
+        // Adapter
+        adapter = new CartAdapter(this, cartItems, this::updateTotal);
         listView.setAdapter(adapter);
 
-        // Hiển thị tổng ban đầu
-        updateTotal();
+        // Tải dữ liệu từ Firebase
+        loadCartFromFirebase();
 
-        // Nút xóa giỏ hàng
+        // Xóa toàn bộ giỏ hàng
         btnClear.setOnClickListener(v -> {
-            CartManager.getInstance().clearCart();
-            adapter.notifyDataSetChanged();
-            updateTotal();
-            Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng", Toast.LENGTH_SHORT).show();
+            cartService.clearCart(
+                    () -> {
+                        cartItems.clear();
+                        adapter.notifyDataSetChanged();
+                        updateTotal();
+                        Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng", Toast.LENGTH_SHORT).show();
+                    },
+                    () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng", Toast.LENGTH_SHORT).show()
+            );
         });
 
-        // Nút thanh toán
+        // Thanh toán
         btnCheckout.setOnClickListener(v -> {
-            double total = CartManager.getInstance().getTotalPrice();
+            double total = calculateTotal();
             if (total == 0) {
                 Toast.makeText(this, "Giỏ hàng đang trống!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
-                CartManager.getInstance().clearCart();
+                return;
+            }
+
+            Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
+
+            cartService.clearCart(
+                    () -> {
+                        cartItems.clear();
+                        adapter.notifyDataSetChanged();
+                        updateTotal();
+                    },
+                    () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng sau thanh toán", Toast.LENGTH_SHORT).show()
+            );
+        });
+    }
+
+    // 🟢 Hàm tải dữ liệu Firestore
+    private void loadCartFromFirebase() {
+        cartService.getCartRef().get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                cartItems.clear();
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null) {
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Book book = new Book(
+                                doc.getString("bookId"),
+                                doc.getString("productName"),
+                                doc.getString("author"),
+                                "", // Mô tả
+                                doc.getString("imageURL"),
+                                doc.getDouble("price")
+                        );
+
+                        Long q = doc.getLong("quantity");
+                        book.setQuantity(q != null ? q.intValue() : 1);
+                        cartItems.add(book);
+                    }
+                }
                 adapter.notifyDataSetChanged();
                 updateTotal();
+            } else {
+                Toast.makeText(this, "Không thể tải giỏ hàng!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void addDemoData() {
-        ArrayList<Book> demoBooks = new ArrayList<>();
-
-        demoBooks.add(new Book(
-                "1",
-                "Clean Code",
-                "Robert C. Martin",
-                "Cuốn sách kinh điển giúp lập trình viên viết code sạch, dễ đọc và bảo trì.",
-                "https://images-na.ssl-images-amazon.com/images/I/41xShlnTZTL._SX374_BO1,204,203,200_.jpg",
-                15.99
-        ));
-
-        demoBooks.add(new Book(
-                "2",
-                "Effective Java",
-                "Joshua Bloch",
-                "Tổng hợp hơn 70 hướng dẫn thực tiễn giúp bạn viết Java hiệu quả và an toàn hơn.",
-                "https://m.media-amazon.com/images/I/41zoxjP9lcL.jpg",
-                22.50
-        ));
-
-        demoBooks.add(new Book(
-                "3",
-                "Android Programming: Big Nerd Ranch Guide",
-                "Big Nerd Ranch",
-                "Hướng dẫn toàn diện về lập trình Android cho cả người mới và chuyên nghiệp.",
-                "https://m.media-amazon.com/images/I/51W9E4EupvL._SX260_.jpg",
-                30.00
-        ));
-
-        for (Book book : demoBooks) {
-            CartManager.getInstance().addToCart(book);
-        }
+    // 🧮 Cập nhật tổng tiền
+    private void updateTotal() {
+        txtTotal.setText("$" + String.format("%.2f", calculateTotal()));
     }
 
-
-    private void updateTotal() {
-        double total = CartManager.getInstance().getTotalPrice();
-        txtTotal.setText("$" + String.format("%.2f", total));
+    private double calculateTotal() {
+        double total = 0;
+        for (Book b : cartItems) {
+            total += b.getPrice() * b.getQuantity();
+        }
+        return total;
     }
 }

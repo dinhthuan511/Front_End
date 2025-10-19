@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -22,30 +21,24 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.book_store_mobileapp.adapter.BookAdapter;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.BookFilter;
-import com.example.book_store_mobileapp.network.ApiService;
+import com.example.book_store_mobileapp.network.FirebaseBookService;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import com.google.firebase.auth.FirebaseAuth;
 public class StoreActivity extends AppCompatActivity {
 
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnCart, btnFilter, btnSort, btnLogout; // ✅ thêm btnLogout
+    private ImageButton btnCart, btnFilter, btnSort, btnLogout;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
     private List<Book> displayedBookList = new ArrayList<>();
     private String currentSearchQuery = "";
     private int activePriceFilter = -1;
-    private static final String BASE_URL = "https://68d4d784e29051d1c0ac400e.mockapi.io/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +52,7 @@ public class StoreActivity extends AppCompatActivity {
             return insets;
         });
 
-        // ✅ Khởi tạo các nút
+        // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
         btnLogout = findViewById(R.id.btnLogout);
         btnFilter = findViewById(R.id.btnFilter);
@@ -68,7 +61,7 @@ public class StoreActivity extends AppCompatActivity {
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
 
-        // ✅ Nút Logout
+        // ✅ Logout
         btnLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
@@ -77,19 +70,19 @@ public class StoreActivity extends AppCompatActivity {
             finish();
         });
 
-        // ✅ Nút Giỏ hàng
+        // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {
             Intent intent = new Intent(StoreActivity.this, CartActivity.class);
             startActivity(intent);
         });
 
-        // --- phần dưới giữ nguyên ---
+        // ✅ Bộ lọc & sắp xếp
         bookFilter = new BookFilter();
         txtSearchName.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {}
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 currentSearchQuery = s.toString();
@@ -122,6 +115,7 @@ public class StoreActivity extends AppCompatActivity {
 
         bookAdapter = new BookAdapter(this, displayedBookList);
         gridView.setAdapter(bookAdapter);
+
         gridView.setOnItemClickListener((parent, view, position, id) -> {
             Book selectedBook = displayedBookList.get(position);
             Intent intent = new Intent(StoreActivity.this, BookDetailActivity.class);
@@ -129,13 +123,12 @@ public class StoreActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        fetchBooks();
+        fetchBooksFromFirebase();
     }
 
     private void applyFiltersAndSearch() {
-        // 1. Start with the full list
         List<Book> filteredList = new ArrayList<>(initialBookList);
-        // 2. Apply the price filter first (if one is active)
+
         if (activePriceFilter != -1) {
             if (activePriceFilter == 0) { // Under 100,000
                 filteredList = bookFilter.filterBooksByPriceRange(filteredList, 0, 99999);
@@ -145,54 +138,40 @@ public class StoreActivity extends AppCompatActivity {
                 filteredList = bookFilter.filterBooksByPriceRange(filteredList, 200001, Double.MAX_VALUE);
             }
         }
-        // 3. Then, apply the search query on the result of the price filter
+
         if (!currentSearchQuery.isEmpty()) {
             filteredList = bookFilter.searchBooks(filteredList, currentSearchQuery);
         }
-        // 4. Finally, update the UI
+
         updateDisplayedBooks(filteredList);
     }
-    private void updateDisplayedBooks(List<Book> bookList){
-        //Clear old displayed list and add new list
+
+    private void updateDisplayedBooks(List<Book> bookList) {
         displayedBookList.clear();
         displayedBookList.addAll(bookList);
-        //Notify the adapter that the data has changed
         bookAdapter.notifyDataSetChanged();
     }
 
-    private void fetchBooks(){
-        progressBar.setVisibility(View.VISIBLE); //Show loading
+    /**
+     * 🟢 Load sách từ Firestore thay cho MockAPI
+     */
+    private void fetchBooksFromFirebase() {
+        progressBar.setVisibility(View.VISIBLE);
 
-        // 1. Initialize retrofit
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        // 2. Create API service instance
-        ApiService apiService = retrofit.create(ApiService.class);
-        // 3. Make API call
-        Call<List<Book>> call = apiService.getBooks();
-        call.enqueue(new Callback<List<Book>>() {
+        FirebaseBookService.getInstance().getAllBooks(new FirebaseBookService.FirestoreCallback<List<Book>>() {
             @Override
-            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+            public void onSuccess(List<Book> data) {
                 progressBar.setVisibility(View.GONE);
-                if(response.isSuccessful() && response.body() != null){
-                    //Clear old initial list and add new list
-                    initialBookList.clear();
-                    initialBookList.addAll(response.body());
-                    //Default displayed books
-                    updateDisplayedBooks(initialBookList);
-                } else {
-                    Toast.makeText(StoreActivity.this, "Fail to retrive books", Toast.LENGTH_SHORT).show();
-                }
+                initialBookList.clear();
+                initialBookList.addAll(data);
+                updateDisplayedBooks(initialBookList);
             }
 
             @Override
-            public void onFailure(Call<List<Book>> call, Throwable t) {
+            public void onError(String message) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(StoreActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }
