@@ -87,9 +87,15 @@ public class StoreActivity extends AppCompatActivity {
         bookFilter = new BookFilter();
         txtSearchName.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {
+                // not needed
+            }
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //not needed
+            }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 currentSearchQuery = s.toString();
@@ -160,6 +166,7 @@ public class StoreActivity extends AppCompatActivity {
         bookAdapter.notifyDataSetChanged();
     }
 
+    // Get book from API
     private void fetchBooks(){
         progressBar.setVisibility(View.VISIBLE); //Show loading
 

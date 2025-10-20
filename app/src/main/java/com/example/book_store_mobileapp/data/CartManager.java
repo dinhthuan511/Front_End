@@ -24,6 +24,18 @@ public class CartManager {
         cartItems.add(new CartItem(book, 1));
     }
 
+    public void addToCart(Book book, int quantity) {
+        for (CartItem item : cartItems) {
+            // if item already in cart, update quantity
+            if (item.getBook().getBookId().equals(book.getBookId())) {
+                item.setQuantity(item.getQuantity() + quantity);
+                return;
+            }
+        }
+        // if item not in cart, add new item
+        cartItems.add(new CartItem(book, quantity));
+    }
+
     public void removeFromCart(String bookId) {
         cartItems.removeIf(item -> item.getBook().getBookId().equals(bookId));
     }
