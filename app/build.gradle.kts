@@ -51,5 +51,9 @@ dependencies {
     implementation("com.google.firebase:firebase-database:21.0.0")
 // nếu lưu thêm user info
 
+    implementation("com.google.firebase:firebase-messaging:24.0.2")
+    // Firebase core & messaging
 
+    implementation("androidx.core:core-ktx:1.13.1")
+    // AndroidX core for notifications
 }
