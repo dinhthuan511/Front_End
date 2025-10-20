@@ -33,8 +33,14 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".UserProfileActivity"
-            android:exported="false" />
+            android:name=".SettingsActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".AccountSecurityActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".AddressActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".StoreActivity"

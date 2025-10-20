@@ -16,7 +16,7 @@
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:tint="#FF6A00"
-        android:src="@drawable/ic_round_shield_24"/>
+        android:src="@drawable/outline_house_with_shield_24"/>
 
     <TextView
         android:id="@+id/title"

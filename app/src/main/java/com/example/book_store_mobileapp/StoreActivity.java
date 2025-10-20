@@ -71,10 +71,9 @@ public class StoreActivity extends AppCompatActivity {
             finish();
         });
 
-        // ✅ Hồ sơ người dùng
+        // ✅ Mở trang Settings (có 2 ô: Tài khoản & Bảo mật, Địa chỉ)
         btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(StoreActivity.this, UserProfileActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(StoreActivity.this, SettingsActivity.class));
         });
 
         // ✅ Giỏ hàng
