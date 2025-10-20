@@ -13,7 +13,7 @@ public class NotificationService extends FirebaseMessagingService {
     public void onNewToken(String token) {
         super.onNewToken(token);
         Log.d(TAG, "FCM token: " + token);
-        // Optionally send token to your backend if needed later
+        // Optionally send token to backend if needed later
     }
 
     @Override
