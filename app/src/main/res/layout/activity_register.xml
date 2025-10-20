@@ -2,97 +2,99 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9FAFB"
-    android:padding="24dp">
+    android:fillViewport="true"
+    android:background="#FFFFFF">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp"
         android:gravity="center_horizontal">
 
+        <!-- App name -->
         <TextView
-            android:text="Đăng ký tài khoản"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/editUsername"
-            android:hint="Tên người dùng"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
+            android:text="Đăng ký tài khoản"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#3F51B5"
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="100dp"/>
+
+        <!-- Username -->
+        <EditText
+            android:id="@+id/edtUsername"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Tên đăng nhập (bắt buộc)"
+            android:inputType="text"
             android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
+            android:background="@android:drawable/edit_text" />
 
+        <!-- Password -->
         <EditText
-            android:id="@+id/editEmail"
-            android:hint="Email"
-            android:layout_marginTop="12dp"
+            android:id="@+id/edtPassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
-
-        <EditText
-            android:id="@+id/editPassword"
-            android:hint="Mật khẩu"
+            android:layout_height="48dp"
             android:layout_marginTop="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:hint="Mật khẩu (bắt buộc)"
             android:inputType="textPassword"
             android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
+            android:background="@android:drawable/edit_text" />
+
+        <!-- Optional fields -->
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Email (tuỳ chọn)"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text" />
 
         <EditText
-            android:id="@+id/editPhone"
-            android:hint="Số điện thoại"
-            android:layout_marginTop="12dp"
+            android:id="@+id/edtPhone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Số điện thoại (tuỳ chọn)"
             android:inputType="phone"
             android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
+            android:background="@android:drawable/edit_text" />
 
         <EditText
-            android:id="@+id/editAddress"
-            android:hint="Địa chỉ"
-            android:layout_marginTop="12dp"
+            android:id="@+id/edtAddress"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Địa chỉ (tuỳ chọn)"
             android:inputType="textPostalAddress"
             android:padding="12dp"
-            android:background="@android:drawable/editbox_background" />
+            android:background="@android:drawable/edit_text" />
 
+        <!-- Register button -->
         <Button
             android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
             android:text="Đăng ký"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="#1976D2"
+            android:backgroundTint="#3F51B5"
             android:textColor="#FFFFFF" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:visibility="gone"
-            android:layout_marginTop="16dp"
+        <!-- Back to login -->
+        <TextView
+            android:id="@+id/btnGoToLogin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btnBackToLogin"
-            android:text="Đã có tài khoản? Đăng nhập"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="← Quay lại đăng nhập"
+            android:textColor="#3F51B5"
+            android:textStyle="bold"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#9E9E9E"
-            android:textColor="#FFFFFF" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 </ScrollView>

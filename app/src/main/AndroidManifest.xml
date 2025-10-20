@@ -12,6 +12,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
+
+        <!-- Admin/Store/…: không có intent-filter => exported=false -->
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StoreActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BookDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+
+        <!-- Chỉ Login có LAUNCHER nên exported=true -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
@@ -20,15 +36,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".StoreActivity" android:exported="false" />
-        <activity android:name=".BookDetailActivity" android:exported="false" />
-        <activity android:name=".CartActivity" android:exported="false" />
-
     </application>
+
 
 </manifest>

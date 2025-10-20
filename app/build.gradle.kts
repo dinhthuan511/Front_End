@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.gms.google-services")
+    id("com.google.gms.google-services") // cần cho Firebase
 }
 
 android {
@@ -33,23 +33,33 @@ android {
 }
 
 dependencies {
-
+    // AndroidX
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    // For making API calls (Retrofit)
+
+    // Network
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    // For loading images from a URL (Glide)
+
+    // Image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.firebase:firebase-database:21.0.0")
-// nếu lưu thêm user info
+    // ===== Firebase (dùng BoM để đồng bộ version) =====
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
 
+    // Auth (không ghi version khi dùng BoM)
+    implementation("com.google.firebase:firebase-auth")
 
+    // Firestore (để map username -> email và login bằng username)
+    implementation("com.google.firebase:firebase-firestore")
+
+    // (Tuỳ chọn) Realtime Database – chỉ giữ nếu bạn thật sự dùng
+    // implementation("com.google.firebase:firebase-database")
 }
