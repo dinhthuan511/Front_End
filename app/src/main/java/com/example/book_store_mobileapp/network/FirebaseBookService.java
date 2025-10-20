@@ -28,7 +28,7 @@ public class FirebaseBookService {
     }
 
     private CollectionReference getBookRef() {
-        return db.collection("books");
+        return db.collection("products");
     }
 
     /**
@@ -40,12 +40,17 @@ public class FirebaseBookService {
                 List<Book> books = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {
                     Book book = new Book(
-                            doc.getId(), // bookId
-                            doc.getString("productName") != null ? doc.getString("productName") : doc.getString("name"),
+                            doc.getId(),
+                            doc.getString("productName"),
                             doc.getString("author"),
-                            doc.getString("description"),
-                            doc.getString("imageURL") != null ? doc.getString("imageURL") : doc.getString("imageUrl"),
-                            doc.getDouble("price")
+                            doc.getString("briefDescription"),
+                            doc.getString("fullDescription"),
+                            doc.getLong("categoryId"),
+                            doc.getString("imageURL"),
+                            doc.getString("isbn"),
+                            doc.getDouble("price"),
+                            doc.getLong("stock"),
+                            doc.getString("technicalSpecifications")
                     );
                     books.add(book);
                 }
@@ -65,11 +70,16 @@ public class FirebaseBookService {
                 DocumentSnapshot doc = task.getResult();
                 Book book = new Book(
                         doc.getId(),
-                        doc.getString("productName") != null ? doc.getString("productName") : doc.getString("name"),
+                        doc.getString("productName"),
                         doc.getString("author"),
-                        doc.getString("description"),
-                        doc.getString("imageURL") != null ? doc.getString("imageURL") : doc.getString("imageUrl"),
-                        doc.getDouble("price")
+                        doc.getString("briefDescription"),
+                        doc.getString("fullDescription"),
+                        doc.getLong("categoryId"),
+                        doc.getString("imageURL"),
+                        doc.getString("isbn"),
+                        doc.getDouble("price"),
+                        doc.getLong("stock"),
+                        doc.getString("technicalSpecifications")
                 );
                 listener.onSuccess(book);
             } else {

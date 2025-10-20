@@ -13,7 +13,7 @@ public class BookFilter {
         List<Book> filteredList = new ArrayList<>();
         String lowerCaseQuery = query.toLowerCase();
         for(Book book : bookList){
-            if(book.getProductName().toLowerCase().contains(lowerCaseQuery)){
+            if(book.getName().toLowerCase().contains(lowerCaseQuery)){
                 filteredList.add(book);
             }
         }
@@ -39,7 +39,7 @@ public class BookFilter {
                 bookList.sort((book1, book2) -> Double.compare(book2.getPrice(), book1.getPrice()));
                 break;
             default:
-                bookList.sort((book1, book2) -> book1.getId().compareTo(book2.getId()));
+                bookList.sort((book1, book2) -> book1.getBookId().compareTo(book2.getBookId()));
                 break;
         }
     }

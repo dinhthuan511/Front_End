@@ -97,9 +97,14 @@ public class CartActivity extends AppCompatActivity {
                                 doc.getString("bookId"),
                                 doc.getString("productName"),
                                 doc.getString("author"),
-                                "", // Mô tả
+                                doc.getString("briefDescription"),
+                                doc.getString("fullDescription"),
+                                doc.getLong("categoryId"),
                                 doc.getString("imageURL"),
-                                doc.getDouble("price")
+                                doc.getString("isbn"),
+                                doc.getDouble("price"),
+                                doc.getLong("stock"),
+                                doc.getString("technicalSpecifications")
                         );
 
                         Long q = doc.getLong("quantity");
