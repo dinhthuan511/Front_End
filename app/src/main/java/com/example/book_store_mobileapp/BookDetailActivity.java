@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.network.FirebaseCartService;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -23,6 +24,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private ImageView detailBookImage;
     private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice;
     private Button btnAddToCart;
+    private FirebaseCartService cartService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,9 @@ public class BookDetailActivity extends AppCompatActivity {
         detailBookDescription = findViewById(R.id.bookDescription);
         detailBookPrice = findViewById(R.id.bookPrice);
         btnAddToCart = findViewById(R.id.btnAddToCart);
+
+        // Initialize FirebaseCartService
+        cartService = new FirebaseCartService();
 
         // Get Book from intent
         Book book = getIntent().getParcelableExtra("SELECTED_BOOK");
@@ -65,7 +70,10 @@ public class BookDetailActivity extends AppCompatActivity {
             // Set event listener for Add to cart button
             btnAddToCart.setOnClickListener(v -> {
                 // Do Add to cart logic
-                Toast.makeText(this, book.getName() + " added to cart(to be implemented)", Toast.LENGTH_SHORT).show();
+                cartService.addToCart(book, 1,
+                        () -> Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show(),
+                        () -> Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show()
+                );
             });
         } else {
             // Handle book data null
