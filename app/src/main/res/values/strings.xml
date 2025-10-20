@@ -6,4 +6,5 @@
     <string name="enter_book_name">Enter book name...</string>
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
+    <string name="user">User</string>
 </resources>

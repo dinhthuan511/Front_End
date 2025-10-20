@@ -69,6 +69,9 @@ public class BookDetailActivity extends AppCompatActivity {
 
             // Set event listener for Add to cart button
             btnAddToCart.setOnClickListener(v -> {
+                // check token cua user neu chua co chuyen qua trang login
+
+
                 // Do Add to cart logic
                 cartService.addToCart(book, 1,
                         () -> Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show(),

@@ -32,7 +32,7 @@ public class StoreActivity extends AppCompatActivity {
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnCart, btnFilter, btnSort, btnLogout;
+    private ImageButton btnCart, btnFilter, btnSort, btnLogout, btnProfile ;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -60,6 +60,7 @@ public class StoreActivity extends AppCompatActivity {
         txtSearchName = findViewById(R.id.txtSearchName);
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
+        btnProfile = findViewById(R.id.btnProfile);
 
         // ✅ Logout
         btnLogout.setOnClickListener(v -> {
@@ -68,6 +69,12 @@ public class StoreActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
+        });
+
+        // ✅ Hồ sơ người dùng
+        btnProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(StoreActivity.this, UserProfileActivity.class);
+            startActivity(intent);
         });
 
         // ✅ Giỏ hàng
