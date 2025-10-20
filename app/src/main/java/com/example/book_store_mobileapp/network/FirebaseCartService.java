@@ -41,9 +41,14 @@ public class FirebaseCartService {
         cartItem.put("bookId", book.getBookId());
         cartItem.put("productName", book.getName());
         cartItem.put("author", book.getAuthor());
-        cartItem.put("description", book.getDescription());
+        cartItem.put("briefDescription", book.getBriefDescription());
+        cartItem.put("fullDescription", book.getFullDescription());
+        cartItem.put("categoryId", book.getCategoryId());
         cartItem.put("imageURL", book.getImageUrl());
+        cartItem.put("isbn", book.getIsbn());
         cartItem.put("price", book.getPrice());
+        cartItem.put("stock", book.getStock());
+        cartItem.put("technicalSpecifications", book.getTechnicalSpecifications());
         cartItem.put("quantity", quantity);
 
         getCartRef().document(book.getBookId())
