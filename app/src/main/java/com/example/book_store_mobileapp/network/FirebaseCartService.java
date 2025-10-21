@@ -1,11 +1,17 @@
 package com.example.book_store_mobileapp.network;
 
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
+
 import com.example.book_store_mobileapp.data.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
@@ -21,21 +27,23 @@ public class FirebaseCartService {
         userId = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                 : null;
+        Log.d(TAG, "UserID hiện tại: " + userId);
     }
 
-    // 🟢 Cho phép class khác (như CartActivity) truy cập
     public CollectionReference getCartRef() {
-        return db.collection("users").document(userId).collection("cart");
+        return db.collection("users")
+                .document(userId)
+                .collection("cart");
     }
 
-    /**
-     * 🟢 Thêm sản phẩm vào giỏ hàng trên Firestore
-     */
     public void addToCart(Book book, int quantity, Runnable onSuccess, Runnable onFailure) {
         if (userId == null) {
+            Log.e(TAG, " Không thể thêm vào giỏ hàng - userId null (chưa đăng nhập).");
             if (onFailure != null) onFailure.run();
             return;
         }
+
+        Log.d(TAG, " Đang thêm sách vào giỏ hàng: " + book.getName());
 
         Map<String, Object> cartItem = new HashMap<>();
         cartItem.put("bookId", book.getBookId());
@@ -51,19 +59,46 @@ public class FirebaseCartService {
         cartItem.put("technicalSpecifications", book.getTechnicalSpecifications());
         cartItem.put("quantity", quantity);
 
-        getCartRef().document(book.getBookId())
-                .set(cartItem)
-                .addOnSuccessListener(unused -> {
-                    if (onSuccess != null) onSuccess.run();
+        getCartRef()
+                .whereEqualTo("bookId", book.getBookId())
+                .get()
+                .addOnSuccessListener(query -> {
+                    if (!query.isEmpty()) {
+                        String docId = query.getDocuments().get(0).getId();
+                        Log.d(TAG, " Sách đã có trong giỏ hàng, cập nhật số lượng...");
+                        getCartRef().document(docId)
+                                .update("quantity", FieldValue.increment(quantity))
+                                .addOnSuccessListener(unused -> {
+                                    Log.d(TAG, "Cập nhật số lượng thành công.");
+                                    if (onSuccess != null) onSuccess.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, " Lỗi khi cập nhật số lượng: ", e);
+                                    if (onFailure != null) onFailure.run();
+                                });
+                    } else {
+                        // Nếu chưa có, thêm mới
+                        Log.d(TAG, "Thêm sách mới vào giỏ hàng...");
+                        getCartRef()
+                                .add(cartItem)
+                                .addOnSuccessListener(unused -> {
+                                    Log.d(TAG, " Thêm mới thành công vào Firestore!");
+                                    if (onSuccess != null) onSuccess.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, " Lỗi khi thêm mới sản phẩm vào giỏ hàng: ", e);
+                                    if (onFailure != null) onFailure.run();
+                                });
+                    }
                 })
                 .addOnFailureListener(e -> {
+                    Log.e(TAG, " Lỗi khi kiểm tra tồn tại trong giỏ hàng: ", e);
                     if (onFailure != null) onFailure.run();
                 });
     }
 
-    /**
-     * 🔴 Xóa sản phẩm khỏi giỏ hàng
-     */
+
+
     public void removeFromCart(String bookId, Runnable onSuccess, Runnable onFailure) {
         if (userId == null) {
             if (onFailure != null) onFailure.run();
@@ -98,7 +133,6 @@ public class FirebaseCartService {
                     if (onFailure != null) onFailure.run();
                 });
     }
-
     /**
      * 🧹 Xóa toàn bộ giỏ hàng (sử dụng batch)
      */

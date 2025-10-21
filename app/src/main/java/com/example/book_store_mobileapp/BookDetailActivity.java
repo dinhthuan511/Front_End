@@ -1,6 +1,8 @@
 package com.example.book_store_mobileapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -67,12 +69,17 @@ public class BookDetailActivity extends AppCompatActivity {
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
-            // Set event listener for Add to cart button
             btnAddToCart.setOnClickListener(v -> {
-                // Do Add to cart logic
+                Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
                 cartService.addToCart(book, 1,
-                        () -> Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show(),
-                        () -> Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show()
+                        () -> {
+                            Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
+                            Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                        },
+                        () -> {
+                            Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
+                            Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                        }
                 );
             });
         } else {
