@@ -3,6 +3,7 @@ package com.example.book_store_mobileapp.network;
 import androidx.annotation.NonNull;
 
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.data.BookCategory;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,6 +32,8 @@ public class FirebaseBookService {
         return db.collection("products");
     }
 
+    private CollectionReference getCategoryRef() { return db.collection("categories");}
+
     /**
      * 🟢 Lấy tất cả sách từ Firestore
      */
@@ -57,6 +60,26 @@ public class FirebaseBookService {
                 listener.onSuccess(books);
             } else {
                 listener.onError("Không thể tải danh sách sách");
+            }
+        });
+    }
+
+    /**
+     * 🟡 Lấy tất cả thể loại từ Firestore
+     */
+    public void getAllCategories(@NonNull FirestoreCallback<List<BookCategory>> listener) {
+        getCategoryRef().get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<BookCategory> categories = new ArrayList<>();
+                for (DocumentSnapshot doc : task.getResult()) {
+                    BookCategory category = new BookCategory(
+                            doc.getId(),
+                            doc.getString("categoryName"));
+                    categories.add(category);
+                }
+                listener.onSuccess(categories);
+            } else {
+                listener.onError("Không thể tải danh sách thể loại");
             }
         });
     }

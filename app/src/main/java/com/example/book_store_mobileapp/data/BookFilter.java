@@ -30,6 +30,21 @@ public class BookFilter {
         return filteredList;
     }
 
+    // Thêm phương thức này vào file BookFilter.java
+    public List<Book> filterBooksByCategories(List<Book> books, List<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+        return books; // Nếu không có id nào được chọn, trả về danh sách gốc
+    }
+        List<Book> filteredBooks = new ArrayList<>();
+        for (Book book : books) {
+            // Kiểm tra xem categoryId của sách có nằm trong danh sách các id được chọn không
+            if (book.getCategoryId() != null && categoryIds.contains(book.getCategoryId())) {
+                filteredBooks.add(book);
+            }
+        }
+        return filteredBooks;
+    }
+
     public void sortBooksByPrice(List<Book> bookList, int sortType){
         switch (sortType){
             case 1: //Ascending price
