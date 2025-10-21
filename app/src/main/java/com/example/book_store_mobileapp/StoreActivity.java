@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoreActivity extends AppCompatActivity {
+public class StoreActivity extends BaseActivity {
 
     private GridView gridView;
     private ProgressBar progressBar;
@@ -179,5 +179,11 @@ public class StoreActivity extends AppCompatActivity {
                 Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Override phương thức này để cho BaseActivity biết cần highlight mục nào
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_home;
     }
 }
