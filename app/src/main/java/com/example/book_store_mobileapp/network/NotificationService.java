@@ -24,7 +24,7 @@ public class NotificationService extends FirebaseMessagingService {
             if ("cart_update".equals(type)) {
                 try {
                     int count = Integer.parseInt(data.get("cart_count"));
-                    NotificationHelper.showCartBadge(getApplicationContext(), count);
+                    NotificationHelper.showCartNotification(getApplicationContext(), count);
                 } catch (Exception e) {
                     Log.e(TAG, "Invalid cart_count", e);
                 }
