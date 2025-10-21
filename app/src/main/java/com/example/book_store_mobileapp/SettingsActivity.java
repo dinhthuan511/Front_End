@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -42,6 +43,18 @@ public class SettingsActivity extends AppCompatActivity {
                     .setImageResource(R.drawable.outline_location_on_24);
             rowAddress.setOnClickListener(v ->
                     startActivity(new Intent(this, AddressActivity.class)));
+        }
+        View btnLogoutBottom = findViewById(R.id.btnLogoutBottom);
+        if (btnLogoutBottom != null) {
+            btnLogoutBottom.setOnClickListener(v -> {
+                // Đăng xuất Firebase
+                FirebaseAuth.getInstance().signOut();
+
+                // Quay lại LoginActivity, xóa lịch sử stack
+                Intent i = new Intent(SettingsActivity.this, LoginActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+            });
         }
     }
 }

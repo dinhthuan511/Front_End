@@ -54,7 +54,7 @@ public class StoreActivity extends AppCompatActivity {
 
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
-        btnLogout = findViewById(R.id.btnLogout);
+//        btnLogout = findViewById(R.id.btnLogout);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
@@ -62,14 +62,14 @@ public class StoreActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnProfile = findViewById(R.id.btnProfile);
 
-        // ✅ Logout
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        });
+//        // ✅ Logout
+//        btnLogout.setOnClickListener(v -> {
+//            FirebaseAuth.getInstance().signOut();
+//            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+//            finish();
+//        });
 
         // ✅ Mở trang Settings (có 2 ô: Tài khoản & Bảo mật, Địa chỉ)
         btnProfile.setOnClickListener(v -> {

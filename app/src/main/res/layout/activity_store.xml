@@ -18,15 +18,15 @@
         android:gravity="end"
         android:background="#F5F5F5">
 
-        <ImageButton
-            android:id="@+id/btnLogout"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:background="@android:color/transparent"
-            android:src="@drawable/outline_exit_to_app_24"
-            android:contentDescription="@string/logout"
-            app:tint="@color/black" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/btnLogout"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_gravity="end"-->
+<!--            android:background="@android:color/transparent"-->
+<!--            android:src="@drawable/outline_exit_to_app_24"-->
+<!--            android:contentDescription="@string/logout"-->
+<!--            app:tint="@color/black" />-->
 
         <ImageButton
             android:id="@+id/btnCart"
