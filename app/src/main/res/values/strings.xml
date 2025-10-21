@@ -6,4 +6,9 @@
     <string name="enter_book_name">Enter book name...</string>
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
+    <string name="notifications">Notifications</string>
+    <string name="notification_center">Notification Center</string>
+    <string name="new_book_available">New Book Available</string>
+    <string name="purchase_successful">Purchase Successful</string>
+    <string name="no_notifications">No notifications yet</string>
 </resources>

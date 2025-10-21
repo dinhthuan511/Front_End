@@ -63,16 +63,12 @@ public class CartActivity extends AppCompatActivity {
         // Hiển thị tổng ban đầu
         updateTotal();
 
-        NotificationHelper.showCartNotification(this, CartManager.getInstance().getCartItems());
-
         // Nút xóa giỏ hàng
         btnClear.setOnClickListener(v -> {
             CartManager.getInstance().clearCart();
             adapter.notifyDataSetChanged();
             updateTotal();
             Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng", Toast.LENGTH_SHORT).show();
-
-            NotificationHelper.showCartNotification(this, 0);
         });
 
         // Nút thanh toán
@@ -82,11 +78,16 @@ public class CartActivity extends AppCompatActivity {
                 Toast.makeText(this, "Giỏ hàng đang trống!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
+                
+                // Add purchase notification
+                if (!CartManager.getInstance().getCartItems().isEmpty()) {
+                    String bookTitle = CartManager.getInstance().getCartItems().get(0).getBook().getName();
+                    com.example.book_store_mobileapp.data.NotificationManager.getInstance().addPurchaseNotification(bookTitle, total);
+                }
+                
                 CartManager.getInstance().clearCart();
                 adapter.notifyDataSetChanged();
                 updateTotal();
-
-                NotificationHelper.showCartNotification(this, 0);
             }
         });
     }

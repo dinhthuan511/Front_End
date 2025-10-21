@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+ notification runtime permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -29,6 +30,7 @@
         <activity android:name=".StoreActivity" android:exported="false" />
         <activity android:name=".BookDetailActivity" android:exported="false" />
         <activity android:name=".CartActivity" android:exported="false" />
+        <activity android:name=".NotificationCenterActivity" android:exported="false" />
 
     </application>
 

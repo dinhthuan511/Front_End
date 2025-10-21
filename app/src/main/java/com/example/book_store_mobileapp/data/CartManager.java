@@ -55,4 +55,12 @@ public class CartManager {
         }
         return total;
     }
+
+    public int getTotalQuantity() {
+        int totalQuantity = 0;
+        for (CartItem item : cartItems) {
+            totalQuantity += item.getQuantity();
+        }
+        return totalQuantity;
+    }
 }
