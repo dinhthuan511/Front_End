@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.book_store_mobileapp.adapter.CartAdapter;
 import com.example.book_store_mobileapp.data.CartManager;
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.data.NotificationHelper;
 
 import java.util.ArrayList;
 
@@ -77,6 +78,13 @@ public class CartActivity extends AppCompatActivity {
                 Toast.makeText(this, "Giỏ hàng đang trống!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
+                
+                // Add purchase notification
+                if (!CartManager.getInstance().getCartItems().isEmpty()) {
+                    String bookTitle = CartManager.getInstance().getCartItems().get(0).getBook().getName();
+                    com.example.book_store_mobileapp.data.NotificationManager.getInstance().addPurchaseNotification(bookTitle, total);
+                }
+                
                 CartManager.getInstance().clearCart();
                 adapter.notifyDataSetChanged();
                 updateTotal();
