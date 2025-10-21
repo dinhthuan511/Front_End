@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("CLAIMS", "claims=" + claims);
                 Log.d("NAV", "routeAfterLogin (onStart) isAdmin=" + isAdmin);
 
-                alreadyRouted = true; // set cờ TRƯỚC khi điều hướng
+                alreadyRouted = true;
                 routeAfterLogin(isAdmin);
             }).addOnFailureListener(e -> {
                 setUiLoading(false);

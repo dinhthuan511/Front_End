@@ -2,6 +2,7 @@ package com.example.book_store_mobileapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -87,38 +88,65 @@ public class CartActivity extends BaseActivity {
 
     // 🟢 Hàm tải dữ liệu Firestore
     private void loadCartFromFirebase() {
+        Log.d("CartActivity", "🔄 Bắt đầu tải giỏ hàng từ Firebase...");
+
+        // Kiểm tra nếu chưa đăng nhập
+        if (cartService == null || cartService.getCartRef() == null) {
+            Log.e("CartActivity", "❌ Không thể tải giỏ hàng: cartService hoặc userId null.");
+            Toast.makeText(this, "Bạn cần đăng nhập để xem giỏ hàng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         cartService.getCartRef().get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                Log.d("CartActivity", "✅ Tải giỏ hàng thành công từ Firestore.");
                 cartItems.clear();
                 QuerySnapshot snapshot = task.getResult();
-                if (snapshot != null) {
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        Book book = new Book(
-                                doc.getString("bookId"),
-                                doc.getString("productName"),
-                                doc.getString("author"),
-                                doc.getString("briefDescription"),
-                                doc.getString("fullDescription"),
-                                doc.getLong("categoryId"),
-                                doc.getString("imageURL"),
-                                doc.getString("isbn"),
-                                doc.getDouble("price"),
-                                doc.getLong("stock"),
-                                doc.getString("technicalSpecifications")
-                        );
 
-                        Long q = doc.getLong("quantity");
-                        book.setQuantity(q != null ? q.intValue() : 1);
-                        cartItems.add(book);
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        try {
+                            // Ghi log từng item
+                            Log.d("CartActivity", "📘 Đang đọc item: " + doc.getId());
+
+                            Book book = new Book(
+                                    doc.getString("bookId"),
+                                    doc.getString("productName"),
+                                    doc.getString("author"),
+                                    doc.getString("briefDescription"),
+                                    doc.getString("fullDescription"),
+                                    doc.getLong("categoryId"),
+                                    doc.getString("imageURL"),
+                                    doc.getString("isbn"),
+                                    doc.getDouble("price"),
+                                    doc.getLong("stock"),
+                                    doc.getString("technicalSpecifications")
+                            );
+
+                            Long q = doc.getLong("quantity");
+                            book.setQuantity(q != null ? q.intValue() : 1);
+
+                            cartItems.add(book);
+
+                            Log.d("CartActivity", "🛒 Thêm vào danh sách: " + book.getName() + " - SL: " + book.getQuantity());
+                        } catch (Exception e) {
+                            Log.e("CartActivity", "⚠️ Lỗi khi đọc document: " + doc.getId(), e);
+                        }
                     }
+                } else {
+                    Log.w("CartActivity", "⚠️ Giỏ hàng trống hoặc snapshot null.");
+                    Toast.makeText(this, "Giỏ hàng của bạn đang trống.", Toast.LENGTH_SHORT).show();
                 }
+
                 adapter.notifyDataSetChanged();
                 updateTotal();
             } else {
+                Log.e("CartActivity", "❌ Không thể tải giỏ hàng từ Firestore.", task.getException());
                 Toast.makeText(this, "Không thể tải giỏ hàng!", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     // 🧮 Cập nhật tổng tiền
     private void updateTotal() {

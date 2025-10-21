@@ -17,6 +17,8 @@ public class Book implements Parcelable {
     private String technicalSpecifications;
     private int quantity; // For cart logic
 
+  
+
     public Book() {
         this.quantity = 1; // Default quantity
     }
