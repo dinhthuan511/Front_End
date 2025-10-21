@@ -22,7 +22,7 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice, detailBookTechnicalSpecifications;
     private Button btnAddToCart;
     private FirebaseCartService cartService;
 
@@ -42,6 +42,7 @@ public class BookDetailActivity extends AppCompatActivity {
         detailBookName = findViewById(R.id.bookName);
         detailBookAuthor = findViewById(R.id.bookAuthor);
         detailBookDescription = findViewById(R.id.bookDescription);
+        detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
         btnAddToCart = findViewById(R.id.btnAddToCart);
 
@@ -57,6 +58,7 @@ public class BookDetailActivity extends AppCompatActivity {
             detailBookName.setText(book.getName());
             detailBookAuthor.setText("Author: " + book.getAuthor());
             detailBookDescription.setText(book.getFullDescription());
+            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications());
             // Format the price
             NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = format.format(book.getPrice());

@@ -13,7 +13,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class CartActivity extends AppCompatActivity {
+public class CartActivity extends BaseActivity {
 
     private ListView listView;
     private TextView txtTotal;
@@ -131,5 +131,11 @@ public class CartActivity extends AppCompatActivity {
             total += b.getPrice() * b.getQuantity();
         }
         return total;
+    }
+
+    // Override phương thức này để cho BaseActivity biết cần highlight mục "Cart"
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_cart_bottom;
     }
 }
