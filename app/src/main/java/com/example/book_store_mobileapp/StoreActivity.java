@@ -281,6 +281,6 @@ public class StoreActivity extends BaseActivity {
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào
     @Override
     protected int getNavigationMenuItemId() {
-        return R.id.nav_home;
+        return R.id.nav_store;
     }
 }
