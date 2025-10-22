@@ -15,12 +15,12 @@ public class Book implements Parcelable {
     private Double price;
     private Long stock;
     private String technicalSpecifications;
-    private int quantity; // For cart logic
 
-  
+
+
 
     public Book() {
-        this.quantity = 1; // Default quantity
+
     }
 
     // Constructor with all fields
@@ -37,7 +37,7 @@ public class Book implements Parcelable {
         this.price = price;
         this.stock = stock;
         this.technicalSpecifications = technicalSpecifications;
-        this.quantity = 1; // Default quantity
+
     }
 
     // Parcelable constructor
@@ -65,7 +65,7 @@ public class Book implements Parcelable {
             stock = in.readLong();
         }
         technicalSpecifications = in.readString();
-        quantity = in.readInt();
+
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Book implements Parcelable {
             dest.writeLong(stock);
         }
         dest.writeString(technicalSpecifications);
-        dest.writeInt(quantity);
+
     }
 
     @Override
@@ -139,6 +139,5 @@ public class Book implements Parcelable {
     public void setStock(Long stock) { this.stock = stock; }
     public String getTechnicalSpecifications() { return technicalSpecifications; }
     public void setTechnicalSpecifications(String technicalSpecifications) { this.technicalSpecifications = technicalSpecifications; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+
 }

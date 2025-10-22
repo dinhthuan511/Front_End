@@ -28,5 +28,15 @@ public class CartItem {
         return book.getPrice() * quantity;
     }
 
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
+    }
+
+
+
 }
 
