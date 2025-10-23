@@ -40,6 +40,11 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
 
+    // Google map
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.cardview)
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

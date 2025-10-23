@@ -25,7 +25,7 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice, detailBookTechnicalSpecifications;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications;
     private Button btnAddToCart;
     private ImageButton btnBack;
     private FirebaseCartService cartService;
