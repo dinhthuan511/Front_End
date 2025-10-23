@@ -9,9 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 
-
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,9 +22,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
-    private EditText edtUsername, edtEmail, edtPassword;
+    private EditText edtUsername, edtEmail, edtPassword, edtPhone, edtAddress;
     private Button btnRegister;
     private TextView btnGoToLogin;
 
@@ -36,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // BaseActivity sẽ nạp activity_base.xml và inflate layout con vào content_frame
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
@@ -44,13 +43,23 @@ public class RegisterActivity extends AppCompatActivity {
         edtUsername  = findViewById(R.id.edtUsername);
         edtEmail     = findViewById(R.id.edtEmail);
         edtPassword  = findViewById(R.id.edtPassword);
+        edtPhone     = findViewById(R.id.edtPhone);
+        edtAddress   = findViewById(R.id.edtAddress);
+
         btnRegister  = findViewById(R.id.btnRegister);
         btnGoToLogin = findViewById(R.id.btnGoToLogin);
 
         btnRegister.setOnClickListener(v -> register());
 
         if (btnGoToLogin != null) {
-            btnGoToLogin.setOnClickListener(v -> finish());
+            btnGoToLogin.setOnClickListener(v -> {
+                // quay lại LoginActivity (giữ cụm Profile)
+                Intent i = new Intent(this, LoginActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(i);
+                overridePendingTransition(0, 0);
+                finish();
+            });
         }
     }
 
@@ -58,10 +67,27 @@ public class RegisterActivity extends AppCompatActivity {
         final String username = edtUsername.getText().toString().trim();
         final String email    = edtEmail.getText().toString().trim();
         final String pass     = edtPassword.getText().toString().trim();
+        final String phone    = edtPhone.getText().toString().trim();
+        final String address  = edtAddress.getText().toString().trim();
 
-        if (!isValidUsername(username)) { toast("Username 3–20 ký tự, chỉ chữ/số/._"); return; }
-        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) { toast("Email không hợp lệ"); return; }
-        if (TextUtils.isEmpty(pass) || pass.length() < 6) { toast("Mật khẩu ≥ 6 ký tự"); return; }
+        // ===== Validate đầu vào =====
+        if (!isValidUsername(username)) {
+            toast("Username 3–20 ký tự, chỉ chữ/số/._");
+            return;
+        }
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            toast("Email không hợp lệ");
+            return;
+        }
+        if (TextUtils.isEmpty(pass) || pass.length() < 6) {
+            toast("Mật khẩu ≥ 6 ký tự");
+            return;
+        }
+        // Phone là tuỳ chọn, nhưng nếu có thì kiểm tra sơ bộ
+        if (!TextUtils.isEmpty(phone) && phone.length() < 8) {
+            toast("Số điện thoại không hợp lệ");
+            return;
+        }
 
         setUiLoading(true);
 
@@ -85,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     final DocumentReference unameRef = db.collection("usernames").document(key);
 
-                    // 2) Transaction: chỉ set khi doc CHƯA tồn tại (create-only semantics)
+                    // 2) Transaction: chỉ set khi doc CHƯA tồn tại
                     db.runTransaction(transaction -> {
                         DocumentSnapshot snap = transaction.get(unameRef);
                         if (snap.exists()) {
@@ -97,27 +123,36 @@ public class RegisterActivity extends AppCompatActivity {
                         transaction.set(unameRef, usernameDoc);
                         return null;
                     }).addOnSuccessListener(v -> {
-                        // 3) (Tuỳ chọn) tạo hồ sơ tối thiểu users/{uid}
+                        // 3) Tạo hồ sơ tối thiểu users/{uid}
                         Map<String, Object> profile = new HashMap<>();
                         profile.put("username", username);
                         profile.put("email", email);
+                        if (!TextUtils.isEmpty(phone))   profile.put("phone", phone);
+                        if (!TextUtils.isEmpty(address)) profile.put("address", address);
 
                         db.collection("users").document(uid).set(profile)
                                 .addOnCompleteListener(t -> {
                                     setUiLoading(false);
-
-                                    // 🔸 Thêm 2 dòng này để đăng xuất và quay về LoginActivity
+                                    // ✅ Sau khi đăng ký thành công, đăng xuất và quay lại Login
                                     FirebaseAuth.getInstance().signOut();
-                                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class)
-                                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-                                    toast("Đăng ký thành công! Hãy đăng nhập bằng USERNAME + mật khẩu");
+                                    toast("Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
+                                    Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                    overridePendingTransition(0, 0);
                                     finish();
 
                                 });
 
-
                     }).addOnFailureListener(e -> {
                         setUiLoading(false);
+                        // Nếu fail vì trùng username → xoá user Auth vừa tạo để tránh orphan account
+                        FirebaseUser justCreated = FirebaseAuth.getInstance().getCurrentUser();
+                        if (justCreated != null) {
+                            justCreated.delete(); // best effort cleanup
+                            FirebaseAuth.getInstance().signOut();
+                        }
+
                         if (e instanceof FirebaseFirestoreException
                                 && ((FirebaseFirestoreException) e).getCode()
                                 == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
@@ -130,7 +165,6 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     setUiLoading(false);
                     String msg = (e != null && e.getMessage() != null) ? e.getMessage() : "Đăng ký thất bại";
-                    // Gợi ý nguyên nhân phổ biến cho dev
                     if (msg.contains("email address is already in use")) {
                         toast("Email đã đăng ký, thử email khác");
                     } else if (msg.contains("badly formatted")) {
@@ -148,10 +182,16 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void setUiLoading(boolean loading) {
         btnRegister.setEnabled(!loading);
-        // Có thể thêm ProgressBar nếu muốn
+        // TODO: nếu có ProgressBar, bật/tắt ở đây
     }
 
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected int getNavigationMenuItemId() {
+        // Đang ở cụm Profile → highlight icon Profile
+        return R.id.nav_profile;
     }
 }

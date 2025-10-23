@@ -32,7 +32,7 @@ public class StoreActivity extends BaseActivity {
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnCart, btnFilter, btnSort, btnLogout, btnProfile ;
+    private ImageButton btnFilter, btnSort;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -53,14 +53,11 @@ public class StoreActivity extends BaseActivity {
         });
 
         // ✅ Khởi tạo view
-        btnCart = findViewById(R.id.btnCart);
-//        btnLogout = findViewById(R.id.btnLogout);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
-        btnProfile = findViewById(R.id.btnProfile);
 
 //        // ✅ Logout
 //        btnLogout.setOnClickListener(v -> {
@@ -71,16 +68,16 @@ public class StoreActivity extends BaseActivity {
 //            finish();
 //        });
 
-        // ✅ Mở trang Settings (có 2 ô: Tài khoản & Bảo mật, Địa chỉ)
-        btnProfile.setOnClickListener(v -> {
-            startActivity(new Intent(StoreActivity.this, SettingsActivity.class));
-        });
+//        // ✅ Mở trang Settings (có 2 ô: Tài khoản & Bảo mật, Địa chỉ)
+//        btnProfile.setOnClickListener(v -> {
+//            startActivity(new Intent(StoreActivity.this, SettingsActivity.class));
+//        });
 
-        // ✅ Giỏ hàng
-        btnCart.setOnClickListener(v -> {
-            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
-            startActivity(intent);
-        });
+//        // ✅ Giỏ hàng
+//        btnCart.setOnClickListener(v -> {
+//            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+//            startActivity(intent);
+//        });
 
         // ✅ Bộ lọc & sắp xếp
         bookFilter = new BookFilter();

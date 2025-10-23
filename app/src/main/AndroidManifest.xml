@@ -41,6 +41,9 @@
         <activity
             android:name=".AddressActivity"
             android:exported="false"/>
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
 
         <activity
             android:name=".StoreActivity"
