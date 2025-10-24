@@ -25,10 +25,12 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications, txtQuantity;
     private Button btnAddToCart;
-    private ImageButton btnBack;
+    private ImageButton btnBack, btnMinus, btnPlus;
     private FirebaseCartService cartService;
+
+    private int currentQuantity = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,9 @@ public class BookDetailActivity extends AppCompatActivity {
         detailBookDescription = findViewById(R.id.bookDescription);
         detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
+        txtQuantity = findViewById(R.id.txtQuantity);
+        btnMinus = findViewById(R.id.btnMinus);
+        btnPlus = findViewById(R.id.btnPlus);
         btnAddToCart = findViewById(R.id.btnAddToCart);
         btnBack = findViewById(R.id.btnBack);
 
@@ -74,9 +79,21 @@ public class BookDetailActivity extends AppCompatActivity {
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
+            btnMinus.setOnClickListener(v -> {
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    txtQuantity.setText(String.valueOf(currentQuantity));
+                }
+            });
+
+            btnPlus.setOnClickListener(v -> {
+                currentQuantity++;
+                txtQuantity.setText(String.valueOf(currentQuantity));
+            });
+
             btnAddToCart.setOnClickListener(v -> {
                 Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
-                cartService.addToCart(book, 1,
+                cartService.addToCart(book, currentQuantity,
                         () -> {
                             Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
                             Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();

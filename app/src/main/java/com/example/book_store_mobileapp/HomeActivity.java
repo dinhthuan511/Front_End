@@ -29,11 +29,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap gMap;
-    // Tọa độ của cửa hàng (Ví dụ: FPT Polytechnic TP.HCM)
-    private final LatLng storeLocation = new LatLng(10.852903, 106.629555);
-
-    // Thêm các biến cho CardView
-    private CardView cardStore, cardCart, cardProfile;
+    private final LatLng storeLocation = new LatLng(10.852903, 106.629555); // Tọa độ cửa hàng
+    private CardView cardStore, cardCart, cardNotification, cardProfile;
 
     // Launcher để xử lý kết quả yêu cầu quyền
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -57,9 +54,10 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             return insets;
         });
 
-        // Ánh xạ các CardView
+        // Ánh xạ view
         cardStore = findViewById(R.id.card_store);
         cardCart = findViewById(R.id.card_cart);
+        cardNotification = findViewById(R.id.card_notification);
         cardProfile = findViewById(R.id.card_profile);
 
 
@@ -78,7 +76,7 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         setupCardClickListeners();
     }
 
-    // HÀM MỚI: Gán sự kiện click
+    // Gán sự kiện click
     private void setupCardClickListeners() {
         cardStore.setOnClickListener(v -> {
             startActivity(new Intent(HomeActivity.this, StoreActivity.class));
@@ -88,9 +86,11 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             startActivity(new Intent(HomeActivity.this, CartActivity.class));
         });
 
-        cardProfile.setOnClickListener(v -> {
-            // Giả sử bạn có một ProfileActivity, nếu chưa có thì tạo mới
-            // startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+        cardNotification.setOnClickListener(v -> {;
+            Toast.makeText(this, "Chức năng Thông báo sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
+        });
+
+        cardProfile.setOnClickListener(v -> {;
             Toast.makeText(this, "Chức năng Hồ sơ sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
         });
     }
