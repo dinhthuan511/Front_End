@@ -1,6 +1,8 @@
 package com.example.book_store_mobileapp;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,11 +11,14 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,6 +38,7 @@ public class StoreActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private EditText txtSearchName;
     private ImageButton btnCart, btnFilter, btnSort, btnLogout;
+    private TextView notificationBadge;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -52,11 +58,19 @@ public class StoreActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Create notification channel early
+        NotificationHelper.createCartChannel(this);
+        
+        // Add sample notifications for demo
+        com.example.book_store_mobileapp.data.NotificationManager.getInstance().addSampleNotifications();
+
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
         btnLogout = findViewById(R.id.btnLogout);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
+        ImageButton btnNotifications = findViewById(R.id.btnNotifications);
+        notificationBadge = findViewById(R.id.notificationBadge);
         txtSearchName = findViewById(R.id.txtSearchName);
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
@@ -73,6 +87,12 @@ public class StoreActivity extends AppCompatActivity {
         // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {
             Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
+
+        // ✅ Nút Notifications
+        btnNotifications.setOnClickListener(v -> {
+            Intent intent = new Intent(StoreActivity.this, NotificationCenterActivity.class);
             startActivity(intent);
         });
 
@@ -109,6 +129,9 @@ public class StoreActivity extends AppCompatActivity {
                         if (item == 3) activePriceFilter = -1;
                         else activePriceFilter = item;
                         applyFiltersAndSearch();
+                        
+                        // Add promotion notification when filtering
+                        addPromotionNotificationIfNeeded();
                     })
                     .show();
         });
@@ -124,6 +147,45 @@ public class StoreActivity extends AppCompatActivity {
         });
 
         fetchBooksFromFirebase();
+        
+        // Update notification badge
+        updateNotificationBadge();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Clear any cart notifications when returning to the app
+        NotificationHelper.cancelCartNotification(this);
+        // Update notification badge
+        updateNotificationBadge();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Post a cart notification if there are items and permission is granted (Android 13+)
+        int totalQty = getCartItemCount();
+        if (totalQty > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    NotificationHelper.showCartNotification(this, totalQty);
+                }
+            } else {
+                NotificationHelper.showCartNotification(this, totalQty);
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Request notification permission on Android 13+ if not granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 100);
+            }
+        }
     }
 
     private void applyFiltersAndSearch() {
@@ -165,6 +227,9 @@ public class StoreActivity extends AppCompatActivity {
                 initialBookList.clear();
                 initialBookList.addAll(data);
                 updateDisplayedBooks(initialBookList);
+                
+                // Add new book notifications for demo (only once)
+                addNewBookNotificationsIfNeeded();
             }
 
             @Override
@@ -173,5 +238,63 @@ public class StoreActivity extends AppCompatActivity {
                 Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateNotificationBadge() {
+        int unreadCount = com.example.book_store_mobileapp.data.NotificationManager.getInstance().getUnreadCount();
+        if (unreadCount > 0) {
+            notificationBadge.setText(String.valueOf(unreadCount));
+            notificationBadge.setVisibility(View.VISIBLE);
+        } else {
+            notificationBadge.setVisibility(View.GONE);
+        }
+    }
+
+    private int getCartItemCount() {
+        // Get cart item count from Firebase cart service
+        // For now, return 0 as we'll implement this properly with Firebase
+        return 0;
+    }
+
+    private void addNewBookNotificationsIfNeeded() {
+        // Add new book notifications for some books (only once)
+        com.example.book_store_mobileapp.data.NotificationManager notificationManager = 
+            com.example.book_store_mobileapp.data.NotificationManager.getInstance();
+        
+        // Check if we already added new book notifications
+        boolean hasNewBookNotifications = false;
+        for (com.example.book_store_mobileapp.data.AppNotification notification : notificationManager.getAllNotifications()) {
+            if ("new_book".equals(notification.getType())) {
+                hasNewBookNotifications = true;
+                break;
+            }
+        }
+        
+        if (!hasNewBookNotifications && !initialBookList.isEmpty()) {
+            // Add new book notifications for first few books
+            for (int i = 0; i < Math.min(3, initialBookList.size()); i++) {
+                Book book = initialBookList.get(i);
+                notificationManager.addNewBookNotification(book.getName(), book.getAuthor());
+            }
+        }
+    }
+
+    private void addPromotionNotificationIfNeeded() {
+        // Add promotion notification only once when user interacts with filters
+        com.example.book_store_mobileapp.data.NotificationManager notificationManager = 
+            com.example.book_store_mobileapp.data.NotificationManager.getInstance();
+        
+        // Check if we already added promotion notifications
+        boolean hasPromotionNotifications = false;
+        for (com.example.book_store_mobileapp.data.AppNotification notification : notificationManager.getAllNotifications()) {
+            if ("promotion".equals(notification.getType())) {
+                hasPromotionNotifications = true;
+                break;
+            }
+        }
+        
+        if (!hasPromotionNotifications) {
+            notificationManager.addPromotionNotification("Special Filter Offer", "Get 15% off on filtered books!");
+        }
     }
 }

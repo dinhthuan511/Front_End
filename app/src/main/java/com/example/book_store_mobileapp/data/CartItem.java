@@ -12,6 +12,15 @@ public class CartItem {
         this.quantity = quantity;
     }
 
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
+    }
+
+
     public Book getBook() {
         return book;
     }

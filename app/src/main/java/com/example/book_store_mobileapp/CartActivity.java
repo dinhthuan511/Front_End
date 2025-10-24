@@ -75,6 +75,12 @@ public class CartActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
 
+            // Add purchase notification
+            if (!cartItems.isEmpty()) {
+                String bookTitle = cartItems.get(0).getName();
+                com.example.book_store_mobileapp.data.NotificationManager.getInstance().addPurchaseNotification(bookTitle, total);
+            }
+
             cartService.clearCart(
                     () -> {
                         cartItems.clear();
