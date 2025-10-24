@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -26,7 +27,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
         // Reuse an existing view if one is available (the convertView).
         // If not, inflate a new view from our custom layout file (grid_item_book.xml).
         View listItemView = convertView;
-        if(listItemView == null){
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_book, parent, false);
         }
 
@@ -37,20 +38,32 @@ public class BookAdapter extends ArrayAdapter<Book> {
         ImageView bookImage = listItemView.findViewById(R.id.book_image);
         TextView bookName = listItemView.findViewById(R.id.book_name);
         TextView bookPrice = listItemView.findViewById(R.id.book_price);
+        TextView overlayOutOfStock = listItemView.findViewById(R.id.overlay_out_of_stock);
+        LinearLayout mainContent = listItemView.findViewById(R.id.main_content);
 
-        // Set book data
-        bookName.setText(currentBook.getName());
-        // Format the price
-        NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
-        String formattedPrice = format.format(currentBook.getPrice());
-        bookPrice.setText(formattedPrice + " VNĐ");
-        // Set image with Glide
-        Glide.with(getContext())
-                .load(currentBook.getImageUrl())
-                .placeholder(android.R.drawable.dark_header)
-                .error(android.R.drawable.dark_header)
-                .into(bookImage);
+        if (currentBook != null) {
+            // Set book data
+            bookName.setText(currentBook.getName());
+            // Format the price
+            NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
+            String formattedPrice = format.format(currentBook.getPrice());
+            bookPrice.setText(formattedPrice + " VNĐ");
+            // Set image with Glide
+            Glide.with(getContext())
+                    .load(currentBook.getImageUrl())
+                    .placeholder(android.R.drawable.dark_header)
+                    .error(android.R.drawable.dark_header)
+                    .into(bookImage);
 
+            // Check if the book is out of stock
+            if (currentBook.getStock() != null && currentBook.getStock() <= 0) {
+                overlayOutOfStock.setVisibility(View.VISIBLE);
+                mainContent.setAlpha(0.25f); // blur the main content
+            } else {
+                overlayOutOfStock.setVisibility(View.GONE);
+                mainContent.setAlpha(1.0f); // unblur the main content
+            }
+        }
         return listItemView;
     }
 }
