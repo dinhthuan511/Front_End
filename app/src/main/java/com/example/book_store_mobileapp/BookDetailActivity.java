@@ -1,7 +1,10 @@
 package com.example.book_store_mobileapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,8 +25,9 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice, detailBookTechnicalSpecifications;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications;
     private Button btnAddToCart;
+    private ImageButton btnBack;
     private FirebaseCartService cartService;
 
     @Override
@@ -45,6 +49,7 @@ public class BookDetailActivity extends AppCompatActivity {
         detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
         btnAddToCart = findViewById(R.id.btnAddToCart);
+        btnBack = findViewById(R.id.btnBack);
 
         // Initialize FirebaseCartService
         cartService = new FirebaseCartService();
@@ -69,15 +74,18 @@ public class BookDetailActivity extends AppCompatActivity {
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
-            // Set event listener for Add to cart button
             btnAddToCart.setOnClickListener(v -> {
-                // check token cua user neu chua co chuyen qua trang login
-
-
-                // Do Add to cart logic
+                Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
                 cartService.addToCart(book, 1,
-                        () -> Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show(),
-                        () -> Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show()
+                        () -> {
+                            Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
+                            Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                            finish();
+                        },
+                        () -> {
+                            Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
+                            Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                        }
                 );
             });
         } else {
@@ -85,5 +93,9 @@ public class BookDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Book data is not found!", Toast.LENGTH_LONG).show();
             finish(); // Close activity
         }
+
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

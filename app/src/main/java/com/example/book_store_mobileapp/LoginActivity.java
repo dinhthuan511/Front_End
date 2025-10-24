@@ -3,13 +3,13 @@ package com.example.book_store_mobileapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,12 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Map;
 
-/**
- * Login có BottomNav (extends BaseActivity) theo phương án B:
- * - Nếu đã đăng nhập mà vào Login => tự chuyển sang SettingsActivity (tab Profile).
- * - Đăng nhập xong => user thường vào SettingsActivity; admin (nếu có claim) vào AdminActivity.
- */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText editUsernameOrEmail, editPassword;
     private Button btnLogin;
@@ -30,7 +25,7 @@ public class LoginActivity extends BaseActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    // Ngăn điều hướng lặp do onStart() + getIdToken()
+    // Chặn gọi startActivity nhiều lần do onStart() / idToken callback lặp
     private boolean alreadyRouted = false;
 
     @Override
@@ -49,7 +44,7 @@ public class LoginActivity extends BaseActivity {
                 Log.d("CLAIMS", "claims=" + claims);
                 Log.d("NAV", "routeAfterLogin (onStart) isAdmin=" + isAdmin);
 
-                alreadyRouted = true; // đặt cờ trước khi điều hướng
+                alreadyRouted = true;
                 routeAfterLogin(isAdmin);
             }).addOnFailureListener(e -> {
                 setUiLoading(false);
@@ -59,9 +54,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // BaseActivity sẽ nạp activity_base.xml và inflate layout con vào content_frame
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
@@ -74,12 +68,8 @@ public class LoginActivity extends BaseActivity {
 
         btnLogin.setOnClickListener(v -> login());
 
-        btnGoToRegister.setOnClickListener(v -> {
-            Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(i);
-            overridePendingTransition(0, 0);
-        });
+        btnGoToRegister.setOnClickListener(v ->
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
     }
 
     private void login() {
@@ -154,32 +144,20 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
-    /**
-     * Theo phương án B:
-     * - Admin -> AdminActivity (nếu bạn cần).
-     * - User thường -> SettingsActivity (tab Profile).
-     */
     private void routeAfterLogin(boolean isAdmin) {
-        Log.d("NAV", "Starting " + (isAdmin ? "AdminActivity" : "SettingsActivity"));
-        Intent i = new Intent(this, isAdmin ? AdminActivity.class : SettingsActivity.class);
+        Log.d("NAV", "Starting " + (isAdmin ? "AdminActivity" : "StoreActivity"));
+        Intent i = new Intent(this, isAdmin ? AdminActivity.class : StoreActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
-        overridePendingTransition(0, 0);
         finish();
     }
 
     private void setUiLoading(boolean loading) {
         btnLogin.setEnabled(!loading);
-        // TODO: nếu có ProgressBar, bật/tắt ở đây
+        // Có thể hiển thị ProgressBar nếu muốn
     }
 
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
-    }
-
-    // 👉 Quan trọng để bottom nav highlight đúng tab Profile khi ở màn Login
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
     }
 }

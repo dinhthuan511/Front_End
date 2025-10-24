@@ -1,10 +1,13 @@
 package com.example.book_store_mobileapp.data;
 
 public class CartItem {
+    private  String cartId;
     private Book book;
     private int quantity;
 
-    public CartItem(Book book, int quantity) {
+    public CartItem() {}
+    public CartItem(String cartId, Book book, int quantity) {
+        this.cartId = cartId;
         this.book = book;
         this.quantity = quantity;
     }
@@ -24,5 +27,16 @@ public class CartItem {
     public double getTotalPrice() {
         return book.getPrice() * quantity;
     }
+
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
+    }
+
+
+
 }
 
