@@ -41,17 +41,36 @@
 
             <!-- Book Image Card -->
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"                android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <ImageView
-                    android:id="@+id/bookImage"
+                <!-- ✅ Sử dụng FrameLayout để có thể đặt overlay lên trên ảnh -->
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="350dp"
-                    android:scaleType="fitCenter"
-                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                    android:layout_height="350dp">
+
+                    <ImageView
+                        android:id="@+id/bookImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                    <!-- ✅ Lớp phủ HẾT HÀNG -->
+                    <TextView
+                        android:id="@+id/imageOutOfStockOverlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="Out of Stock"
+                        android:textColor="#EF5350"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                </FrameLayout>
             </androidx.cardview.widget.CardView>
 
             <!-- Book Title and Author -->

@@ -28,6 +28,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
     private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications, txtQuantity;
+    private TextView imageOutOfStockOverlay;
     private LinearLayout addToCartRow;
     private Button btnAddToCart;
     private ImageButton btnBack, btnMinus, btnPlus;
@@ -47,6 +48,7 @@ public class BookDetailActivity extends AppCompatActivity {
         });
 
         // Initialize views
+        imageOutOfStockOverlay = findViewById(R.id.imageOutOfStockOverlay);
         detailBookImage = findViewById(R.id.bookImage);
         detailBookName = findViewById(R.id.bookName);
         detailBookAuthor = findViewById(R.id.bookAuthor);
@@ -72,7 +74,7 @@ public class BookDetailActivity extends AppCompatActivity {
             detailBookName.setText(book.getName());
             detailBookAuthor.setText("Author: " + book.getAuthor());
             detailBookDescription.setText(book.getFullDescription());
-            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications());
+            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
             // Format the price
             NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = format.format(book.getPrice());
@@ -85,8 +87,11 @@ public class BookDetailActivity extends AppCompatActivity {
 
             if(book.getStock() != null && book.getStock() <= 0) {
                 addToCartRow.setVisibility(View.GONE);
+                imageOutOfStockOverlay.setVisibility(View.VISIBLE);
+                detailBookImage.setAlpha(0.25f);
             } else {
                 addToCartRow.setVisibility(View.VISIBLE);
+                imageOutOfStockOverlay.setVisibility(View.GONE);
             }
 
             btnMinus.setOnClickListener(v -> {
