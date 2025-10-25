@@ -10,43 +10,63 @@
     app:cardElevation="4dp"
     app:cardUseCompatPadding="true">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-        <ImageView
-            android:id="@+id/book_image"
+        android:layout_height="300dp">
+        <LinearLayout
+            android:id="@+id/main_content"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:scaleType="centerCrop"
-            tools:srcCompat="@drawable/ic_launcher_foreground" />
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:padding="10dp">
 
+            <ImageView
+                android:id="@+id/book_image"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                tools:srcCompat="@drawable/book_sample_background" />
+
+            <TextView
+                android:id="@+id/book_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:minLines="2"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="This is a Very Long Book Title That Wraps to Two Lines" />
+
+            <TextView
+                android:id="@+id/book_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="#F44336"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="150,000 VNĐ" />
+
+        </LinearLayout>
+
+        <!-- Lớp phủ Hết hàng -->
         <TextView
-            android:id="@+id/book_name"
+            android:id="@+id/overlay_out_of_stock"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:minLines="2"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="16sp"
+            android:text="Out of Stock"
+            android:textColor="#EF5350"
+            android:textSize="24sp"
             android:textStyle="bold"
-            tools:text="This is a Very Long Book Title That Wraps to Two Lines" />
+            android:visibility="gone"
+            tools:visibility="visible"/>
+    </RelativeLayout>
 
-        <TextView
-            android:id="@+id/book_price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:textColor="#F44336"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            tools:text="150,000 VNĐ" />
-    </LinearLayout>
 </androidx.cardview.widget.CardView>

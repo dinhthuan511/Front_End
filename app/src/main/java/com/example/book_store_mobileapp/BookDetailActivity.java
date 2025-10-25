@@ -3,9 +3,11 @@ package com.example.book_store_mobileapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,10 +27,14 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications, txtQuantity;
+    private TextView imageOutOfStockOverlay;
+    private LinearLayout addToCartRow;
     private Button btnAddToCart;
-    private ImageButton btnBack;
+    private ImageButton btnBack, btnMinus, btnPlus;
     private FirebaseCartService cartService;
+
+    private int currentQuantity = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +48,17 @@ public class BookDetailActivity extends AppCompatActivity {
         });
 
         // Initialize views
+        imageOutOfStockOverlay = findViewById(R.id.imageOutOfStockOverlay);
         detailBookImage = findViewById(R.id.bookImage);
         detailBookName = findViewById(R.id.bookName);
         detailBookAuthor = findViewById(R.id.bookAuthor);
         detailBookDescription = findViewById(R.id.bookDescription);
         detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
+        addToCartRow = findViewById(R.id.addToCartRow);
+        txtQuantity = findViewById(R.id.txtQuantity);
+        btnMinus = findViewById(R.id.btnMinus);
+        btnPlus = findViewById(R.id.btnPlus);
         btnAddToCart = findViewById(R.id.btnAddToCart);
         btnBack = findViewById(R.id.btnBack);
 
@@ -63,7 +74,7 @@ public class BookDetailActivity extends AppCompatActivity {
             detailBookName.setText(book.getName());
             detailBookAuthor.setText("Author: " + book.getAuthor());
             detailBookDescription.setText(book.getFullDescription());
-            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications());
+            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
             // Format the price
             NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = format.format(book.getPrice());
@@ -74,9 +85,34 @@ public class BookDetailActivity extends AppCompatActivity {
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
+            if(book.getStock() != null && book.getStock() <= 0) {
+                addToCartRow.setVisibility(View.GONE);
+                imageOutOfStockOverlay.setVisibility(View.VISIBLE);
+                detailBookImage.setAlpha(0.25f);
+            } else {
+                addToCartRow.setVisibility(View.VISIBLE);
+                imageOutOfStockOverlay.setVisibility(View.GONE);
+            }
+
+            btnMinus.setOnClickListener(v -> {
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    txtQuantity.setText(String.valueOf(currentQuantity));
+                }
+            });
+
+            btnPlus.setOnClickListener(v -> {
+                if(currentQuantity < book.getStock()){
+                    currentQuantity++;
+                    txtQuantity.setText(String.valueOf(currentQuantity));
+                }
+            });
+
             btnAddToCart.setOnClickListener(v -> {
+                btnAddToCart.setEnabled(false);
+                btnAddToCart.setText("Adding...");
                 Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
-                cartService.addToCart(book, 1,
+                cartService.addToCart(book, currentQuantity,
                         () -> {
                             Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
                             Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
@@ -84,6 +120,8 @@ public class BookDetailActivity extends AppCompatActivity {
                         },
                         () -> {
                             Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
+                            btnAddToCart.setEnabled(true);
+                            btnAddToCart.setText("Add to cart");
                             Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
                         }
                 );
