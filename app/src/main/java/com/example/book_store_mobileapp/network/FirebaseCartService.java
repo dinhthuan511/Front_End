@@ -3,9 +3,11 @@ package com.example.book_store_mobileapp.network;
 import static android.content.ContentValues.TAG;
 import android.util.Log;
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.data.CartItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirebaseCartService {
@@ -88,6 +90,18 @@ public class FirebaseCartService {
 
     }
 
+
+    // Đặt trong một file riêng hoặc làm nested interface trong FirebaseCartService
+    public interface CartLoadSuccessCallback {
+        void onSuccess(List<CartItem> items);
+    }
+
+    // Đặt trong một file riêng hoặc làm nested interface trong FirebaseCartService
+    public interface CartLoadErrorCallback {
+        void onError(Exception error);
+    }
+
+
     /** 🔢 Cập nhật số lượng (theo documentId) */
     public void updateQuantity(String cartItemId, int newQuantity, Runnable onSuccess, Runnable onFailure) {
         if (userId == null) {
@@ -125,32 +139,20 @@ public class FirebaseCartService {
                     if (onFailure != null) onFailure.run();
                 });
     }
-    /** 🧹 Xóa toàn bộ giỏ hàng */
-    public void clearCart(Runnable onSuccess, Runnable onFailure) {
-        if (userId == null) {
-            if (onFailure != null) onFailure.run();
-            return;
-        }
 
-        getCartRef().get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                WriteBatch batch = db.batch();
-                for (DocumentSnapshot doc : task.getResult()) {
-                    batch.delete(doc.getReference());
-                }
-
-                batch.commit()
-                        .addOnSuccessListener(unused -> {
-                            Log.d(TAG, "✅ Đã xóa toàn bộ giỏ hàng.");
-                            if (onSuccess != null) onSuccess.run();
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "❌ Lỗi khi xóa toàn bộ giỏ hàng: ", e);
-                            if (onFailure != null) onFailure.run();
-                        });
-            } else {
-                if (onFailure != null) onFailure.run();
+    public void clearCart(String userId, Runnable onSuccess) {
+        CollectionReference cartRef = FirebaseFirestore.getInstance()
+                .collection("carts")
+                .document(userId)
+                .collection("items");
+        cartRef.get().addOnSuccessListener(query -> {
+            WriteBatch batch = FirebaseFirestore.getInstance().batch();
+            for (DocumentSnapshot doc : query.getDocuments()) {
+                batch.delete(doc.getReference());
             }
+            batch.commit().addOnSuccessListener(unused -> {
+                if (onSuccess != null) onSuccess.run();
+            });
         });
     }
 }

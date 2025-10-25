@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Quyền truy cập vị trí -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Quyền truy cập vị trí -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -16,16 +15,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
-        <!-- Ko có API key-->
+        <activity
+            android:name=".VNPayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OrderStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentSuccessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentProcessingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" /> <!-- Ko có API key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY" />
+
         <activity
             android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".network.Firebase"
-            android:exported="false" /> <!-- Admin/Store/…: không có intent-filter => exported=false -->
+            android:exported="false" /> <!-- <activity -->
+        <!-- android:name=".network.Firebase" -->
+        <!-- android:exported="false" /> &lt;!&ndash; Admin/Store/…: không có intent-filter => exported=false &ndash;&gt; -->
         <activity
             android:name=".AdminActivity"
             android:exported="false" />
