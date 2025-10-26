@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

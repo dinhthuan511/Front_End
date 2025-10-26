@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.admin;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -13,23 +13,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.book_store_mobileapp.R;
+import com.example.book_store_mobileapp.network.FirebaseAdminService; // ✅ service
+import com.example.book_store_mobileapp.ui.admin.adapter.AdminProductAdapter; // ✅ (nếu m đã tách adapter vào ui.admin.adapter)
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Quản lý sản phẩm trong collection "products" */
-public class ManageProductsActivity extends AppCompatActivity implements AdminProductAdapter.OnProductAction {
+/** Quản lý sản phẩm trong collection "products" (qua service) */
+public class AdminProductsActivity extends AppCompatActivity implements AdminProductAdapter.OnProductAction {
 
     private RecyclerView rv;
     private AdminProductAdapter adapter;
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<DocumentSnapshot> docs = new ArrayList<>();
+
+    private FirebaseAdminService adminService;        // ✅ service
+    private ListenerRegistration productsReg = null;  // ✅ giữ listener để remove
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,48 +50,56 @@ public class ManageProductsActivity extends AppCompatActivity implements AdminPr
             tb.setNavigationOnClickListener(v -> finish());
         }
 
+        adminService = new FirebaseAdminService(); // ✅
+
         rv = findViewById(R.id.recycler);
         rv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AdminProductAdapter(docs, this);
         rv.setAdapter(adapter);
 
-        load();
+        listenProducts();
     }
 
-    private void load() {
-        db.collection("products")
-                .limit(100)
-                .addSnapshotListener((snaps, e) -> {
-                    if (e != null) {
-                        Log.e("MANAGE", "load error", e);
-                        Toast.makeText(this, "Lỗi load: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        return;
+    private void listenProducts() {
+        // ✅ thay vì db.collection().addSnapshotListener(...)
+        productsReg = adminService.listenProducts(100, new FirebaseAdminService.ProductsListener() {
+            @Override public void onChanged(List<DocumentSnapshot> snapshots) {
+                int count = (snapshots != null ? snapshots.size() : 0);
+                Log.d("MANAGE", "docs=" + count);
+
+                docs.clear();
+                if (snapshots != null) {
+                    // In chi tiết để chắc chắn đang đọc đúng collection & field
+                    for (DocumentSnapshot d : snapshots) {
+                        Log.d("MANAGE", "docId=" + d.getId()
+                                + ", productName=" + d.getString("productName")
+                                + ", imageURL=" + d.getString("imageURL")
+                                + ", price=" + d.get("price")
+                                + ", createdAt=" + d.get("createdAt"));
                     }
+                    docs.addAll(snapshots);
+                }
+                adapter.notifyDataSetChanged();
 
-                    int count = (snaps != null ? snaps.size() : 0);
-                    Log.d("MANAGE", "docs=" + count);
+                if (count == 0) {
+                    Toast.makeText(AdminProductsActivity.this, "Chưa có sản phẩm nào", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                    docs.clear();
-                    if (snaps != null) {
-                        for (DocumentSnapshot d : snaps.getDocuments()) {
-                            // In chi tiết để chắc chắn đang đọc đúng collection & field
-                            Log.d("MANAGE", "docId=" + d.getId()
-                                    + ", productName=" + d.getString("productName")
-                                    + ", imageURL=" + d.getString("imageURL")
-                                    + ", price=" + d.get("price")
-                                    + ", createdAt=" + d.get("createdAt"));
-                        }
-                        docs.addAll(snaps.getDocuments());
-                    }
-                    adapter.notifyDataSetChanged();
+            @Override public void onError(String message) {
+                Toast.makeText(AdminProductsActivity.this, "Lỗi load: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-                    if (count == 0) {
-                        Toast.makeText(this, "Chưa có sản phẩm nào", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-}
-
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        // ✅ nhớ huỷ listener để tránh rò rỉ
+        if (productsReg != null) {
+            productsReg.remove();
+            productsReg = null;
+        }
+    }
 
     /** Sửa đầy đủ field */
     @Override public void onEdit(DocumentSnapshot docSnap) {
@@ -154,9 +166,14 @@ public class ManageProductsActivity extends AppCompatActivity implements AdminPr
                     up.put("fullDescription", TextUtils.isEmpty(f)? null : f);
                     up.put("technicalSpecifications", TextUtils.isEmpty(sp)? null : sp);
 
-                    docSnap.getReference().update(up)
-                            .addOnSuccessListener(vv -> Toast.makeText(this, "Đã cập nhật", Toast.LENGTH_SHORT).show())
-                            .addOnFailureListener(err -> Toast.makeText(this, "Lỗi: " + err.getMessage(), Toast.LENGTH_SHORT).show());
+                    // ✅ gọi service update
+                    adminService.updateProduct(docSnap.getId(), up, res -> {
+                        if (res.isSuccess()) {
+                            Toast.makeText(this, "Đã cập nhật", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Lỗi: " + res.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
                 .setNegativeButton("Huỷ", null)
                 .show();
@@ -167,9 +184,15 @@ public class ManageProductsActivity extends AppCompatActivity implements AdminPr
                 .setTitle("Xoá sản phẩm?")
                 .setMessage("Thao tác không thể hoàn tác.")
                 .setPositiveButton("Xoá", (d, w) ->
-                        doc.getReference().delete()
-                                .addOnSuccessListener(v -> Toast.makeText(this, "Đã xoá", Toast.LENGTH_SHORT).show())
-                                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show()))
+                        // ✅ gọi service delete
+                        adminService.deleteProduct(doc.getId(), res -> {
+                            if (res.isSuccess()) {
+                                Toast.makeText(this, "Đã xoá", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(this, "Lỗi: " + res.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                )
                 .setNegativeButton("Huỷ", null)
                 .show();
     }

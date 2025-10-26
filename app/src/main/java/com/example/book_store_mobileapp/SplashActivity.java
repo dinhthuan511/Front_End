@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen; // implementation "androidx.core:core-splashscreen:1.0.1"
 
+import com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
@@ -37,7 +38,7 @@ public class SplashActivity extends AppCompatActivity {
                 .addOnSuccessListener((GetTokenResult result) -> {
                     boolean isAdmin = Boolean.TRUE.equals(result.getClaims().get("admin"));
                     Log.w("ROUTER", "Splash route. isAdmin=" + isAdmin);
-                    go(isAdmin ? AdminActivity.class : StoreActivity.class);
+                    go(isAdmin ? AdminDashboardActivity.class : StoreActivity.class);
                 })
                 .addOnFailureListener(e -> {
                     Log.e("ROUTER", "Get token failed -> StoreActivity", e);

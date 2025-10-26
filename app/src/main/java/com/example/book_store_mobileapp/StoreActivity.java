@@ -11,19 +11,18 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.book_store_mobileapp.adapter.BookAdapter;
+import com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.BookCategory;
 import com.example.book_store_mobileapp.data.BookFilter;
@@ -293,7 +292,7 @@ public class StoreActivity extends BaseActivity {
                         boolean isAdmin = Boolean.TRUE.equals(result.getClaims().get("admin"));
                         if (isAdmin) {
                             // Nếu là admin → chuyển ngay sang AdminActivity
-                            Intent i = new Intent(this, AdminActivity.class);
+                            Intent i = new Intent(this, AdminDashboardActivity.class);
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
                             finish();

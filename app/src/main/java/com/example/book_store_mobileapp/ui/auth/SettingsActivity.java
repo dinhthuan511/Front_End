@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.AddressActivity;
+import com.example.book_store_mobileapp.R;
+import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ service
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -35,7 +37,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         // 2) Row: Tài khoản & Bảo mật
-        // CHÚ Ý: id đặt trên <include> CHÍNH LÀ root của item đã include
         View rowAccount = findViewById(R.id.rowAccountSecurity);
         if (rowAccount != null) {
             TextView title = rowAccount.findViewById(R.id.title);
@@ -44,7 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (title != null) title.setText("Tài khoản & bảo mật");
             if (icon != null) icon.setImageResource(R.drawable.outline_house_with_shield_24);
 
-            // GẮN CLICK trực tiếp vào rowAccount (root của item include)
             rowAccount.setOnClickListener(v ->
                     startActivity(new Intent(this, AccountSecurityActivity.class)));
         } else {
@@ -66,11 +66,12 @@ public class SettingsActivity extends AppCompatActivity {
             Log.e(TAG, "Không tìm thấy rowAddress");
         }
 
-        // 4) Logout
+        // 4) Logout (qua service)
         View btnLogoutBottom = findViewById(R.id.btnLogoutBottom);
         if (btnLogoutBottom != null) {
             btnLogoutBottom.setOnClickListener(v -> {
-                FirebaseAuth.getInstance().signOut();
+                // ✅ chỉ 1 dòng
+                new FirebaseAuthService().logout();
                 Intent i = new Intent(this, LoginActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);

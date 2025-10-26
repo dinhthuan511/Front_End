@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.admin;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,22 +10,24 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.R;
+import com.example.book_store_mobileapp.network.FirebaseAdminService; // ✅ dùng service
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/** Thêm tài liệu vào collection "products" theo schema mới */
-public class AddProductActivity extends AppCompatActivity {
+/** Thêm tài liệu vào collection "products" theo schema mới (qua service) */
+public class AddEditProductActivity extends AppCompatActivity {
 
     private TextInputEditText edtProductName, edtAuthor, edtPrice, edtStock, edtCategoryId,
             edtIsbn, edtImageURL, edtBrief, edtFull, edtSpecs;
     private ImageView ivPreview;
     private Button btnPreview, btnSave;
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    // ✅ Service admin
+    private FirebaseAdminService adminService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,6 +39,8 @@ public class AddProductActivity extends AppCompatActivity {
         setSupportActionBar(tb);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tb.setNavigationOnClickListener(v -> finish());
+
+        adminService = new FirebaseAdminService(); // ✅ init service
 
         // Bind
         edtProductName = findViewById(R.id.edtProductName);
@@ -63,10 +67,10 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void save() {
-        String name = t(edtProductName);
-        String priceS = t(edtPrice);
-        String stockS = t(edtStock);
-        String catS   = t(edtCategoryId);
+        String name  = t(edtProductName);
+        String priceS= t(edtPrice);
+        String stockS= t(edtStock);
+        String catS  = t(edtCategoryId);
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(priceS)) {
             toast("Cần ít nhất productName + price");
@@ -91,9 +95,15 @@ public class AddProductActivity extends AppCompatActivity {
         doc.put("technicalSpecifications", emptyToNull(t(edtSpecs)));
         doc.put("createdAt", System.currentTimeMillis());
 
-        db.collection("products").add(doc)
-                .addOnSuccessListener(r -> { toast("Đã thêm sản phẩm"); finish(); })
-                .addOnFailureListener(e -> toast("Lỗi thêm: " + e.getMessage()));
+        // ✅ Gọi service thay vì db.collection("products").add(...)
+        adminService.addProduct(doc, res -> {
+            if (!res.isSuccess()) {
+                toast("Lỗi thêm: " + res.getMessage());
+                return;
+            }
+            toast("Đã thêm sản phẩm (id=" + res.getData() + ")");
+            finish();
+        });
     }
 
     private static String t(TextInputEditText e){ return e==null?"":String.valueOf(e.getText()).trim(); }

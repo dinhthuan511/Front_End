@@ -7,6 +7,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
+import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;

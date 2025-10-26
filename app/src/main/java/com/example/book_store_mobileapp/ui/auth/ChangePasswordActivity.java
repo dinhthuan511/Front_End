@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -7,9 +7,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+
+import com.example.book_store_mobileapp.BaseActivity;
+import com.example.book_store_mobileapp.R;
+import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ service
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -18,7 +20,7 @@ public class ChangePasswordActivity extends BaseActivity {
     private EditText edtOldPassword, edtNewPassword, edtConfirmPassword;
     private Button btnSubmit;
 
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private FirebaseAuthService authService; // ✅
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +37,8 @@ public class ChangePasswordActivity extends BaseActivity {
         bar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         // =================================================
 
+        authService = new FirebaseAuthService(); // ✅
+
         edtOldPassword = findViewById(R.id.edtOldPassword);
         edtNewPassword = findViewById(R.id.edtNewPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
@@ -44,7 +48,7 @@ public class ChangePasswordActivity extends BaseActivity {
     }
 
     private void doChangePassword() {
-        FirebaseUser user = auth.getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || TextUtils.isEmpty(user.getEmail())) {
             Toast.makeText(this, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
             return;
@@ -67,15 +71,22 @@ public class ChangePasswordActivity extends BaseActivity {
             return;
         }
 
-        AuthCredential cred = EmailAuthProvider.getCredential(user.getEmail(), oldPwd);
-        user.reauthenticate(cred).addOnSuccessListener(unused ->
-                user.updatePassword(newPwd).addOnSuccessListener(u -> {
+        // ✅ Re-auth qua service
+        authService.reAuthenticate(user.getEmail(), oldPwd, step1 -> {
+            if (!step1.isSuccess()) {
+                Toast.makeText(this, step1.getMessage() != null ? step1.getMessage() : "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // ✅ Đổi mật khẩu qua service
+            authService.changePassword(newPwd, step2 -> {
+                if (step2.isSuccess()) {
                     Toast.makeText(this, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
                     finish(); // quay lại trang AccountSecurityActivity
-                }).addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi đổi mật khẩu: " + e.getMessage(), Toast.LENGTH_SHORT).show())
-        ).addOnFailureListener(e ->
-                Toast.makeText(this, "Mật khẩu cũ không đúng", Toast.LENGTH_SHORT).show());
+                } else {
+                    Toast.makeText(this, "Lỗi đổi mật khẩu: " + step2.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     @Override
