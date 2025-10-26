@@ -1,23 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootAdmin"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#EFF5FB"
+    android:fitsSystemWindows="true">   <!-- ✅ chừa chỗ status bar -->
 
-    <TextView
-        android:text="📚 Trang Quản Trị - Dành cho Admin"
-        android:textSize="20sp"
-        android:layout_margin="20dp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btnLogoutAdmin"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đăng xuất"
-        android:layout_margin="16dp" />
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar">
 
-</LinearLayout>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#28527A"
+        app:title="Hello, Admin"
+        app:titleTextColor="@android:color/white"
+        app:menu="@menu/menu_admin_toolbar"/>
+</com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Nội dung -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Services"
+                android:textStyle="bold"
+                android:textColor="#14213D"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Add new product -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddProduct"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Add new product"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Modify product -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModifyProduct"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Modify product"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:backgroundTint="#274C77"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Bạn có thể thêm các nút khác sau này -->
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

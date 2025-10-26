@@ -280,6 +280,30 @@ public class StoreActivity extends BaseActivity {
             }
         });
     }
+    // 🛡️ Kiểm tra quyền admin mỗi khi mở StoreActivity
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Nếu người dùng đã đăng nhập, kiểm tra claim admin
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseAuth.getInstance().getCurrentUser()
+                    .getIdToken(false)
+                    .addOnSuccessListener(result -> {
+                        boolean isAdmin = Boolean.TRUE.equals(result.getClaims().get("admin"));
+                        if (isAdmin) {
+                            // Nếu là admin → chuyển ngay sang AdminActivity
+                            Intent i = new Intent(this, AdminActivity.class);
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Không cần xử lý lỗi, chỉ bỏ qua nếu token hỏng
+                    });
+        }
+    }
 
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào
     @Override

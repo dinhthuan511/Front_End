@@ -53,13 +53,30 @@
         <activity
             android:name=".ChangePasswordActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".AddProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageProductsActivity"
+            android:exported="false" />
         <activity
             android:name=".StoreActivity"
-            android:exported="true">    <!-- mở app đẩy thẳng vào trang home -->
+            android:exported="false"/>
+
+<!--        <activity-->
+<!--            android:name=".StoreActivity"-->
+<!--            android:exported="true">    &lt;!&ndash; mở app đẩy thẳng vào trang home &ndash;&gt;-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+        <!-- SPLASH LÀ LAUNCHER -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Book_Store_MobileApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -7,4 +7,8 @@
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
     <string name="user">User</string>
+    <string name="change_email">Đổi email</string>
+    <string name="email_verification_sent">Đã gửi email xác minh</string>
+    <string name="email_verified_update">Đã cập nhật email sau xác minh</string>
+
 </resources>

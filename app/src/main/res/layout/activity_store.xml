@@ -8,36 +8,56 @@
     android:orientation="vertical"
     tools:context=".StoreActivity">
 
-    <!-- Thanh trên cùng chứa nút Logout và Giỏ hàng -->
-    <LinearLayout
+    <!-- 🔹 Thanh tiêu đề có Title ở giữa + nút Logout/Cart bên phải -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:orientation="horizontal"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        android:elevation="4dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp">
 
-        <ImageButton
-            android:id="@+id/btnLogout"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/logout"
-            android:src="@drawable/outline_exit_to_app_24"
-            app:tint="@color/black" />
-        <ImageButton
+        <!-- Tiêu đề ở giữa -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Book Store"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium" />
 
+        <!-- Nhóm nút bên phải: Logout + Cart -->
+        <LinearLayout
+            android:id="@+id/top_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+<!--            <ImageButton-->
+<!--                android:id="@+id/btnLogout"-->
+<!--                android:layout_width="40dp"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:background="@android:color/transparent"-->
+<!--                android:contentDescription="@string/logout"-->
+<!--                android:src="@drawable/outline_exit_to_app_24"-->
+<!--                app:tint="@color/black" />-->
 
-            android:id="@+id/btnCart"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/cart"
-            android:src="@drawable/ic_add_shopping_cart_black_24dp"
-            app:tint="@color/black" />
-    </LinearLayout>
+<!--            <ImageButton-->
+<!--                android:id="@+id/btnCart"-->
+<!--                android:layout_width="40dp"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:background="@android:color/transparent"-->
+<!--                android:contentDescription="@string/cart"-->
+<!--                android:src="@drawable/ic_add_shopping_cart_black_24dp"-->
+<!--                app:tint="@color/black" />-->
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <!-- Thanh tìm kiếm -->
     <LinearLayout
@@ -103,7 +123,7 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-        <!-- Danh sách sách -->
+    <!-- Danh sách sách -->
     <GridView
         android:id="@+id/grid_view"
         android:layout_width="match_parent"
