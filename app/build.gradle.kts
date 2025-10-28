@@ -44,6 +44,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation(libs.cardview)
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
 
     // Test
     testImplementation(libs.junit)
@@ -68,4 +70,6 @@ dependencies {
 
     // (Tuỳ chọn) Realtime Database – chỉ giữ nếu bạn thật sự dùng
     // implementation("com.google.firebase:firebase-database")
+
+
 }
