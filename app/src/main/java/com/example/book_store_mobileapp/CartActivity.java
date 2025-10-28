@@ -6,8 +6,10 @@ import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.book_store_mobileapp.adapter.CartAdapter;
+import com.example.book_store_mobileapp.data.AppNotification;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
+import com.example.book_store_mobileapp.data.NotificationManager;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -52,7 +54,22 @@ public class CartActivity extends BaseActivity {
                         cartItems.clear();
                         adapter.notifyDataSetChanged();
                         updateTotal();
+
                         Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng", Toast.LENGTH_SHORT).show();
+                        
+                        // Add in-app notification
+                        NotificationManager.getInstance().addNotification(
+                                this,
+                                new AppNotification(
+                                        "cart_cleared_" + System.currentTimeMillis(),
+                                        "Cart Cleared",
+                                        "You cleared all items from your cart.",
+                                        "cart_cleared"
+                                )
+                        );
+                        
+                        // Update system notification (cart is now empty, so it will be cancelled)
+                        NotificationHelper.updateCartSystemNotification(this);
                     },
                     () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng", Toast.LENGTH_SHORT).show()
             );
@@ -67,11 +84,21 @@ public class CartActivity extends BaseActivity {
 
             Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
 
+            // Add purchase notification
+            NotificationManager.getInstance().addPurchaseNotification(
+                    this,
+                    "Books in Cart",
+                    total
+            );
+            
             cartService.clearCart(
                     () -> {
                         cartItems.clear();
                         adapter.notifyDataSetChanged();
                         updateTotal();
+                        
+                        // Update system notification (cart is now empty, so it will be cancelled)
+                        NotificationHelper.updateCartSystemNotification(this);
                     },
                     () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng sau thanh toán", Toast.LENGTH_SHORT).show()
             );

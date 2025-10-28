@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 13+ notification runtime permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".BookStoreApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,10 +16,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
-        <activity
-            android:name=".network.Firebase"
-            android:exported="false" />
-        <!-- Admin/Store/…: không có intent-filter => exported=false -->
+<!--        <activity-->
+<!--            android:name=".network.Firebase"-->
+<!--            android:exported="false" />-->
+<!--        &lt;!&ndash; Admin/Store/…: không có intent-filter => exported=false &ndash;&gt;-->
         <activity
             android:name=".AdminActivity"
             android:exported="false" />
@@ -41,6 +44,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".NotificationCenterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

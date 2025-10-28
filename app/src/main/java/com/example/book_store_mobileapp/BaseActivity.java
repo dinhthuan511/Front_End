@@ -8,11 +8,14 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.data.NotificationManager;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected BottomNavigationView bottomNavigationView;
+    private BadgeDrawable notificationBadge;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +36,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Thiết lập listener cho BottomNavigationView
         setupBottomNavigation();
+
+        // 🔹 Setup notification badge
+        setupNotificationBadge();
     }
 
     private void setupBottomNavigation() {
@@ -51,7 +57,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_cart_bottom) {
                 intent = new Intent(this, CartActivity.class);
             } else if (itemId == R.id.nav_notifications) {
-                // intent = new Intent(this, NotificationActivity.class);
+                intent = new Intent(this, NotificationCenterActivity.class);
             } else if (itemId == R.id.nav_profile) {
                 // intent = new Intent(this, ProfileActivity.class);
             }
@@ -67,12 +73,38 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 🔸 Create and initialize the red badge on the notification icon
+     */
+    private void setupNotificationBadge() {
+        notificationBadge = bottomNavigationView.getOrCreateBadge(R.id.nav_notifications);
+        notificationBadge.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+        notificationBadge.setBadgeTextColor(getResources().getColor(android.R.color.white));
+        notificationBadge.setVisible(false); // start hidden
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Cập nhật mục được chọn trên BottomNav dựa trên Activity hiện tại
         updateNavigationBarState();
+        updateNotificationBadge();
+    }
+
+    /**
+     // Phương thức này sẽ được các Activity con override để cho biết mục nào cần highlight
+     * 🔸 Update the notification badge count based on unread notifications
+     */
+    protected void updateNotificationBadge() {
+        NotificationManager manager = NotificationManager.getInstance();
+        int unreadCount = manager.getUnreadCount();
+        if (unreadCount > 0) {
+            notificationBadge.setVisible(true);
+            notificationBadge.setNumber(unreadCount);
+        } else {
+            notificationBadge.clearNumber();
+            notificationBadge.setVisible(false);
+        }
     }
 
     // Phương thức này sẽ được các Activity con override để cho biết mục nào cần highlight

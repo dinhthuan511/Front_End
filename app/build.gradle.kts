@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
+    implementation(libs.lifecycle.process)
 
     // Test
     testImplementation(libs.junit)
@@ -61,6 +62,9 @@ dependencies {
     // Firestore (để map username -> email và login bằng username)
     implementation("com.google.firebase:firebase-firestore")
 
+
+    // Add this line for Firebase Realtime Database
+    implementation("com.google.firebase:firebase-database")
     // (Tuỳ chọn) Realtime Database – chỉ giữ nếu bạn thật sự dùng
     // implementation("com.google.firebase:firebase-database")
 }

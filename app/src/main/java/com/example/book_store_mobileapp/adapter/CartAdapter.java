@@ -9,6 +9,7 @@ import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.NotificationHelper;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
@@ -74,7 +75,10 @@ public class CartAdapter extends BaseAdapter {
             txtQuantity.setText(String.valueOf(newQuantity));
 
             cartService.updateQuantity(item.getCartId(), newQuantity,
-                    () -> Toast.makeText(context, "Cập nhật số lượng +1", Toast.LENGTH_SHORT).show(),
+                    () -> {
+                        Toast.makeText(context, "Cập nhật số lượng +1", Toast.LENGTH_SHORT).show();
+                        NotificationHelper.updateCartSystemNotification(context);
+                    },
                     () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
             onUpdateTotal.run();
         });
@@ -87,7 +91,10 @@ public class CartAdapter extends BaseAdapter {
                 txtQuantity.setText(String.valueOf(newQuantity));
 
                 cartService.updateQuantity(item.getCartId(), newQuantity,
-                        () -> Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show(),
+                        () -> {
+                            Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show();
+                            NotificationHelper.updateCartSystemNotification(context);
+                        },
                         () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
                 onUpdateTotal.run();
             }
@@ -115,6 +122,9 @@ public class CartAdapter extends BaseAdapter {
                                     onUpdateTotal.run();
 
                                     Toast.makeText(context, "Đã xóa sản phẩm khỏi giỏ", Toast.LENGTH_SHORT).show();
+                                    
+                                    // Update system notification
+                                    NotificationHelper.updateCartSystemNotification(context);
                                 },
                                 () -> Toast.makeText(context, "Lỗi khi xóa sản phẩm", Toast.LENGTH_SHORT).show());
                     })

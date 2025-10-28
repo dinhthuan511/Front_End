@@ -52,6 +52,7 @@ public class StoreActivity extends BaseActivity {
             return insets;
         });
 
+
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
         btnLogout = findViewById(R.id.btnLogout);

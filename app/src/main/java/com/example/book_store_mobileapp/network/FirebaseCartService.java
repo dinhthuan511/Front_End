@@ -153,4 +153,31 @@ public class FirebaseCartService {
             }
         });
     }
+
+    /** 🔢 Get total cart item count */
+    public interface CartCountCallback {
+        void onCartCount(int count);
+    }
+
+    public void getCartItemCount(CartCountCallback callback) {
+        if (userId == null) {
+            callback.onCartCount(0);
+            return;
+        }
+
+        getCartRef().get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                int totalCount = 0;
+                for (DocumentSnapshot doc : task.getResult()) {
+                    Long quantity = doc.getLong("quantity");
+                    if (quantity != null) {
+                        totalCount += quantity.intValue();
+                    }
+                }
+                callback.onCartCount(totalCount);
+            } else {
+                callback.onCartCount(0);
+            }
+        });
+    }
 }
