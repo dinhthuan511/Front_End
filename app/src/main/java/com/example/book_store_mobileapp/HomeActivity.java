@@ -23,13 +23,17 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap gMap;
-    private final LatLng storeLocation = new LatLng(10.852903, 106.629555); // Tọa độ cửa hàng
+    private final Map<String, LatLng> storeLocation = new HashMap<>(); // Tọa độ cửa hàng
     private CardView cardStore, cardCart, cardNotification, cardProfile;
 
     // Launcher để xử lý kết quả yêu cầu quyền
@@ -53,6 +57,8 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        initializeStoreLocations();
 
         // Ánh xạ view
         cardStore = findViewById(R.id.card_store);
@@ -95,6 +101,12 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         });
     }
 
+    // Dữ liệu vị trí Store
+    private void initializeStoreLocations() {
+        storeLocation.put("Chi nhánh HCM", new LatLng(10.841348873595665, 106.81025314114362));
+        storeLocation.put("Chi nhánh HN", new LatLng(21.01253686535662, 105.52568616343122));
+    }
+
     /**
      * Được gọi khi bản đồ đã sẵn sàng để sử dụng.
      */
@@ -106,9 +118,25 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         gMap.getUiSettings().setZoomControlsEnabled(true);
         gMap.getUiSettings().setCompassEnabled(false);
 
-        // Thêm một điểm đánh dấu tại vị trí cửa hàng và di chuyển camera
-        gMap.addMarker(new MarkerOptions().position(storeLocation).title("Book Store"));
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(storeLocation, 16f)); // Zoom gần hơn một chút
+        if (storeLocation.isEmpty()) {
+            Toast.makeText(this, "Không có dữ liệu vị trí cửa hàng.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        LatLngBounds.Builder boundsBUilder = new LatLngBounds.Builder();
+        for (Map.Entry<String, LatLng> entry : storeLocation.entrySet()){
+            String storeName = entry.getKey();
+            LatLng location = entry.getValue();
+
+            // Thêm một điểm đánh dấu tại vị trí cửa hàng và di chuyển camera
+            gMap.addMarker(new MarkerOptions().position(location).title(storeName));
+            boundsBUilder.include(location);
+        }
+
+        // Di chuyển camera để hiển thị tất cả các điểm đánh dấu
+        LatLngBounds bounds = boundsBUilder.build();
+        int padding = 150;
+        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding)); // Zoom gần hơn một chút
 
         checkLocationPermission();
     }
@@ -138,14 +166,33 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
      * Mở ứng dụng Google Maps để chỉ đường đến cửa hàng.
      */
     private void getDirections() {
-        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + storeLocation.latitude + "," + storeLocation.longitude);
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
+        // Kiểm tra xem có cửa hàng nào không
+        if (storeLocation.isEmpty()) {
+            Toast.makeText(this, "Không có vị trí cửa hàng nào để chỉ đường.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        if (mapIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(mapIntent);
+        // Nếu chỉ có một cửa hàng, chỉ đường trực tiếp đến đó.
+        if (storeLocation.size() == 1) {
+            // Lấy ra cửa hàng
+            Map.Entry<String, LatLng> singleEntry = storeLocation.entrySet().iterator().next();
+            LatLng location = singleEntry.getValue();
+            String storeName = singleEntry.getKey();
+
+            // Tạo Uri với tọa độ và tên để hiển thị trên bản đồ
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location.latitude + "," + location.longitude);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+
+            // Thử khởi động Intent, nếu không có app bản đồ sẽ báo lỗi
+            try {
+                startActivity(mapIntent);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(this, "Không tìm thấy ứng dụng bản đồ nào.", Toast.LENGTH_SHORT).show();
+            }
+
         } else {
-            Toast.makeText(this, "Không tìm thấy ứng dụng Google Maps.", Toast.LENGTH_SHORT).show();
+            // Nếu có nhiều hơn một cửa hàng, yêu cầu người dùng chọn
+            Toast.makeText(this, "Vui lòng nhấn vào một cửa hàng trên bản đồ để được chỉ đường.", Toast.LENGTH_LONG).show();
         }
     }
 

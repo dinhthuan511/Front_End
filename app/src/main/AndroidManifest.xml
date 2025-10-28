@@ -21,7 +21,7 @@
         <!-- API Key Map -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" /> <!-- Activities người dùng -->
+            android:value="AIzaSyDNI_ZWPqvdS6r6gPVO50I4TlYkfkZdXh8" /> <!-- Activities người dùng -->
         <activity
             android:name=".VNPayActivity"
             android:exported="false" />
