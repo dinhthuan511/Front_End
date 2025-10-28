@@ -9,51 +9,53 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="24dp"
         android:gravity="center_horizontal">
 
-        <!-- Logo / App name -->
+        <!-- Tiêu đề -->
         <TextView
             android:id="@+id/appName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BookStore"
-            android:textSize="28sp"
+            android:text="Đăng nhập"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#3F51B5"
-            android:layout_marginBottom="36dp"
-            android:layout_marginTop="100dp"/>
+            android:textColor="#222222"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"/>
 
-        <!-- Username or email -->
+        <!-- Username hoặc Email -->
         <EditText
             android:id="@+id/editUsernameOrEmail"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Tên đăng nhập hoặc Email"
-            android:inputType="textEmailAddress"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text" />
+            android:inputType="textEmailAddress|textNoSuggestions"
+            android:paddingHorizontal="12dp"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp" />
 
         <!-- Password -->
         <EditText
             android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginTop="12dp"
             android:hint="Mật khẩu"
             android:inputType="textPassword"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text" />
+            android:paddingHorizontal="12dp"
+            android:background="@android:color/transparent"
+            android:layout_marginBottom="12dp" />
 
-        <!-- Login button -->
+        <!-- Nút Đăng nhập -->
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginTop="24dp"
             android:text="Đăng nhập"
+            android:textColor="#FFFFFF"
             android:backgroundTint="#3F51B5"
-            android:textColor="#FFFFFF" />
+            android:layout_marginTop="8dp" />
 
         <!-- Divider -->
         <TextView
@@ -61,11 +63,11 @@
             android:layout_height="wrap_content"
             android:text="──────────  hoặc  ──────────"
             android:gravity="center"
-            android:textColor="#AAAAAA"
-            android:layout_marginTop="20dp"
+            android:textColor="#9E9E9E"
+            android:layout_marginTop="16dp"
             android:textSize="12sp" />
 
-        <!-- Go to register -->
+        <!-- Đi tới Đăng ký -->
         <TextView
             android:id="@+id/btnGoToRegister"
             android:layout_width="wrap_content"
@@ -73,7 +75,7 @@
             android:text="Chưa có tài khoản? Đăng ký ngay"
             android:textColor="#3F51B5"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:textSize="14sp" />
 
     </LinearLayout>

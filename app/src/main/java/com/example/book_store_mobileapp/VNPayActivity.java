@@ -25,7 +25,8 @@ public class VNPayActivity extends AppCompatActivity {
     private Button btnPayVNPay;
     private ImageButton btnBack;
 
-    private String name, phone, address, totalAmount;
+    private String name, phone, address;
+      private double total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +46,14 @@ public class VNPayActivity extends AppCompatActivity {
         // Nhận dữ liệu từ CheckoutActivity
         Intent intent = getIntent();
         cartItems = intent.getParcelableArrayListExtra("cartItems");
-        totalAmount = intent.getStringExtra("totalAmount");
+        total = intent.getDoubleExtra("total", 0);
         name = intent.getStringExtra("name");
         phone = intent.getStringExtra("phone");
         address = intent.getStringExtra("address");
 
         // Hiển thị thông tin khách hàng
         txtCustomerInfo.setText("Tên: " + name + "\nSĐT: " + phone + "\nĐịa chỉ: " + address);
-        txtTotalVNPay.setText(totalAmount);
+        txtTotalVNPay.setText(FormatUtils.formatCurrency(total));
 
         // Hiển thị danh sách hàng
         adapter = new CheckoutAdapter(this, cartItems);
@@ -76,11 +77,6 @@ public class VNPayActivity extends AppCompatActivity {
         // 🔹 Giả lập thanh toán thành công
         Toast.makeText(this, "Thanh toán VNPay thành công!", Toast.LENGTH_SHORT).show();
 
-        // 🔹 Lưu đơn hàng vào Firebase
-        double total = 0;
-        try {
-            total = Double.parseDouble(totalAmount.replaceAll("[^0-9.]", ""));
-        } catch (Exception ignored) { }
 
         saveOrderToFirebase(name, phone, address, bankAccount, total, cartItems);
     }
@@ -104,8 +100,8 @@ public class VNPayActivity extends AppCompatActivity {
         order.put("paymentMethod", "VNPay");
         order.put("bankAccount", bankAccount);
         order.put("paymentStatus", "Đã thanh toán");
-        order.put("status", "Đang vận chuyển");
-        order.put("total", totalAmount + " VND");
+        order.put("status", "Chờ xác nhận");
+        order.put("total", total);
         order.put("createdAt", FieldValue.serverTimestamp());
 
         // 🔹 Chuyển danh sách giỏ hàng thành danh sách Map

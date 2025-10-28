@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rowRoot"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:tint="#FF6A00"
+        android:src="@drawable/outline_house_with_shield_24"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:text="Tiêu đề"
+        android:textColor="#111827"
+        android:textSize="15sp"/>
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/outline_chevron_right_24"
+        android:tint="#C7C9D1"/>
+</LinearLayout>

@@ -56,11 +56,9 @@ public class CheckoutActivity extends AppCompatActivity {
         for (CartItem item : cartItems) {
             total += item.getBook().getPrice() * item.getQuantity();
         }
-        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        txtTotal.setText("Tổng cộng: " + formatter.format(total) + " VND");
+        txtTotal.setText("Tổng cộng: " + FormatUtils.formatCurrency(total));
 
         btnBack.setOnClickListener(v -> finish());
-
         btnConfirm.setOnClickListener(v -> handleConfirm());
     }
 
@@ -89,7 +87,7 @@ public class CheckoutActivity extends AppCompatActivity {
             // Chuyển sang trang VNPay
             Intent intent = new Intent(this, VNPayActivity.class);
             intent.putParcelableArrayListExtra("cartItems", cartItems);
-            intent.putExtra("totalAmount", total);
+            intent.putExtra("total", total); // giữ nguyên kiểu double
             intent.putExtra("name", name);
             intent.putExtra("phone", phone);
             intent.putExtra("address", address);
@@ -108,10 +106,10 @@ public class CheckoutActivity extends AppCompatActivity {
             order.put("name", name);
             order.put("phone", phone);
             order.put("address", address);
-            order.put("total", total + " VND");
+            order.put("total", total); //
             order.put("paymentMethod", paymentMethod);
             order.put("paymentStatus", "Chưa thanh toán");
-            order.put("status", "Đang vận chuyển");
+            order.put("status", "Chờ xác nhận");
             order.put("createdAt", FieldValue.serverTimestamp());
 
             // Danh sách sản phẩm
@@ -121,10 +119,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 itemMap.put("quantity", item.getQuantity());
 
                 Map<String, Object> bookMap = new HashMap<>();
-                bookMap.put("bookId", item.getBook().getBookId() != null ? item.getBook().getBookId() : "");
-                bookMap.put("name", item.getBook().getName() != null ? item.getBook().getName() : "");
+                bookMap.put("bookId", item.getBook().getBookId());
+                bookMap.put("name", item.getBook().getName());
                 bookMap.put("price", item.getBook().getPrice());
-                bookMap.put("imageUrl", item.getBook().getImageUrl() != null ? item.getBook().getImageUrl() : "");
+                bookMap.put("imageUrl", item.getBook().getImageUrl());
 
                 itemMap.put("book", bookMap);
                 itemsList.add(itemMap);
@@ -137,8 +135,7 @@ public class CheckoutActivity extends AppCompatActivity {
                         // 🔹 Gọi clearCart sau khi lưu đơn hàng thành công
                         FirebaseCartService cartService = new FirebaseCartService();
                         cartService.clearCart(userId, () -> {
-                            Toast.makeText(this, "Đặt hàng thành công!.", Toast.LENGTH_SHORT).show();
-                            // Sau khi xóa giỏ hàng, chuyển sang trang trạng thái đơn hàng
+                            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(this, PaymentProcessingActivity.class);
                             intent.putExtra("orderId", orderId);
                             startActivity(intent);

@@ -1,65 +1,77 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.book_store_mobileapp.BaseActivity;
+import com.example.book_store_mobileapp.R;
+import com.example.book_store_mobileapp.StoreActivity;
+import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ import service đúng package
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Map;
 
-public class LoginActivity extends AppCompatActivity {
+/**
+ * Login:
+ * - Hỗ trợ login bằng email hoặc username (lookup Firestore).
+ * - Nếu đã đăng nhập: đọc claim 'admin' và điều hướng.
+ * - Sau khi login:
+ *      + Admin  -> AdminDashboardActivity
+ *      + User   -> StoreActivity
+ */
+public class LoginActivity extends BaseActivity {
+
+    private static final String TAG = "LoginActivity";
 
     private EditText editUsernameOrEmail, editPassword;
     private Button btnLogin;
     private TextView btnGoToRegister;
-    private FirebaseAuth mAuth;
+
+    private FirebaseAuthService authService; // ✅ dùng service
     private FirebaseFirestore db;
 
-    // Chặn gọi startActivity nhiều lần do onStart() / idToken callback lặp
+    // Ngăn điều hướng lặp do onStart() + lấy claims
     private boolean alreadyRouted = false;
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
+        // ✅ Nếu đã có session → đọc claim và điều hướng luôn
+        FirebaseUser u = (authService != null) ? authService.currentUser() : null;
         if (u != null && !alreadyRouted) {
             setUiLoading(true);
-            u.getIdToken(true).addOnSuccessListener(result -> {
-                boolean isAdmin = false;
-                Map<String, Object> claims = result.getClaims();
-                Object v = claims.get("admin");
-                if (v instanceof Boolean) isAdmin = (Boolean) v;
-
-                Log.d("CLAIMS", "claims=" + claims);
-                Log.d("NAV", "routeAfterLogin (onStart) isAdmin=" + isAdmin);
-
+            // lấy claims (không ép refresh để nhanh)
+            authService.getIdTokenClaims(false, claimsRes -> {
+                if (!claimsRes.isSuccess()) {            // 🔧 dùng getter
+                    setUiLoading(false);
+                    toast("Không lấy được claim: " + claimsRes.getMessage()); // 🔧 dùng getter
+                    return;
+                }
+                boolean isAdmin = Boolean.TRUE.equals(claimsRes.getData().get("admin")); // 🔧 dùng getter
+                Log.d(TAG, "onStart -> isAdmin=" + isAdmin);
                 alreadyRouted = true;
                 routeAfterLogin(isAdmin);
-            }).addOnFailureListener(e -> {
-                setUiLoading(false);
-                toast("Không lấy được claim: " + e.getMessage());
             });
         }
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
-        db   = FirebaseFirestore.getInstance();
+        authService = new FirebaseAuthService(); // ✅
+        db         = FirebaseFirestore.getInstance();
 
         editUsernameOrEmail = findViewById(R.id.editUsernameOrEmail);
         editPassword        = findViewById(R.id.editPassword);
@@ -68,8 +80,12 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.setOnClickListener(v -> login());
 
-        btnGoToRegister.setOnClickListener(v ->
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+        btnGoToRegister.setOnClickListener(v -> {
+            Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(i);
+            overridePendingTransition(0, 0);
+        });
     }
 
     private void login() {
@@ -111,53 +127,58 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signInWithEmail(String email, String pass) {
-        mAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(t -> {
-            if (!t.isSuccessful()) {
+        // ✅ Gọi service thay vì gọi trực tiếp FirebaseAuth
+        authService.login(email, pass, res -> {
+            if (!res.isSuccess()) {                      // 🔧 dùng getter
                 setUiLoading(false);
                 toast("Sai thông tin đăng nhập");
                 return;
             }
-            FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
-            if (u == null) {
-                setUiLoading(false);
-                toast("Lỗi đăng nhập");
-                return;
-            }
 
-            // Lấy custom claim 'admin' rồi điều hướng
-            u.getIdToken(true).addOnSuccessListener(result -> {
-                boolean isAdmin = false;
-                Map<String, Object> claims = result.getClaims();
-                Object v = claims.get("admin");
-                if (v instanceof Boolean) isAdmin = (Boolean) v;
-
-                Log.d("CLAIMS", "claims=" + claims);
-                Log.d("NAV", "routeAfterLogin (login) isAdmin=" + isAdmin);
+            // ✅ Ép refresh token để lấy custom claim 'admin' mới nhất
+            authService.getIdTokenClaims(true, claimsRes -> {
+                if (!claimsRes.isSuccess()) {            // 🔧 dùng getter
+                    setUiLoading(false);
+                    toast("Không lấy được claim: " + claimsRes.getMessage()); // 🔧
+                    return;
+                }
+                Map<String, Object> claims = claimsRes.getData(); // 🔧
+                boolean isAdmin = Boolean.TRUE.equals(claims.get("admin"));
+                Log.d(TAG, "claims=" + claims);
+                Log.d(TAG, "routeAfterLogin (login) isAdmin=" + isAdmin);
 
                 toast("Đăng nhập thành công!");
                 alreadyRouted = true; // tránh onStart() redirect thêm lần nữa
                 routeAfterLogin(isAdmin);
-            }).addOnFailureListener(e -> {
-                setUiLoading(false);
-                toast("Không lấy được claim: " + e.getMessage());
             });
         });
     }
 
+    /**
+     * Điều hướng sau đăng nhập:
+     * - Admin  -> AdminDashboardActivity
+     * - User   -> StoreActivity
+     */
     private void routeAfterLogin(boolean isAdmin) {
-        Log.d("NAV", "Starting " + (isAdmin ? "AdminActivity" : "StoreActivity"));
-        Intent i = new Intent(this, isAdmin ? AdminActivity.class : StoreActivity.class);
+        Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "StoreActivity"));
+        Intent i = new Intent(this, isAdmin ? com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class : StoreActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
+        overridePendingTransition(0, 0);
         finish();
     }
 
     private void setUiLoading(boolean loading) {
         btnLogin.setEnabled(!loading);
-        // Có thể hiển thị ProgressBar nếu muốn
+        // Nếu có ProgressBar, bật/tắt ở đây
     }
 
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_profile;
     }
 }

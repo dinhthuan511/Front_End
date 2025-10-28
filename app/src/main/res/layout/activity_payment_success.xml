@@ -21,7 +21,7 @@
         android:id="@+id/btnViewOrder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Xem trạng thái đơn hàng"
+        android:text="Quay về trang chủ"
         android:padding="12dp"
         android:backgroundTint="#2E7D32"
         android:textColor="#FFFFFF" />

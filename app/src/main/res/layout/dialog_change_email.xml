@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/edtNewEmail"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Email mới"
+        android:inputType="textEmailAddress"
+        android:paddingHorizontal="12dp" />
+
+    <EditText
+        android:id="@+id/edtCurrentPassword"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Mật khẩu hiện tại (để xác thực)"
+        android:inputType="textPassword"
+        android:paddingHorizontal="12dp"
+        android:layout_marginTop="12dp" />
+
+    <Button
+        android:id="@+id/btnSendVerify"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Gửi email xác minh"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnIHaveVerified"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Tôi đã xác minh xong"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

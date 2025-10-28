@@ -61,7 +61,7 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
-        btnLogout = findViewById(R.id.btnLogout);
+
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
@@ -69,13 +69,13 @@ public class StoreActivity extends BaseActivity {
         progressBar = findViewById(R.id.progressBar);
 
         // ✅ Logout
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
-        });
+//        btnLogout.setOnClickListener(v -> {
+//            FirebaseAuth.getInstance().signOut();
+//            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+//            finish();
+//        });
 
         // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {

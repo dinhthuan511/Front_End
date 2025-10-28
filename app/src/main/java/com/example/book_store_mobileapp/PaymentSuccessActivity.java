@@ -23,7 +23,7 @@ public class PaymentSuccessActivity extends AppCompatActivity {
 
         btnViewOrder.setOnClickListener(v -> {
             String orderId = getIntent().getStringExtra("orderId");
-            Intent intent = new Intent(PaymentSuccessActivity.this, OrderStatusActivity.class);
+            Intent intent = new Intent(PaymentSuccessActivity.this, StoreActivity.class);
             intent.putExtra("orderId", orderId);
             startActivity(intent);
             finish();

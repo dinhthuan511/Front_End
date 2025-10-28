@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <!-- AppBar cố định trên cùng -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Tài khoản &amp; Bảo mật"
+            app:titleTextColor="@android:color/black"
+            app:navigationIcon="@drawable/outline_arrow_back_24"
+            app:navigationIconTint="@android:color/black" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Nội dung cuộn -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Phần giới thiệu -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cập nhật thông tin cá nhân để bảo mật tài khoản và nhận ưu đãi tốt hơn."
+                android:textSize="13sp"
+                android:textColor="#777"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Username -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tên đăng nhập"
+                android:textStyle="bold"
+                android:textColor="#333" />
+
+            <EditText
+                android:id="@+id/edtUsername"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:enabled="false"
+                android:background="@android:color/transparent"
+                android:textColor="#222"
+                android:paddingHorizontal="12dp"
+                android:hint="Không thể thay đổi"
+                android:textSize="14sp" />
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textStyle="bold"
+                android:textColor="#333" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/edtEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:background="@android:color/transparent"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp"
+                    android:hint="Chưa có email" />
+
+                <TextView
+                    android:id="@+id/tvChangeEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thay đổi"
+                    android:textColor="#1976D2"
+                    android:textStyle="bold"
+                    android:padding="8dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Phone -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Số điện thoại"
+                android:textStyle="bold"
+                android:textColor="#333" />
+
+            <EditText
+                android:id="@+id/edtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="phone"
+                android:paddingHorizontal="12dp"
+                android:hint="Nhập số điện thoại"
+                android:background="@android:color/transparent"
+                android:textSize="14sp" />
+
+            <!-- Address -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Địa chỉ"
+                android:textStyle="bold"
+                android:textColor="#333" />
+
+            <EditText
+                android:id="@+id/edtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:gravity="top|start"
+                android:inputType="textPostalAddress"
+                android:padding="12dp"
+                android:hint="Nhập địa chỉ của bạn"
+                android:background="@android:color/transparent"
+                android:textSize="14sp" />
+
+            <!-- Nút đổi mật khẩu -->
+            <Button
+                android:id="@+id/btnChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Đổi mật khẩu"
+                android:backgroundTint="#CC0000"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="20dp"
+                android:textSize="15sp" />
+
+            <!-- Nút lưu -->
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Lưu thay đổi"
+                android:enabled="false"
+                android:backgroundTint="#BDBDBD"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="10dp"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

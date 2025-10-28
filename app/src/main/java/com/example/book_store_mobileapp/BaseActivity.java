@@ -8,7 +8,10 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
+import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -50,12 +53,14 @@ public abstract class BaseActivity extends AppCompatActivity {
                 intent = new Intent(this, HomeActivity.class);
             } else if (itemId == R.id.nav_store) {
                 intent = new Intent(this, StoreActivity.class);
-            } else if (itemId == R.id.nav_cart_bottom) {
-                intent = new Intent(this, CartActivity.class);
-            } else if (itemId == R.id.nav_notifications) {
+            }  else if (itemId == R.id.nav_notifications) {
                 // intent = new Intent(this, NotificationActivity.class);
             } else if (itemId == R.id.nav_profile) {
-                // intent = new Intent(this, ProfileActivity.class);
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    intent = new Intent(this, SettingsActivity.class);
+                } else {
+                    intent = new Intent(this, LoginActivity.class);
+                }
             }
 
             if (intent != null) {

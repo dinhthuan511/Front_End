@@ -14,12 +14,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CartActivity extends BaseActivity {
+public class CartActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView txtTotal;
     private Button btnClear, btnCheckout;
-    private ImageButton btnBack;
+    private ImageButton btnBack ;
     private CartAdapter adapter;
 
     private ArrayList<CartItem> cartItems = new ArrayList<>();
@@ -133,10 +133,5 @@ public class CartActivity extends BaseActivity {
             total += item.getBook().getPrice() * item.getQuantity();
         }
         return total;
-    }
-
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_cart_bottom;
     }
 }

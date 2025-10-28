@@ -1,6 +1,6 @@
 package com.example.book_store_mobileapp;
 
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,59 +11,57 @@ import com.example.book_store_mobileapp.data.CartItem;
 import com.example.book_store_mobileapp.data.Book;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.*;
 
 public class OrderStatusActivity extends AppCompatActivity {
 
     private TextView tvOrderId, tvStatus, tvCustomerInfo, tvTotalAmount;
-    private ImageButton btnBack;
-    private Button btnReturnHome;
     private RecyclerView recyclerOrderItems;
     private CheckoutAdapter adapter;
     private ArrayList<CartItem> orderItems = new ArrayList<>();
     private String orderId;
+    private ImageButton btnBack;
+    private FirebaseFirestore db;
+    private ListenerRegistration orderListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_status);
 
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         tvOrderId = findViewById(R.id.tvOrderId);
         tvStatus = findViewById(R.id.tvStatus);
         tvCustomerInfo = findViewById(R.id.tvCustomerInfo);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
-        btnReturnHome = findViewById(R.id.btnReturnHome);
         recyclerOrderItems = findViewById(R.id.recyclerOrderItems);
         recyclerOrderItems.setLayoutManager(new LinearLayoutManager(this));
+
+        db = FirebaseFirestore.getInstance();
+
         orderId = getIntent().getStringExtra("orderId");
 
         if (orderId != null && !orderId.isEmpty()) {
-            loadOrderDetails(orderId);
+            listenOrderChanges(orderId);
         } else {
             Toast.makeText(this, "Không tìm thấy mã đơn hàng!", Toast.LENGTH_SHORT).show();
         }
-        btnReturnHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, StoreActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
     }
 
-    private void loadOrderDetails(String orderId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("orders").document(orderId)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    if (snapshot.exists()) {
-                        displayOrder(snapshot);
-                    } else {
-                        Toast.makeText(this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
+    private void listenOrderChanges(String orderId) {
+        orderListener = db.collection("orders").document(orderId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        Toast.makeText(this, "Lỗi khi cập nhật đơn: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
                     }
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi khi tải đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+                    if (snapshot != null && snapshot.exists()) {
+                        displayOrder(snapshot);
+                    }
+                });
     }
 
     private void displayOrder(DocumentSnapshot snapshot) {
@@ -72,15 +70,29 @@ public class OrderStatusActivity extends AppCompatActivity {
         String address = snapshot.getString("address");
         String paymentStatus = snapshot.getString("paymentStatus");
         String status = snapshot.getString("status");
-        String total = snapshot.getString("total");
-        List<Map<String, Object>> items = (List<Map<String, Object>>) snapshot.get("items");
+        Double total = snapshot.getDouble("total");
 
         tvOrderId.setText("Mã đơn hàng: " + snapshot.getId());
-        tvStatus.setText("Thanh toán: " + paymentStatus + "\nVận chuyển: " + status);
         tvCustomerInfo.setText("Tên: " + name + "\nSĐT: " + phone + "\nĐịa chỉ: " + address);
-        tvTotalAmount.setText("Tổng tiền: " + total);
+        tvTotalAmount.setText("Tổng tiền: " + FormatUtils.formatCurrency(total));
 
-        // Hiển thị danh sách sản phẩm
+        // ✅ Xử lý hiển thị màu chữ
+        String paymentText = "Thanh toán: " + paymentStatus;
+        String deliveryText = "Vận chuyển: " + status;
+
+        String combined = paymentText + "\n" + deliveryText;
+        tvStatus.setText(combined);
+
+        // ✅ Nếu đã thanh toán hoặc đã giao thì hiển thị màu xanh
+        if ((paymentStatus != null && paymentStatus.equalsIgnoreCase("Đã thanh toán")) ||
+                (status != null && status.equalsIgnoreCase("Đã giao"))) {
+            tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh đậm
+        } else {
+            tvStatus.setTextColor(Color.parseColor("#F57C00")); // cam cho đang xử lý
+        }
+
+        // ✅ Hiển thị danh sách sản phẩm
+        List<Map<String, Object>> items = (List<Map<String, Object>>) snapshot.get("items");
         if (items != null) {
             orderItems.clear();
             for (Map<String, Object> map : items) {
@@ -95,20 +107,34 @@ public class OrderStatusActivity extends AppCompatActivity {
                     book.setBookId((String) bookMap.get("bookId"));
                     book.setName((String) bookMap.get("name"));
                     book.setImageUrl((String) bookMap.get("imageUrl"));
+
                     Object priceObj = bookMap.get("price");
                     if (priceObj instanceof Double)
                         book.setPrice((Double) priceObj);
                     else if (priceObj instanceof Long)
                         book.setPrice(((Long) priceObj).doubleValue());
-                    item.setBook(book);
 
+                    item.setBook(book);
                     orderItems.add(item);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            adapter = new CheckoutAdapter(this, orderItems);
-            recyclerOrderItems.setAdapter(adapter);
+
+            if (adapter == null) {
+                adapter = new CheckoutAdapter(this, orderItems);
+                recyclerOrderItems.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (orderListener != null) {
+            orderListener.remove();
         }
     }
 }
