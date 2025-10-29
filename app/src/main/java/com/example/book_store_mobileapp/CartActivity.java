@@ -18,7 +18,8 @@ public class CartActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView txtTotal;
-    private Button btnClear, btnCheckout;
+
+    private Button btnCheckout;
     private ImageButton btnBack ;
     private CartAdapter adapter;
 
@@ -32,7 +33,6 @@ public class CartActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.listViewCart);
         txtTotal = findViewById(R.id.txtTotal);
-        btnClear = findViewById(R.id.btnClear);
         btnCheckout = findViewById(R.id.btnCheckout);
         btnBack = findViewById(R.id.btnBack);
 
