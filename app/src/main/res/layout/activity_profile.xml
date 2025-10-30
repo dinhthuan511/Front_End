@@ -18,7 +18,6 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Tài khoản của tôi"
             app:titleTextColor="@android:color/black"
             app:titleCentered="false"
             app:navigationIcon="@drawable/outline_arrow_back_24"

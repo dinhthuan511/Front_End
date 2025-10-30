@@ -29,9 +29,9 @@
             android:exported="false" />
 
         <!-- Giữ nguyên theo yêu cầu -->
-        <activity
-            android:name=".network.Firebase"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".network.Firebase"-->
+<!--            android:exported="false" />-->
         <!-- Admin/Store/…: không có intent-filter => exported=false -->
 
         <!-- Admin (đang dùng package ui.admin) -->
@@ -53,7 +53,7 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.SettingsActivity"
+            android:name=".ui.auth.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.AccountSecurityActivity"
@@ -73,6 +73,9 @@
         <activity
             android:name=".StoreActivity"
             android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".PasswordRecoveryActivity"-->
+<!--            android:exported="false"/>-->
 
         <!-- Khối dưới là code cũ từng thử cho Store làm LAUNCHER; để comment là OK
         <activity

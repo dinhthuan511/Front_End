@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.example.book_store_mobileapp.BaseActivity;
+//import com.example.book_store_mobileapp.ui.auth.PasswordRecoveryActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.StoreActivity;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ import service đúng package
@@ -77,6 +78,11 @@ public class LoginActivity extends BaseActivity {
         editPassword        = findViewById(R.id.editPassword);
         btnLogin            = findViewById(R.id.btnLogin);
         btnGoToRegister     = findViewById(R.id.btnGoToRegister);
+
+//        // ✅ Quên mật khẩu
+//        TextView btnForgot = findViewById(R.id.btnForgotPassword);
+//        btnForgot.setOnClickListener(v ->
+//                startActivity(new Intent(this, PasswordRecoveryActivity.class)));
 
         btnLogin.setOnClickListener(v -> login());
 

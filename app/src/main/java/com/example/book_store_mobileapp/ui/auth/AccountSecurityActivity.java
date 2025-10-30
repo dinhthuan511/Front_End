@@ -221,7 +221,7 @@ public class AccountSecurityActivity extends BaseActivity {
 
     @Override
     protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
+        return -1;
     }
 
     private static class SimpleWatcher implements TextWatcher {

@@ -2,13 +2,14 @@ package com.example.book_store_mobileapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
-import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
+import com.example.book_store_mobileapp.ui.auth.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,7 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             // intent = new Intent(this, NotificationActivity.class);
         } else if (itemId == R.id.nav_profile) {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, ProfileActivity.class);
             } else {
                 intent = new Intent(this, LoginActivity.class);
             }
@@ -86,13 +87,20 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void updateNavigationBarState() {
         int menuItemId = getNavigationMenuItemId();
 
+        if (menuItemId == -1) {
+            // ❌ Không highlight gì và ẨN nav bar
+            bottomNavigationView.setVisibility(View.GONE);
+            return;
+        }
+
+        // ✅ Nếu có nav -> HIỆN nav
+        bottomNavigationView.setVisibility(View.VISIBLE);
+
         // Tháo listener để set chọn mà không bị điều hướng
         bottomNavigationView.setOnItemSelectedListener(null);
         bottomNavigationView.setSelectedItemId(menuItemId);
         // Gắn lại listener
         bottomNavigationView.setOnItemSelectedListener(navListener);
-
-        // (Tuỳ chọn) Cách đơn giản hơn:
-        // bottomNavigationView.getMenu().findItem(menuItemId).setChecked(true);
     }
+
 }
