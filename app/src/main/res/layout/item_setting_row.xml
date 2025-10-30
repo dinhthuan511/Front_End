@@ -31,6 +31,6 @@
     <ImageView
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/ic_round_chevron_right_24"
+        android:src="@drawable/outline_chevron_right_24"
         android:tint="#C7C9D1"/>
 </LinearLayout>

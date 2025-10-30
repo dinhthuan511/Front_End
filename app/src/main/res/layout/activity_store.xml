@@ -38,23 +38,23 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/btnLogout"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:background="@android:color/transparent"-->
-<!--                android:contentDescription="@string/logout"-->
-<!--                android:src="@drawable/outline_exit_to_app_24"-->
-<!--                app:tint="@color/black" />-->
+            <!--            <ImageButton-->
+            <!--                android:id="@+id/btnLogout"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:background="@android:color/transparent"-->
+            <!--                android:contentDescription="@string/logout"-->
+            <!--                android:src="@drawable/outline_exit_to_app_24"-->
+            <!--                app:tint="@color/black" />-->
+            <ImageButton
+                            android:id="@+id/btnCart"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="@string/cart"
+                            android:src="@drawable/ic_add_shopping_cart_black_24dp"
+                            app:tint="@color/black" />
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/btnCart"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:background="@android:color/transparent"-->
-<!--                android:contentDescription="@string/cart"-->
-<!--                android:src="@drawable/ic_add_shopping_cart_black_24dp"-->
-<!--                app:tint="@color/black" />-->
         </LinearLayout>
 
     </RelativeLayout>

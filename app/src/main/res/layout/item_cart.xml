@@ -42,15 +42,6 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txtAuthor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Tác giả"
-            android:textColor="#616161"
-            android:textSize="14sp" />
-
-        <TextView
             android:id="@+id/txtBookPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

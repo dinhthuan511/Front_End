@@ -3,9 +3,11 @@ package com.example.book_store_mobileapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,105 +20,120 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
-import com.example.book_store_mobileapp.ui.auth.LoginActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 public class BookDetailActivity extends AppCompatActivity {
 
-    private static final String TAG = "BookDetailActivity";
-
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription, detailBookPrice, detailBookTechnicalSpecifications;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications, txtQuantity;
+    private TextView imageOutOfStockOverlay;
+    private LinearLayout addToCartRow;
     private Button btnAddToCart;
-    private ImageButton btnBack;
+    private ImageButton btnBack, btnMinus, btnPlus;
     private FirebaseCartService cartService;
+
+    private int currentQuantity = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_book_detail);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) ->{
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Init views
+        // Initialize views
+        imageOutOfStockOverlay = findViewById(R.id.imageOutOfStockOverlay);
         detailBookImage = findViewById(R.id.bookImage);
         detailBookName = findViewById(R.id.bookName);
         detailBookAuthor = findViewById(R.id.bookAuthor);
         detailBookDescription = findViewById(R.id.bookDescription);
         detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
+        addToCartRow = findViewById(R.id.addToCartRow);
+        txtQuantity = findViewById(R.id.txtQuantity);
+        btnMinus = findViewById(R.id.btnMinus);
+        btnPlus = findViewById(R.id.btnPlus);
         btnAddToCart = findViewById(R.id.btnAddToCart);
         btnBack = findViewById(R.id.btnBack);
 
-        // Service
+        // Initialize FirebaseCartService
         cartService = new FirebaseCartService();
 
-        // Lấy dữ liệu sách
+        // Get Book from intent
         Book book = getIntent().getParcelableExtra("SELECTED_BOOK");
 
-        if (book != null) {
-            // Bind dữ liệu
+        // Check if book is not null
+        if(book != null){
+            // Set book data
             detailBookName.setText(book.getName());
             detailBookAuthor.setText("Author: " + book.getAuthor());
             detailBookDescription.setText(book.getFullDescription());
-            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications());
-
+            detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
+            // Format the price
             NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = format.format(book.getPrice());
             detailBookPrice.setText(formattedPrice + " VNĐ");
-
+            // Set image with Glide
             Glide.with(this)
                     .load(book.getImageUrl())
                     .error(android.R.drawable.dark_header)
                     .into(detailBookImage);
 
-            // Thêm vào giỏ
-            btnAddToCart.setOnClickListener(v -> {
-                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                if (currentUser == null) {
-                    // Chưa đăng nhập -> chuyển Login
-                    Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                    Intent login = new Intent(this, LoginActivity.class);
-                    // Có thể muốn quay lại màn này sau khi login:
-                    login.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(login);
-                    return;
-                }
+            if(book.getStock() != null && book.getStock() <= 0) {
+                addToCartRow.setVisibility(View.GONE);
+                imageOutOfStockOverlay.setVisibility(View.VISIBLE);
+                detailBookImage.setAlpha(0.25f);
+            } else {
+                addToCartRow.setVisibility(View.VISIBLE);
+                imageOutOfStockOverlay.setVisibility(View.GONE);
+            }
 
-                Log.d(TAG, "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
-                cartService.addToCart(
-                        book,
-                        1,
+            btnMinus.setOnClickListener(v -> {
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    txtQuantity.setText(String.valueOf(currentQuantity));
+                }
+            });
+
+            btnPlus.setOnClickListener(v -> {
+                if(currentQuantity < book.getStock()){
+                    currentQuantity++;
+                    txtQuantity.setText(String.valueOf(currentQuantity));
+                }
+            });
+
+            btnAddToCart.setOnClickListener(v -> {
+                btnAddToCart.setEnabled(false);
+                btnAddToCart.setText("Adding...");
+                Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
+                cartService.addToCart(book, currentQuantity,
                         () -> {
-                            Log.d(TAG, "Thêm thành công: " + book.getName());
-                            Toast.makeText(BookDetailActivity.this,
-                                    book.getName() + " đã được thêm vào giỏ hàng",
-                                    Toast.LENGTH_SHORT).show();
-                            finish(); // Đóng lại trang chi tiết sau khi thêm
+                            Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
+                            Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                            finish();
                         },
                         () -> {
-                            Log.e(TAG, "Thêm thất bại: " + book.getName());
-                            Toast.makeText(BookDetailActivity.this,
-                                    "Lỗi khi thêm vào giỏ hàng",
-                                    Toast.LENGTH_SHORT).show();
+                            Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
+                            btnAddToCart.setEnabled(true);
+                            btnAddToCart.setText("Add to cart");
+                            Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
                         }
                 );
             });
         } else {
+            // Handle book data null
             Toast.makeText(this, "Book data is not found!", Toast.LENGTH_LONG).show();
-            finish();
+            finish(); // Close activity
         }
 
-        // Back
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

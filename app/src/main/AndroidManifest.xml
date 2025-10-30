@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Quyền cần thiết -->
+    <!-- Quyền truy cập Internet và vị trí -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Nếu không dùng location, có thể cân nhắc bỏ bớt 2 quyền dưới để giảm prompt permission -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -17,52 +15,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
-
-        <!-- Ko có API key (placeholder) -->
+        <activity
+            android:name=".OrderDetailActivity"
+            android:exported="false" />
+        <!-- API Key Map -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
-
-        <!-- App screens (exported=false vì không có intent-filter public) -->
+            android:value="YOUR_API_KEY" /> <!-- Activities người dùng -->
+        <activity
+            android:name=".VNPayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OrderStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentSuccessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentProcessingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" />
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-
-        <!-- Giữ nguyên theo yêu cầu -->
-<!--        <activity-->
-<!--            android:name=".network.Firebase"-->
-<!--            android:exported="false" />-->
-        <!-- Admin/Store/…: không có intent-filter => exported=false -->
-
-        <!-- Admin (đang dùng package ui.admin) -->
         <activity
-            android:name=".ui.admin.AdminDashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.admin.AddEditProductActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.admin.AdminProductsActivity"
-            android:exported="false" />
-
-        <!-- User flows -->
-        <activity
-            android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.AccountSecurityActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AddressActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.ChangePasswordActivity"
+            android:name=".StoreActivity"
             android:exported="false" />
         <activity
             android:name=".BookDetailActivity"
@@ -70,35 +49,38 @@
         <activity
             android:name=".CartActivity"
             android:exported="false" />
+        <activity android:name=".OrderListActivity" /> <!-- Admin -->
         <activity
-            android:name=".StoreActivity"
+            android:name=".ui.admin.AdminDashboardActivity"
             android:exported="false" />
-<!--        <activity-->
-<!--            android:name=".PasswordRecoveryActivity"-->
-<!--            android:exported="false"/>-->
-
-        <!-- Khối dưới là code cũ từng thử cho Store làm LAUNCHER; để comment là OK
         <activity
-            android:name=".StoreActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        -->
-
-        <!-- SPLASH LÀ LAUNCHER -->
+            android:name=".AdminOrdersActivity"
+            android:exported="false" /> <!-- User flows -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.AccountSecurityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.ChangePasswordActivity"
+            android:exported="false" /> <!-- Splash (Main entry point) -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Book_Store_MobileApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

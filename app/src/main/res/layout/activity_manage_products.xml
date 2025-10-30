@@ -18,7 +18,7 @@
             android:background="?attr/colorPrimary"
             app:title="Modify product"
             app:titleTextColor="@android:color/white"
-            app:navigationIcon="@drawable/ic_round_arrow_back_24"
+            app:navigationIcon="@drawable/ic_arrowback_black_24dp"
             app:navigationIconTint="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 

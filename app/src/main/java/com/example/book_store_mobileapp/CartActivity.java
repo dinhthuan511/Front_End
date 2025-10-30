@@ -12,14 +12,17 @@ import com.example.book_store_mobileapp.network.FirebaseCartService;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.List;
 
-public class CartActivity extends BaseActivity {
+public class CartActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView txtTotal;
-    private Button btnClear, btnCheckout;
-    private ImageButton btnBack;
+
+    private Button btnCheckout;
+    private ImageButton btnBack ;
     private CartAdapter adapter;
+
     private ArrayList<CartItem> cartItems = new ArrayList<>();
     private FirebaseCartService cartService;
 
@@ -30,7 +33,6 @@ public class CartActivity extends BaseActivity {
 
         listView = findViewById(R.id.listViewCart);
         txtTotal = findViewById(R.id.txtTotal);
-        btnClear = findViewById(R.id.btnClear);
         btnCheckout = findViewById(R.id.btnCheckout);
         btnBack = findViewById(R.id.btnBack);
 
@@ -46,35 +48,12 @@ public class CartActivity extends BaseActivity {
 
         loadCartFromFirebase();
 
-        btnClear.setOnClickListener(v -> {
-            cartService.clearCart(
-                    () -> {
-                        cartItems.clear();
-                        adapter.notifyDataSetChanged();
-                        updateTotal();
-                        Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng", Toast.LENGTH_SHORT).show();
-                    },
-                    () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng", Toast.LENGTH_SHORT).show()
-            );
-        });
-
         btnCheckout.setOnClickListener(v -> {
-            double total = calculateTotal();
-            if (total == 0) {
-                Toast.makeText(this, "Giỏ hàng đang trống!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Toast.makeText(this, "Thanh toán thành công: $" + String.format("%.2f", total), Toast.LENGTH_LONG).show();
-
-            cartService.clearCart(
-                    () -> {
-                        cartItems.clear();
-                        adapter.notifyDataSetChanged();
-                        updateTotal();
-                    },
-                    () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng sau thanh toán", Toast.LENGTH_SHORT).show()
-            );
+            double totalAmount = calculateTotal(); // ✅ Lấy tổng tiền thực tế
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            intent.putExtra("totalAmount", totalAmount);
+            intent.putParcelableArrayListExtra("cartItems", cartItems);
+            startActivity(intent);
         });
     }
 
@@ -139,6 +118,8 @@ public class CartActivity extends BaseActivity {
         });
     }
 
+
+
     private void updateTotal() {
         double total = calculateTotal();
         // Định dạng theo kiểu Việt Nam
@@ -152,10 +133,5 @@ public class CartActivity extends BaseActivity {
             total += item.getBook().getPrice() * item.getQuantity();
         }
         return total;
-    }
-
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_cart_bottom;
     }
 }

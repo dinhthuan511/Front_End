@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EFF5FB"
-    android:fitsSystemWindows="true">   <!-- ✅ chừa chỗ status bar -->
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -14,17 +14,16 @@
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.Material3.ActionBar">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#28527A"
-        app:title="Hello, Admin"
-        app:titleTextColor="@android:color/white"
-        app:menu="@menu/menu_admin_toolbar"/>
-</com.google.android.material.appbar.AppBarLayout>
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#28527A"
+            app:title="Hello, Admin"
+            app:titleTextColor="@android:color/white"
+            app:menu="@menu/menu_admin_toolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Nội dung -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,9 +42,8 @@
                 android:textStyle="bold"
                 android:textColor="#14213D"
                 android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp" />
 
-            <!-- Add new product -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddProduct"
                 android:layout_width="match_parent"
@@ -53,9 +51,8 @@
                 android:text="Add new product"
                 android:textAllCaps="false"
                 app:cornerRadius="16dp"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Modify product -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnModifyProduct"
                 android:layout_width="match_parent"
@@ -65,9 +62,17 @@
                 app:cornerRadius="16dp"
                 app:backgroundTint="#274C77"
                 android:textColor="@android:color/white"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Bạn có thể thêm các nút khác sau này -->
+            <!-- ✅ Nút Quản lý đơn hàng -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManageOrders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quản lý đơn hàng"
+                android:drawableStart="@drawable/outline_orders_24"
+                android:layout_marginTop="12dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
         </LinearLayout>
     </ScrollView>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.AdminOrdersActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ dùng service cho đồng bộ
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
@@ -14,12 +15,12 @@ import com.google.android.material.button.MaterialButton;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private MaterialButton btnAddProduct, btnModifyProduct;
+    private MaterialButton btnAddProduct, btnModifyProduct,btnManageOrders;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);
+        setContentView(R.layout.activity_admin_dashboard);
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
         topAppBar.setTitle("Hello, Admin");
@@ -38,10 +39,13 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         btnAddProduct    = findViewById(R.id.btnAddProduct);
         btnModifyProduct = findViewById(R.id.btnModifyProduct);
+        btnManageOrders = findViewById(R.id.btnManageOrders);
 
         btnAddProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AddEditProductActivity.class)));
         btnModifyProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductsActivity.class)));
+        btnManageOrders.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminOrdersActivity.class))); // 👈 mở trang quản lý đơn hàng
     }
 }

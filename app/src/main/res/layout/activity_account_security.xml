@@ -20,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             app:title="Tài khoản &amp; Bảo mật"
             app:titleTextColor="@android:color/black"
-            app:navigationIcon="@drawable/ic_round_arrow_back_24"
+            app:navigationIcon="@drawable/outline_arrow_back_24"
             app:navigationIconTint="@android:color/black" />
     </com.google.android.material.appbar.AppBarLayout>
 

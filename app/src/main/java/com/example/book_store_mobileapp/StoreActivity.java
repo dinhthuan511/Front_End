@@ -11,18 +11,19 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.book_store_mobileapp.adapter.BookAdapter;
-import com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.BookCategory;
 import com.example.book_store_mobileapp.data.BookFilter;
@@ -37,7 +38,7 @@ public class StoreActivity extends BaseActivity {
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnFilter, btnSort;
+    private ImageButton btnCart, btnFilter, btnSort, btnLogout;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -59,13 +60,15 @@ public class StoreActivity extends BaseActivity {
         });
 
         // ✅ Khởi tạo view
+        btnCart = findViewById(R.id.btnCart);
+
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
 
-//        // ✅ Logout
+        // ✅ Logout
 //        btnLogout.setOnClickListener(v -> {
 //            FirebaseAuth.getInstance().signOut();
 //            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
@@ -74,16 +77,11 @@ public class StoreActivity extends BaseActivity {
 //            finish();
 //        });
 
-//        // ✅ Mở trang Settings (có 2 ô: Tài khoản & Bảo mật, Địa chỉ)
-//        btnProfile.setOnClickListener(v -> {
-//            startActivity(new Intent(StoreActivity.this, SettingsActivity.class));
-//        });
-
-//        // ✅ Giỏ hàng
-//        btnCart.setOnClickListener(v -> {
-//            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
-//            startActivity(intent);
-//        });
+        // ✅ Giỏ hàng
+        btnCart.setOnClickListener(v -> {
+            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
 
         // ✅ Bộ lọc & sắp xếp
         bookFilter = new BookFilter();

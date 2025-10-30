@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#F6F7FB">
+
+    <!-- AppBar chứa Toolbar để không bị view khác đè lên -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.Material3.ActionBar"
+        android:background="@android:color/white">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Tài khoản của tôi"
+            app:titleTextColor="@android:color/black"
+            app:titleCentered="false"
+            app:navigationIcon="@drawable/outline_arrow_back_24"
+            app:navigationIconTint="@android:color/black"
+            app:elevation="2dp" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Nội dung: đặt behavior để CoordinatorLayout quản lý scroll, không đè Toolbar -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Hàng: Tài khoản & Bảo mật -->
+            <include
+                android:id="@+id/rowAccountSecurity"
+                layout="@layout/item_setting_row" />
+            <!-- Hàng: Địa chỉ -->
+            <include
+                android:id="@+id/rowMyOrders"
+                layout="@layout/item_setting_row" />
+            <!-- khoảng trắng cuối -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:background="#F6F7FB" />
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:padding="12dp"
+        android:elevation="4dp"
+        android:gravity="center_horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogoutBottom"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Đăng xuất"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="12dp" />
+
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

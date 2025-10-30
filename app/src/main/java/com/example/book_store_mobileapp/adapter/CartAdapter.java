@@ -122,7 +122,6 @@ public class CartAdapter extends BaseAdapter {
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         });
-
         return convertView;
 
     }
