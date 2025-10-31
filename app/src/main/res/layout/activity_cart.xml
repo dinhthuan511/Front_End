@@ -69,6 +69,14 @@
             android:layout_marginTop="10dp">
 
             <Button
+                android:id="@+id/btnClearAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🗑️ Xóa toàn bộ"
+                android:backgroundTint="#F44336"
+                android:textColor="#FFFFFF" />
+
+            <Button
                 android:id="@+id/btnCheckout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

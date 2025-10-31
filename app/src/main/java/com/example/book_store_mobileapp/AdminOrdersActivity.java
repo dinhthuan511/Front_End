@@ -32,7 +32,7 @@ public class AdminOrdersActivity extends AppCompatActivity {
         recyclerOrders = findViewById(R.id.recyclerOrders);
         recyclerOrders.setLayoutManager(new LinearLayoutManager(this));
 
-        btnBack = findViewById(R.id.btnBack); // ✅ nút back trong layout
+        btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
         orderService = new FirebaseOrderService();
@@ -49,7 +49,6 @@ public class AdminOrdersActivity extends AppCompatActivity {
                     AdminOrdersActivity.this,
                     orderList,
                     new AdminOrderAdapter.OnStatusChangeListener() {
-
                         // ✅ Khi admin thay đổi trạng thái
                         @Override
                         public void onStatusChange(Order order, String newStatus) {
@@ -90,6 +89,7 @@ public class AdminOrdersActivity extends AppCompatActivity {
                     });
 
             recyclerOrders.setAdapter(adapter);
+
         }, e -> Toast.makeText(this, "Lỗi tải đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

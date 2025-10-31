@@ -57,19 +57,21 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
         holder.tvTotal.setText("Tổng tiền: " + order.getTotal() + " ₫");
         holder.tvCreatedAt.setText("Ngày tạo: " + formatDate(order.getCreatedAt()));
 
-        // Trạng thái đơn hàng
+        // Danh sách trạng thái
         String[] statusOptions = {"Đang xử lý", "Đang giao", "Đã giao"};
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, statusOptions);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                statusOptions
+        );
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         holder.spinnerStatus.setAdapter(spinnerAdapter);
 
         // Hiển thị đúng trạng thái hiện tại
         int selectedPos = spinnerAdapter.getPosition(order.getStatus());
-        if (selectedPos >= 0) {
-            holder.spinnerStatus.setSelection(selectedPos, false);
-        }
+        if (selectedPos >= 0) holder.spinnerStatus.setSelection(selectedPos, false);
 
+        // Khi chọn thay đổi trạng thái
         holder.spinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             boolean firstCall = true;
 
@@ -83,7 +85,7 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                 String newStatus = parent.getItemAtPosition(pos).toString();
                 String currentStatus = order.getStatus();
 
-                // ✅ Ngăn không cho lùi trạng thái
+                // Ngăn không cho lùi trạng thái
                 if (currentStatus.equals("Đang giao") && newStatus.equals("Đang xử lý")) {
                     Toast.makeText(context, "Không thể quay lại 'Đang xử lý'", Toast.LENGTH_SHORT).show();
                     holder.spinnerStatus.setSelection(getStatusPosition(currentStatus));
@@ -96,7 +98,7 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                     return;
                 }
 
-                // ✅ Cập nhật hợp lệ
+                // Hợp lệ → cập nhật
                 if (!newStatus.equals(currentStatus)) {
                     listener.onStatusChange(order, newStatus);
                 }
@@ -106,14 +108,12 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // ✅ Nút HỦY ĐƠN
+        // Nút "Hủy đơn"
         holder.btnCancel.setOnClickListener(v -> {
             new AlertDialog.Builder(context)
                     .setTitle("Xác nhận hủy đơn")
                     .setMessage("Bạn có chắc muốn hủy đơn hàng này không?")
-                    .setPositiveButton("Hủy đơn", (dialog, which) -> {
-                        listener.onCancelOrder(order);
-                    })
+                    .setPositiveButton("Hủy đơn", (dialog, which) -> listener.onCancelOrder(order))
                     .setNegativeButton("Không", null)
                     .show();
         });
@@ -140,7 +140,6 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
         }
     }
 
-    // ✅ Hàm lấy vị trí trạng thái trong Spinner
     private int getStatusPosition(String status) {
         switch (status) {
             case "Đang xử lý": return 0;
@@ -150,7 +149,6 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
         }
     }
 
-    // ✅ Format Timestamp -> dd/MM/yyyy HH:mm
     private String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "Không có dữ liệu";
         Date date = timestamp.toDate();

@@ -3,6 +3,7 @@ package com.example.book_store_mobileapp;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.*;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +24,10 @@ public class OrderStatusActivity extends AppCompatActivity {
     private String orderId;
     private ImageButton btnBack;
     private FirebaseFirestore db;
+    private Button btnCancelOrder;
+
     private ListenerRegistration orderListener;
+    private String paymentStatus, deliveryStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class OrderStatusActivity extends AppCompatActivity {
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
         recyclerOrderItems = findViewById(R.id.recyclerOrderItems);
         recyclerOrderItems.setLayoutManager(new LinearLayoutManager(this));
+        btnCancelOrder = findViewById(R.id.btnCancelOrder);
 
         db = FirebaseFirestore.getInstance();
 
@@ -49,6 +54,9 @@ public class OrderStatusActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Không tìm thấy mã đơn hàng!", Toast.LENGTH_SHORT).show();
         }
+
+        // 👉 Xử lý sự kiện hủy đơn hàng
+        btnCancelOrder.setOnClickListener(v -> showCancelConfirmDialog());
     }
 
     private void listenOrderChanges(String orderId) {
@@ -68,27 +76,36 @@ public class OrderStatusActivity extends AppCompatActivity {
         String name = snapshot.getString("name");
         String phone = snapshot.getString("phone");
         String address = snapshot.getString("address");
-        String paymentStatus = snapshot.getString("paymentStatus");
-        String status = snapshot.getString("status");
+        paymentStatus = snapshot.getString("paymentStatus");
+        deliveryStatus = snapshot.getString("status");
         Double total = snapshot.getDouble("total");
 
         tvOrderId.setText("Mã đơn hàng: " + snapshot.getId());
         tvCustomerInfo.setText("Tên: " + name + "\nSĐT: " + phone + "\nĐịa chỉ: " + address);
         tvTotalAmount.setText("Tổng tiền: " + FormatUtils.formatCurrency(total));
 
-        // ✅ Xử lý hiển thị màu chữ
+        // ✅ Hiển thị màu chữ theo trạng thái
         String paymentText = "Thanh toán: " + paymentStatus;
-        String deliveryText = "Vận chuyển: " + status;
+        String deliveryText = "Vận chuyển: " + deliveryStatus;
+        tvStatus.setText(paymentText + "\n" + deliveryText);
 
-        String combined = paymentText + "\n" + deliveryText;
-        tvStatus.setText(combined);
-
-        // ✅ Nếu đã thanh toán hoặc đã giao thì hiển thị màu xanh
         if ((paymentStatus != null && paymentStatus.equalsIgnoreCase("Đã thanh toán")) ||
-                (status != null && status.equalsIgnoreCase("Đã giao"))) {
-            tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh đậm
+                (deliveryStatus != null && deliveryStatus.equalsIgnoreCase("Đã giao"))) {
+            tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh
         } else {
-            tvStatus.setTextColor(Color.parseColor("#F57C00")); // cam cho đang xử lý
+            tvStatus.setTextColor(Color.parseColor("#F57C00")); // cam
+        }
+
+        // ✅ Nếu đã giao hoặc đang giao thì không cho hủy
+        if (deliveryStatus != null &&
+                (deliveryStatus.equalsIgnoreCase("Đang giao") ||
+                        deliveryStatus.equalsIgnoreCase("Đã giao") ||
+                        deliveryStatus.equalsIgnoreCase("Đã hủy"))) {
+            btnCancelOrder.setEnabled(false);
+            btnCancelOrder.setBackgroundTintList(getColorStateList(android.R.color.darker_gray));
+        } else {
+            btnCancelOrder.setEnabled(true);
+            btnCancelOrder.setBackgroundTintList(getColorStateList(android.R.color.holo_red_dark));
         }
 
         // ✅ Hiển thị danh sách sản phẩm
@@ -128,6 +145,33 @@ public class OrderStatusActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         }
+    }
+
+    // 🧩 Hộp thoại xác nhận hủy
+    private void showCancelConfirmDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận hủy đơn hàng")
+                .setMessage("Bạn có chắc chắn muốn hủy đơn hàng này không?")
+                .setPositiveButton("Có, hủy đơn", (dialog, which) -> cancelOrder())
+                .setNegativeButton("Không", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    // 🧩 Hàm thực hiện hủy đơn hàng trong Firestore
+    private void cancelOrder() {
+        if (orderId == null || orderId.isEmpty()) {
+            Toast.makeText(this, "Không tìm thấy mã đơn hàng.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("orders").document(orderId)
+                .update("status", "Đã hủy", "paymentStatus", "Đã hủy")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Đơn hàng đã được hủy thành công!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi khi hủy đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override
