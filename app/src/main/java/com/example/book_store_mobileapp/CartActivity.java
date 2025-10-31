@@ -11,6 +11,7 @@ import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
 import com.example.book_store_mobileapp.data.NotificationManager;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
@@ -70,6 +71,8 @@ public class CartActivity extends BaseActivity {
                         
                         // Update system notification (cart is now empty, so it will be cancelled)
                         NotificationHelper.updateCartSystemNotification(this);
+                        // refresh repository so UI badges update immediately
+                        CartCountRepository.getInstance().refreshCartCount();
                     },
                     () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng", Toast.LENGTH_SHORT).show()
             );
@@ -99,6 +102,8 @@ public class CartActivity extends BaseActivity {
                         
                         // Update system notification (cart is now empty, so it will be cancelled)
                         NotificationHelper.updateCartSystemNotification(this);
+                        // refresh repository so UI badges update immediately
+                        CartCountRepository.getInstance().refreshCartCount();
                     },
                     () -> Toast.makeText(this, "Lỗi khi xóa giỏ hàng sau thanh toán", Toast.LENGTH_SHORT).show()
             );

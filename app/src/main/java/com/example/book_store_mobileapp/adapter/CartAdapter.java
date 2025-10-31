@@ -14,6 +14,7 @@ import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -78,6 +79,8 @@ public class CartAdapter extends BaseAdapter {
                     () -> {
                         Toast.makeText(context, "Cập nhật số lượng +1", Toast.LENGTH_SHORT).show();
                         NotificationHelper.updateCartSystemNotification(context);
+                        // refresh shared repository so UI badges update immediately
+                        CartCountRepository.getInstance().refreshCartCount();
                     },
                     () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
             onUpdateTotal.run();
@@ -94,6 +97,7 @@ public class CartAdapter extends BaseAdapter {
                         () -> {
                             Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show();
                             NotificationHelper.updateCartSystemNotification(context);
+                            CartCountRepository.getInstance().refreshCartCount();
                         },
                         () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
                 onUpdateTotal.run();
@@ -125,15 +129,17 @@ public class CartAdapter extends BaseAdapter {
                                     
                                     // Update system notification
                                     NotificationHelper.updateCartSystemNotification(context);
+                                    // refresh shared repository so UI badges update immediately
+                                    CartCountRepository.getInstance().refreshCartCount();
                                 },
                                 () -> Toast.makeText(context, "Lỗi khi xóa sản phẩm", Toast.LENGTH_SHORT).show());
-                    })
-                    .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        });
+                     })
+                     .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                     .setIcon(android.R.drawable.ic_dialog_alert)
+                     .show();
+         });
 
-        return convertView;
+         return convertView;
 
-    }
-}
+     }
+ }

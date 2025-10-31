@@ -12,6 +12,7 @@ public class FirebaseCartService {
 
     private final FirebaseFirestore db;
     private final String userId;
+    private ListenerRegistration cartCountListener;
 
     public FirebaseCartService() {
         db = FirebaseFirestore.getInstance();
@@ -179,5 +180,45 @@ public class FirebaseCartService {
                 callback.onCartCount(0);
             }
         });
+    }
+
+    /**
+     * Start a realtime listener on the user's cart items and report total quantity via callback.
+     */
+    public void listenToCartItemCount(CartCountCallback callback) {
+        if (userId == null) {
+            callback.onCartCount(0);
+            return;
+        }
+
+        // remove existing listener if present
+        if (cartCountListener != null) {
+            cartCountListener.remove();
+            cartCountListener = null;
+        }
+
+        cartCountListener = getCartRef().addSnapshotListener((value, error) -> {
+            if (error != null || value == null) {
+                callback.onCartCount(0);
+                return;
+            }
+
+            int totalCount = 0;
+            for (DocumentSnapshot doc : value.getDocuments()) {
+                Long quantity = doc.getLong("quantity");
+                if (quantity != null) totalCount += quantity.intValue();
+            }
+            callback.onCartCount(totalCount);
+        });
+    }
+
+    /**
+     * Stop the realtime cart listener if it exists.
+     */
+    public void stopListeningToCartCount() {
+        if (cartCountListener != null) {
+            cartCountListener.remove();
+            cartCountListener = null;
+        }
     }
 }

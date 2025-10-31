@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.AppNotification;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.NotificationManager;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
 
 import java.text.NumberFormat;
@@ -97,6 +98,9 @@ public class BookDetailActivity extends AppCompatActivity {
                             // Update system notification with current cart count
                             NotificationHelper.createCartChannel(BookDetailActivity.this);
                             NotificationHelper.updateCartSystemNotification(BookDetailActivity.this);
+
+                            // Force repository to refresh and notify listeners (update UI badges)
+                            CartCountRepository.getInstance().refreshCartCount();
 
                             finish();
                         },

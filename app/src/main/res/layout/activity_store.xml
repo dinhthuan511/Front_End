@@ -26,17 +26,37 @@
             android:contentDescription="@string/logout"
             android:src="@drawable/outline_exit_to_app_24"
             app:tint="@color/black" />
-        <ImageButton
 
-
-
-            android:id="@+id/btnCart"
+        <FrameLayout
+            android:id="@+id/cart_btn_container"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/cart"
-            android:src="@drawable/ic_add_shopping_cart_black_24dp"
-            app:tint="@color/black" />
+            android:layout_gravity="end">
+
+            <ImageButton
+                android:id="@+id/btnCart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/cart"
+                android:src="@drawable/ic_add_shopping_cart_black_24dp"
+                app:tint="@color/black" />
+
+            <!-- Simple badge overlay implemented with a TextView to avoid experimental APIs -->
+            <TextView
+                android:id="@+id/top_cart_badge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="-4dp"
+                android:background="@drawable/circle_red"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:visibility="gone" />
+
+        </FrameLayout>
     </LinearLayout>
 
     <!-- Thanh tìm kiếm -->
@@ -103,7 +123,7 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
-        <!-- Danh sách sách -->
+    <!-- Danh sách sách -->
     <GridView
         android:id="@+id/grid_view"
         android:layout_width="match_parent"

@@ -9,11 +9,16 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import android.widget.FrameLayout;
+import androidx.core.content.ContextCompat;
+
+import com.example.book_store_mobileapp.network.CartCountRepository;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,6 +38,17 @@ public class StoreActivity extends BaseActivity {
     private ProgressBar progressBar;
     private EditText txtSearchName;
     private ImageButton btnCart, btnFilter, btnSort, btnLogout;
+    private FrameLayout cartBtnContainer;
+    private TextView cartBadge;
+    private final CartCountRepository.CartCountCallback cartCountCallback = count -> runOnUiThread(() -> {
+        if (cartBadge == null) return;
+        if (count > 0) {
+            cartBadge.setText(String.valueOf(count > 99 ? "99+" : count));
+            cartBadge.setVisibility(View.VISIBLE);
+        } else {
+            cartBadge.setVisibility(View.GONE);
+        }
+    });
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -55,6 +71,7 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
+        cartBtnContainer = findViewById(R.id.cart_btn_container);
         btnLogout = findViewById(R.id.btnLogout);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
@@ -76,6 +93,10 @@ public class StoreActivity extends BaseActivity {
             Intent intent = new Intent(StoreActivity.this, CartActivity.class);
             startActivity(intent);
         });
+
+        // Setup simple top-right cart badge TextView
+        cartBadge = findViewById(R.id.top_cart_badge);
+        cartBadge.setVisibility(View.GONE);
 
         // ✅ Bộ lọc & sắp xếp
         bookFilter = new BookFilter();
@@ -174,6 +195,20 @@ public class StoreActivity extends BaseActivity {
                 Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register with shared repository so we get realtime cart updates
+        CartCountRepository.getInstance().registerListener(cartCountCallback);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // unregister from repository when not visible
+        CartCountRepository.getInstance().unregisterListener(cartCountCallback);
     }
 
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào
