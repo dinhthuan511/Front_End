@@ -18,6 +18,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
+import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,15 +92,28 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
         });
 
         cardCart.setOnClickListener(v -> {
-            startActivity(new Intent(HomeActivity.this, CartActivity.class));
+            if(FirebaseAuth.getInstance().getCurrentUser() == null)
+                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            else{
+                startActivity(new Intent(HomeActivity.this, CartActivity.class));
+            }
         });
 
-        cardNotification.setOnClickListener(v -> {;
-            Toast.makeText(this, "Chức năng Thông báo sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
+        cardNotification.setOnClickListener(v -> {
+            if(FirebaseAuth.getInstance().getCurrentUser() == null)
+                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            else{
+//                startActivity(new Intent(HomeActivity.this, NotificationActivity.class));
+                Toast.makeText(this, "Chức năng Thông báo sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        cardProfile.setOnClickListener(v -> {;
-            Toast.makeText(this, "Chức năng Hồ sơ sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
+        cardProfile.setOnClickListener(v -> {
+            if(FirebaseAuth.getInstance().getCurrentUser() == null)
+                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            else{
+                startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
+            }
         });
     }
 

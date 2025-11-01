@@ -10,11 +10,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.BaseActivity;
+import com.example.book_store_mobileapp.HomeActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.StoreActivity;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ import service đúng package
+import com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -28,7 +31,7 @@ import java.util.Map;
  *      + Admin  -> AdminDashboardActivity
  *      + User   -> StoreActivity
  */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
@@ -157,11 +160,11 @@ public class LoginActivity extends BaseActivity {
     /**
      * Điều hướng sau đăng nhập:
      * - Admin  -> AdminDashboardActivity
-     * - User   -> StoreActivity
+     * - User   -> HomeActivity
      */
     private void routeAfterLogin(boolean isAdmin) {
-        Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "StoreActivity"));
-        Intent i = new Intent(this, isAdmin ? com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class : StoreActivity.class);
+        Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "HomeActivity"));
+        Intent i = new Intent(this, isAdmin ? AdminDashboardActivity.class : HomeActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
         overridePendingTransition(0, 0);
@@ -175,10 +178,5 @@ public class LoginActivity extends BaseActivity {
 
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
     }
 }

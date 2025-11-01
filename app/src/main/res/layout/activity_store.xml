@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="@string/search_for"
+            android:text="Tìm kiếm: "
             android:textColor="@color/black"
             android:textSize="16sp" />
 
@@ -83,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:autofillHints="username"
-            android:hint="@string/enter_book_name"
+            android:hint="Nhập tên sách ..."
             android:inputType="text" />
     </LinearLayout>
 

@@ -54,7 +54,11 @@ public abstract class BaseActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_store) {
                 intent = new Intent(this, StoreActivity.class);
             }  else if (itemId == R.id.nav_notifications) {
-                // intent = new Intent(this, NotificationActivity.class);
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    // intent = new Intent(this, NotificationActivity.class);
+                } else {
+                    intent = new Intent(this, LoginActivity.class);
+                }
             } else if (itemId == R.id.nav_profile) {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     intent = new Intent(this, SettingsActivity.class);
