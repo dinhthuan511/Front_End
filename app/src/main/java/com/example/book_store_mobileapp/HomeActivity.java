@@ -103,9 +103,7 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             if(FirebaseAuth.getInstance().getCurrentUser() == null)
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
             else{
-//                startActivity(new Intent(HomeActivity.this, NotificationActivity.class));
-                Toast.makeText(this, "Chức năng Thông báo sẽ sớm được cập nhật!", Toast.LENGTH_SHORT).show();
-            }
+                startActivity(new Intent(HomeActivity.this, NotificationCenterActivity.class));}
         });
 
         cardProfile.setOnClickListener(v -> {
