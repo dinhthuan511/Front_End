@@ -7,20 +7,4 @@
 
     <style name="Theme.Book_Store_MobileApp" parent="Base.Theme.Book_Store_MobileApp" />
 
-    <!-- ✅ Thêm theme splash riêng cho SplashActivity -->
-<!--    <style name="Theme.Book_Store_MobileApp.Splash" parent="Theme.SplashScreen">-->
-<!--        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_splash_logo_book</item>-->
-<!--        <item name="windowSplashScreenBackground">#FFFFFF</item>-->
-<!--        <item name="postSplashScreenTheme">@style/Theme.Book_Store_MobileApp</item>-->
-<!--    </style>-->
-    <style name="Theme.Book_Store_MobileApp.Splash" parent="Theme.SplashScreen">
-        <!-- Dùng icon launcher mặc định -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
-
-        <!-- Màu nền dùng theo theme hệ thống -->
-        <item name="windowSplashScreenBackground">?android:colorBackground</item>
-
-        <!-- Sau splash sẽ dùng theme chính -->
-        <item name="postSplashScreenTheme">@style/Theme.Book_Store_MobileApp</item>
-    </style>
 </resources>

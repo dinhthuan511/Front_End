@@ -68,11 +68,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tiền mặt khi nhận hàng" />
+
             <RadioButton
-                android:id="@+id/rbVNPay"
+                android:id="@+id/rdoZaloPay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thanh toán qua VNPay" />
+                android:text="ZaloPay" />
+
+
         </RadioGroup>
 
         <!-- Kiểm tra lại đơn hàng -->

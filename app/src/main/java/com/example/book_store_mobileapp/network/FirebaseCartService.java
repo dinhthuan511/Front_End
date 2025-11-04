@@ -145,14 +145,20 @@ public class FirebaseCartService {
                 .collection("carts")
                 .document(userId)
                 .collection("items");
+
         cartRef.get().addOnSuccessListener(query -> {
             WriteBatch batch = FirebaseFirestore.getInstance().batch();
             for (DocumentSnapshot doc : query.getDocuments()) {
                 batch.delete(doc.getReference());
             }
-            batch.commit().addOnSuccessListener(unused -> {
-                if (onSuccess != null) onSuccess.run();
-            });
-        });
+
+            batch.commit()
+                    .addOnSuccessListener(unused -> {
+                        Log.d("CART", "✅ Đã xóa giỏ hàng thành công!");
+                        if (onSuccess != null) onSuccess.run();
+                    })
+                    .addOnFailureListener(e -> Log.e("CART", "❌ Lỗi xóa giỏ hàng: " + e.getMessage()));
+        }).addOnFailureListener(e ->
+                Log.e("CART", "❌ Lỗi lấy danh sách giỏ hàng: " + e.getMessage()));
     }
 }

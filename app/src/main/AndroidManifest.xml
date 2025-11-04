@@ -1,86 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!-- Quyền truy cập Internet và vị trí -->
+
+    <!-- Quyền truy cập -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
+        android:name=".ZaloPaySDKInit"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
+
+        <activity android:name=".CheckoutActivity" android:exported="false" />
+        <!-- ✅ ZaloPay Callback Activity -->
         <activity
-            android:name=".OrderDetailActivity"
-            android:exported="false" />
-        <!-- API Key Map -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDNI_ZWPqvdS6r6gPVO50I4TlYkfkZdXh8" /> <!-- Activities người dùng -->
-        <activity
-            android:name=".VNPayActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OrderStatusActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentSuccessActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentProcessingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CheckoutActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
+            android:name=".ZaloPayActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <intent-filter>
+                <data android:scheme="zalopay2554" android:host="app" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
+        <!-- ✅ Screens -->
+        <activity android:name=".PaymentSuccessActivity" android:exported="false" />
+        <activity android:name=".PaymentProcessingActivity" android:exported="false" />
+        <activity android:name=".OrderDetailActivity" android:exported="false" />
+        <activity android:name=".OrderStatusActivity" android:exported="false" />
+        <activity android:name=".CartActivity" android:exported="false" />
+        <activity android:name=".OrderListActivity" android:exported="false" />
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".BookDetailActivity" android:exported="false" />
+
+        <!-- ✅ Checkout (no intent filter) -->
+
+
+        <!-- ✅ Admin -->
+        <activity android:name=".ui.admin.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".AdminOrdersActivity" android:exported="false" />
+
+        <!-- ✅ Auth -->
+        <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
+        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
+        <activity android:name=".ui.auth.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.auth.AccountSecurityActivity" android:exported="false" />
+        <activity android:name=".ui.auth.ChangePasswordActivity" android:exported="false" />
+
+        <!-- ✅ StoreActivity là màn hình mở đầu -->
         <activity
             android:name=".StoreActivity"
-            android:exported="false" />
-        <activity
-            android:name=".BookDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CartActivity"
-            android:exported="false" />
-        <activity android:name=".OrderListActivity" /> <!-- Admin -->
-        <activity
-            android:name=".ui.admin.AdminDashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AdminOrdersActivity"
-            android:exported="false" /> <!-- User flows -->
-        <activity
-            android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.AccountSecurityActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.ChangePasswordActivity"
-            android:exported="false" /> <!-- Splash (Main entry point) -->
-        <activity
-            android:name=".SplashActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Book_Store_MobileApp.Splash">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

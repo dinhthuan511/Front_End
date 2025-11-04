@@ -2,24 +2,20 @@ package com.example.book_store_mobileapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.book_store_mobileapp.adapter.CheckoutAdapter;
 import com.example.book_store_mobileapp.data.CartItem;
-import com.example.book_store_mobileapp.network.FirebaseCartService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import java.text.NumberFormat;
-import java.util.*;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class CheckoutActivity extends AppCompatActivity {
 
     private ArrayList<CartItem> cartItems;
-    private CheckoutAdapter adapter;
     private TextView txtTotal;
     private EditText edtName, edtPhone, edtAddress;
     private RadioGroup paymentMethodGroup;
@@ -32,7 +28,7 @@ public class CheckoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
-        // Ánh xạ view
+        // views
         txtTotal = findViewById(R.id.txtTotal);
         edtName = findViewById(R.id.edtName);
         edtPhone = findViewById(R.id.edtPhone);
@@ -44,14 +40,14 @@ public class CheckoutActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recyclerCheckout);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Nhận cartItems từ Intent
+        // get cart from Intent
         cartItems = getIntent().getParcelableArrayListExtra("cartItems");
         if (cartItems == null) cartItems = new ArrayList<>();
 
-        adapter = new CheckoutAdapter(this, cartItems);
+        CheckoutAdapter adapter = new CheckoutAdapter(this, cartItems);
         recyclerView.setAdapter(adapter);
 
-        // Tính tổng tiền
+        // calc total
         total = 0;
         for (CartItem item : cartItems) {
             total += item.getBook().getPrice() * item.getQuantity();
@@ -72,79 +68,81 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        int selectedMethodId = paymentMethodGroup.getCheckedRadioButtonId();
-        if (selectedMethodId == -1) {
+        int selectedMethodId  = paymentMethodGroup.getCheckedRadioButtonId();
+        if (selectedMethodId  == -1) {
             Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        RadioButton selectedMethod = findViewById(selectedMethodId);
+        RadioButton selectedMethod = findViewById(selectedMethodId );
         String method = selectedMethod.getText().toString();
 
-        if (method.contains("Tiền mặt")) {
-            saveOrderToFirebase(name, phone, address, "Tiền mặt");
-        } else {
-            // Chuyển sang trang VNPay
-            Intent intent = new Intent(this, VNPayActivity.class);
-            intent.putParcelableArrayListExtra("cartItems", cartItems);
-            intent.putExtra("total", total); // giữ nguyên kiểu double
-            intent.putExtra("name", name);
-            intent.putExtra("phone", phone);
-            intent.putExtra("address", address);
-            startActivity(intent);
+
+        if (method.contains("ZaloPay")) {
+            Log.d("CHECKOUT", "🟢 Bắt đầu gọi createOrderAndStartPayment()");
+            createOrderAndStartPayment(name, phone, address);
+        }
+        else if (method.contains("Tiền mặt")) {
+            Log.d("CHECKOUT", "💰 Thanh toán tiền mặt - lưu đơn hàng ngay");
+            OrderRepository.saveOrder(
+                    this,
+                    cartItems,
+                    total,
+                    name,
+                    phone,
+                    address,
+                    "Tiền mặt",
+                    "CHƯA THANH TOÁN",
+                    null,
+                    null,
+                    null
+            );
+            Toast.makeText(this, "Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "Phương thức này hiện chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // 🟢 Hàm lưu đơn hàng vào Firestore
-    private void saveOrderToFirebase(String name, String phone, String address, String paymentMethod) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            String userId = user.getUid();
-            Map<String, Object> order = new HashMap<>();
-            order.put("userId", userId);
-            order.put("name", name);
-            order.put("phone", phone);
-            order.put("address", address);
-            order.put("total", total); //
-            order.put("paymentMethod", paymentMethod);
-            order.put("paymentStatus", "Chưa thanh toán");
-            order.put("status", "Chờ xác nhận");
-            order.put("createdAt", FieldValue.serverTimestamp());
 
-            // Danh sách sản phẩm
-            List<Map<String, Object>> itemsList = new ArrayList<>();
-            for (CartItem item : cartItems) {
-                Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("quantity", item.getQuantity());
+    private void createOrderAndStartPayment(String name, String phone, String address) {
+        new Thread(() -> {
+            try {
+                Log.d("CreateOrder", "🔹 Bắt đầu tạo đơn hàng ZaloPay...");
+                CreateOrder createOrder = new CreateOrder();
+                long amount = Math.round(total); // Ép kiểu double → long, đảm bảo chính xác
+                JSONObject resp = createOrder.createOrder(String.valueOf(amount));
 
-                Map<String, Object> bookMap = new HashMap<>();
-                bookMap.put("bookId", item.getBook().getBookId());
-                bookMap.put("name", item.getBook().getName());
-                bookMap.put("price", item.getBook().getPrice());
-                bookMap.put("imageUrl", item.getBook().getImageUrl());
+                Log.d("CreateOrder", "✅ Response từ ZaloPay: " + resp.toString());
 
-                itemMap.put("book", bookMap);
-                itemsList.add(itemMap);
-            }
-            order.put("items", itemsList);
-
-            db.collection("orders").add(order)
-                    .addOnSuccessListener(docRef -> {
-                        String orderId = docRef.getId();
-                        // 🔹 Gọi clearCart sau khi lưu đơn hàng thành công
-                        FirebaseCartService cartService = new FirebaseCartService();
-                        cartService.clearCart(userId, () -> {
-                            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(this, PaymentProcessingActivity.class);
-                            intent.putExtra("orderId", orderId);
-                            startActivity(intent);
-                            finish();
-                        });
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Lỗi khi lưu đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                int returnCode = resp.optInt("return_code", -1);
+                if (returnCode == 1) {
+                    String zpTransToken = resp.optString("zp_trans_token", null);
+                    Log.d("CreateOrder", "🎯 zp_trans_token = " + zpTransToken);
+                    runOnUiThread(() -> {
+                        Log.d("CREATE_ORDER", "zp_trans_token gửi sang ZaloPayActivity: " + zpTransToken);
+                        Intent intent = new Intent(CheckoutActivity.this, ZaloPayActivity.class);
+                        intent.putParcelableArrayListExtra("cartItems", cartItems);
+                        intent.putExtra("total", amount);
+                        intent.putExtra("name", name);
+                        intent.putExtra("phone", phone);
+                        intent.putExtra("address", address);
+                        intent.putExtra("zp_trans_token", zpTransToken);
+                        startActivity(intent);
+                    });
+                } else {
+                    final String msg = resp.optString("return_message", "Tạo đơn lỗi");
+                    Log.e("CreateOrder", "❌ Tạo đơn thất bại: " + msg);
+                    runOnUiThread(() ->
+                            Toast.makeText(CheckoutActivity.this, "Tạo đơn thất bại: " + msg, Toast.LENGTH_LONG).show()
                     );
-        }
+                }
+            } catch (Exception e) {
+                Log.e("CreateOrder", "🔥 Lỗi tạo đơn: " + e.getMessage(), e);
+                runOnUiThread(() ->
+                        Toast.makeText(CheckoutActivity.this, "Lỗi tạo đơn: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
     }
 }
