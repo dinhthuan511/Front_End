@@ -16,6 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
 
+        <!-- Map API key, đừng xóa-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDc7PnOq3Hxzq6dxeUVaY8WGLHIePl0swY" />
+
         <activity android:name=".CheckoutActivity" android:exported="false" />
         <!-- ✅ ZaloPay Callback Activity -->
         <activity

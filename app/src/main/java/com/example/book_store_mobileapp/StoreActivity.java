@@ -110,9 +110,9 @@ public class StoreActivity extends BaseActivity {
 
         // Sorting
         btnSort.setOnClickListener(v -> {
-            final CharSequence[] options = {"Default", "Price: Low to High", "Price: High to Low"};
+            final CharSequence[] options = {"Mặc định", "Giá thấp đến cao", "Giá cao đến thấp"};
             new AlertDialog.Builder(StoreActivity.this)
-                    .setTitle("Sort By")
+                    .setTitle("Sắp xếp theo")
                     .setItems(options, (dialog, item) -> {
                         bookFilter.sortBooksByPrice(displayedBookList, item);
                         bookAdapter.notifyDataSetChanged();
