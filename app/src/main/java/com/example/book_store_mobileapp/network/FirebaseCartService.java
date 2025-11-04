@@ -14,6 +14,7 @@ public class FirebaseCartService {
 
     private final FirebaseFirestore db;
     private final String userId;
+    private ListenerRegistration cartCountListener;
 
     public FirebaseCartService() {
         db = FirebaseFirestore.getInstance();
@@ -160,5 +161,72 @@ public class FirebaseCartService {
                     .addOnFailureListener(e -> Log.e("CART", "❌ Lỗi xóa giỏ hàng: " + e.getMessage()));
         }).addOnFailureListener(e ->
                 Log.e("CART", "❌ Lỗi lấy danh sách giỏ hàng: " + e.getMessage()));
+    }
+
+    /** 🔢 Get total cart item count */
+    public interface CartCountCallback {
+        void onCartCount(int count);
+    }
+
+    public void getCartItemCount(CartCountCallback callback) {
+        if (userId == null) {
+            callback.onCartCount(0);
+            return;
+        }
+
+        getCartRef().get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                int totalCount = 0;
+                for (DocumentSnapshot doc : task.getResult()) {
+                    Long quantity = doc.getLong("quantity");
+                    if (quantity != null) {
+                        totalCount += quantity.intValue();
+                    }
+                }
+                callback.onCartCount(totalCount);
+            } else {
+                callback.onCartCount(0);
+            }
+        });
+    }
+
+    /**
+     * Start a realtime listener on the user's cart items and report total quantity via callback.
+     */
+    public void listenToCartItemCount(CartCountCallback callback) {
+        if (userId == null) {
+            callback.onCartCount(0);
+            return;
+        }
+
+        // remove existing listener if present
+        if (cartCountListener != null) {
+            cartCountListener.remove();
+            cartCountListener = null;
+        }
+
+        cartCountListener = getCartRef().addSnapshotListener((value, error) -> {
+            if (error != null || value == null) {
+                callback.onCartCount(0);
+                return;
+            }
+
+            int totalCount = 0;
+            for (DocumentSnapshot doc : value.getDocuments()) {
+                Long quantity = doc.getLong("quantity");
+                if (quantity != null) totalCount += quantity.intValue();
+            }
+            callback.onCartCount(totalCount);
+        });
+    }
+
+    /**
+     * Stop the realtime cart listener if it exists.
+     */
+    public void stopListeningToCartCount() {
+        if (cartCountListener != null) {
+            cartCountListener.remove();
+            cartCountListener = null;
+        }
     }
 }

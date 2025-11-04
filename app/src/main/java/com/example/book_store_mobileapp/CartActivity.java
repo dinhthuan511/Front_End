@@ -8,10 +8,13 @@ import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.book_store_mobileapp.adapter.CartAdapter;
+import com.example.book_store_mobileapp.data.AppNotification;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
+import com.example.book_store_mobileapp.data.NotificationManager;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
 import com.google.firebase.auth.FirebaseAuth;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
@@ -47,9 +50,6 @@ public class CartActivity extends AppCompatActivity {
 
         adapter = new CartAdapter(this, cartItems, this::updateTotal);
         listView.setAdapter(adapter);
-
-        // ✅ Kiểm tra trạng thái đăng nhập
-        checkLoginStatus();
 
         loadCartFromFirebase();
 

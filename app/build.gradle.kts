@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
+    implementation(libs.lifecycle.process)
 
     // Google map
     implementation("com.google.android.gms:play-services-maps:18.2.0")
@@ -75,4 +76,9 @@ dependencies {
     ))
 
 
+
+    // Add this line for Firebase Realtime Database
+    implementation("com.google.firebase:firebase-database")
+    // (Tuỳ chọn) Realtime Database – chỉ giữ nếu bạn thật sự dùng
+    // implementation("com.google.firebase:firebase-database")
 }

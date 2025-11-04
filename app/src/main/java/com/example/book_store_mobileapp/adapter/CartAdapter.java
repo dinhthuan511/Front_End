@@ -9,10 +9,12 @@ import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.NotificationHelper;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -134,6 +136,11 @@ public class CartAdapter extends BaseAdapter {
                                     onUpdateTotal.run();
 
                                     Toast.makeText(context, "Đã xóa sản phẩm khỏi giỏ", Toast.LENGTH_SHORT).show();
+
+                                    // Update system notification
+                                    NotificationHelper.updateCartSystemNotification(context);
+                                    // refresh shared repository so UI badges update immediately
+                                    CartCountRepository.getInstance().refreshCartCount();
                                 },
                                 () -> Toast.makeText(context, "Lỗi khi xóa sản phẩm", Toast.LENGTH_SHORT).show());
                     })
@@ -143,5 +150,5 @@ public class CartAdapter extends BaseAdapter {
         });
         return convertView;
 
-    }
-}
+     }
+ }
