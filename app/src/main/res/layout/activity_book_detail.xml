@@ -41,7 +41,8 @@
 
             <!-- Book Image Card -->
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
@@ -63,7 +64,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="Out of Stock"
+                        android:text="HẾT HÀNG"
                         android:textColor="#EF5350"
                         android:textSize="32sp"
                         android:textStyle="bold"
@@ -118,7 +119,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Description"
+                android:text="Mô tả sách"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -138,7 +139,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Technical Specifications"
+                android:text="Thông số kĩ thuật"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -205,7 +206,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:backgroundTint="#2196F3"
-            android:text="Add To Cart"
+            android:text="Thêm vào giỏ hàng"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="18sp"

@@ -28,6 +28,7 @@ import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.BookCategory;
 import com.example.book_store_mobileapp.data.BookFilter;
 import com.example.book_store_mobileapp.network.FirebaseBookService;
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -79,8 +80,16 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {
-            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
-            startActivity(intent);
+            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                // Chuyển hướng đến trang đăng nhập
+                Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+                startActivity(intent);
+            } else {
+                // Chuyển hướng đến giỏ hàng
+                Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+                startActivity(intent);
+            }
+
         });
 
         // ✅ Bộ lọc & sắp xếp
@@ -155,7 +164,7 @@ public class StoreActivity extends BaseActivity {
         // --- Tạo động các CheckBox cho thể loại ---
         FirebaseBookService.getInstance().getAllCategories(new FirebaseBookService.FirestoreCallback<List<BookCategory>>() {
             @Override
-            public void onSuccess(List<com.example.book_store_mobileapp.data.BookCategory> categories) {
+            public void onSuccess(List<BookCategory> categories) {
                 llCategoryCheckboxes.removeAllViews(); // Xóa các checkbox cũ
 
                 if (categories == null || categories.isEmpty()) {
@@ -163,7 +172,7 @@ public class StoreActivity extends BaseActivity {
                     return;
                 }
 
-                for (com.example.book_store_mobileapp.data.BookCategory category : categories) {
+                for (BookCategory category : categories) {
                     try {
                         // Chuyển đổi ID từ String (Firestore doc ID) sang Long để so sánh với categoryId trong Book
                         long categoryId = Long.parseLong(category.getId());

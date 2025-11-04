@@ -69,14 +69,33 @@ public class CartAdapter extends BaseAdapter {
 
         // Nút tăng
         btnPlus.setOnClickListener(v -> {
-            int newQuantity = item.getQuantity() + 1;
-            item.setQuantity(newQuantity);
-            txtQuantity.setText(String.valueOf(newQuantity));
+            Long stock = book.getStock();
 
-            cartService.updateQuantity(item.getCartId(), newQuantity,
-                    () -> Toast.makeText(context, "Cập nhật số lượng +1", Toast.LENGTH_SHORT).show(),
-                    () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
-            onUpdateTotal.run();
+            // Kiểm tra thông tin Stock và số lượng trong giỏ
+            if(stock != null && item.getQuantity() < stock){
+                int newQuantity = item.getQuantity() + 1;
+                item.setQuantity(newQuantity);
+                txtQuantity.setText(String.valueOf(newQuantity));
+                cartService.updateQuantity(item.getCartId(), newQuantity,
+                        () -> {},
+                        () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
+                onUpdateTotal.run();
+            } else if (stock == null) {
+                // Trường hợp sách không có thông tin về stock (logic cũ)
+                // Vẫn cho phép tăng nhưng có thể log ra để kiểm tra dữ liệu
+                // Tránh bị treo app
+                int newQuantity = item.getQuantity() + 1;
+                item.setQuantity(newQuantity);
+                txtQuantity.setText(String.valueOf(newQuantity));
+
+                cartService.updateQuantity(item.getCartId(), newQuantity, null, null);
+                onUpdateTotal.run();
+            } else {
+                // Đã đạt giới hạn sách trong stock
+//                Toast.makeText(context, "Đã đạt số lượng tối đa", Toast.LENGTH_SHORT).show();
+            }
+
+
         });
 
         // Nút giảm

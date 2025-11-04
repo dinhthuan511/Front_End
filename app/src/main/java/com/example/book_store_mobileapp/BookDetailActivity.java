@@ -20,6 +20,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
+import com.example.book_store_mobileapp.ui.auth.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -109,22 +111,29 @@ public class BookDetailActivity extends AppCompatActivity {
             });
 
             btnAddToCart.setOnClickListener(v -> {
-                btnAddToCart.setEnabled(false);
-                btnAddToCart.setText("Adding...");
-                Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
-                cartService.addToCart(book, currentQuantity,
-                        () -> {
-                            Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
-                            Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                            finish();
-                        },
-                        () -> {
-                            Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
-                            btnAddToCart.setEnabled(true);
-                            btnAddToCart.setText("Add to cart");
-                            Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                        }
-                );
+                if(FirebaseAuth.getInstance().getCurrentUser() == null){
+                    // Nếu chưa đăng nhập, chuyển về trang Login và thông báo cần đăng nhập
+                    Intent intent = new Intent(BookDetailActivity.this, LoginActivity.class);
+                    Toast.makeText(BookDetailActivity.this, "Bạn cần đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
+                } else {
+                    btnAddToCart.setEnabled(false);
+                    btnAddToCart.setText("Adding...");
+                    Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
+                    cartService.addToCart(book, currentQuantity,
+                            () -> {
+                                Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
+                                Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                                finish();
+                            },
+                            () -> {
+                                Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
+                                btnAddToCart.setEnabled(true);
+                                btnAddToCart.setText("Add to cart");
+                                Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                            }
+                    );
+                }
             });
         } else {
             // Handle book data null
