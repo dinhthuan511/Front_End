@@ -97,7 +97,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     null,
                     null
             );
-            Toast.makeText(this, "Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
         }
         else {
             Toast.makeText(this, "Phương thức này hiện chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();

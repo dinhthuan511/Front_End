@@ -108,7 +108,8 @@ public class CartAdapter extends BaseAdapter {
                 txtQuantity.setText(String.valueOf(newQuantity));
 
                 cartService.updateQuantity(item.getCartId(), newQuantity,
-                        () -> Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show(),
+                        () -> {},
+//                        () -> Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show(),
                         () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
                 onUpdateTotal.run();
             }
