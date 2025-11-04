@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -27,6 +29,7 @@ import com.example.book_store_mobileapp.adapter.BookAdapter;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.BookCategory;
 import com.example.book_store_mobileapp.data.BookFilter;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.example.book_store_mobileapp.network.FirebaseBookService;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +42,7 @@ public class StoreActivity extends BaseActivity {
     private GridView gridView;
     private ProgressBar progressBar;
     private EditText txtSearchName;
-    private ImageButton btnCart, btnFilter, btnSort, btnLogout;
+    private ImageButton btnCart, btnFilter, btnSort, btnChatFloating;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
     private List<Book> initialBookList = new ArrayList<>();
@@ -47,6 +50,18 @@ public class StoreActivity extends BaseActivity {
     private String currentSearchQuery = "";
     private int activePriceFilter = -1;
     private List<Long> activeCategoryFilters = new ArrayList<>();
+
+    private FrameLayout cartBtnContainer;
+    private TextView cartBadge;
+    private final CartCountRepository.CartCountCallback cartCountCallback = count -> runOnUiThread(() -> {
+        if (cartBadge == null) return;
+        if (count > 0) {
+            cartBadge.setText(String.valueOf(count > 99 ? "99+" : count));
+            cartBadge.setVisibility(View.VISIBLE);
+        } else {
+            cartBadge.setVisibility(View.GONE);
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,21 +77,15 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
-
+        cartBtnContainer = findViewById(R.id.cart_btn_container);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
         gridView = findViewById(R.id.grid_view);
         progressBar = findViewById(R.id.progressBar);
+        btnChatFloating = findViewById(R.id.btnChatFloating);
 
-        // ✅ Logout
-//        btnLogout.setOnClickListener(v -> {
-//            FirebaseAuth.getInstance().signOut();
-//            Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            finish();
-//        });
+
 
         // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {
@@ -91,7 +100,9 @@ public class StoreActivity extends BaseActivity {
             }
 
         });
-
+        // Setup simple top-right cart badge TextView
+        cartBadge = findViewById(R.id.top_cart_badge);
+        cartBadge.setVisibility(View.GONE);
         // ✅ Bộ lọc & sắp xếp
         bookFilter = new BookFilter();
 

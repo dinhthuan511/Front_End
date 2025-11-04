@@ -8,4 +8,5 @@
     <string name="sort">Sort</string>
     <string name="notification_center">Notification Center</string>
     <string name="no_notifications">No notifications yet</string>
+    <string name="chat">Chat</string>
 </resources>

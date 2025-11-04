@@ -85,7 +85,7 @@ public class NotificationCenterActivity extends AppCompatActivity {
 
     private void updateNotificationList() {
         List<AppNotification> notifications = notificationManager.getAllNotifications();
-        
+
         if (notifications.isEmpty()) {
             listViewNotifications.setVisibility(View.GONE);
             emptyState.setVisibility(View.VISIBLE);

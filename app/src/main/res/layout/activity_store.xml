@@ -1,136 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".StoreActivity">
 
-    <!-- 🔹 Thanh tiêu đề có Title ở giữa + nút Logout/Cart bên phải -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
-        android:elevation="4dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-
-        <!-- Tiêu đề ở giữa -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Book Store"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium" />
-
-        <!-- Nhóm nút bên phải: Logout + Cart -->
-        <LinearLayout
-            android:id="@+id/top_actions"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <!--            <ImageButton-->
-            <!--                android:id="@+id/btnLogout"-->
-            <!--                android:layout_width="40dp"-->
-            <!--                android:layout_height="40dp"-->
-            <!--                android:background="@android:color/transparent"-->
-            <!--                android:contentDescription="@string/logout"-->
-            <!--                android:src="@drawable/outline_exit_to_app_24"-->
-            <!--                app:tint="@color/black" />-->
-            <ImageButton
-                            android:id="@+id/btnCart"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="@string/cart"
-                            android:src="@drawable/ic_add_shopping_cart_black_24dp"
-                            app:tint="@color/black" />
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-    <!-- Thanh tìm kiếm -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Tìm kiếm: "
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/txtSearchName"
-            style="@style/Widget.AppCompat.EditText"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:autofillHints="username"
-            android:hint="Nhập tên sách ..."
-            android:inputType="text" />
-    </LinearLayout>
-
-    <!-- Thanh bộ lọc -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#F1F1F1"
-        android:gravity="end"
-        android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-
-        <ImageButton
-            android:id="@+id/btnFilter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="#F1F1F1"
-            android:contentDescription="@string/filter"
-            android:src="@drawable/filter_alt_24px" />
-
-        <ImageButton
-            android:id="@+id/btnSort"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="#F1F1F1"
-            android:contentDescription="@string/sort"
-            app:srcCompat="@drawable/swap_vert_24px" />
-    </LinearLayout>
-
-    <!-- Loading -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
-
-    <!-- Danh sách sách -->
-    <GridView
-        android:id="@+id/grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:horizontalSpacing="0dp"
-        android:numColumns="2"
-        android:padding="8dp"
-        android:verticalSpacing="0dp" />
-</LinearLayout>
+        android:orientation="vertical">
+
+        <!-- 🔹 Thanh tiêu đề -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <!-- Tiêu đề ở giữa -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Book Store"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <!-- ✅ FrameLayout chứa nút giỏ hàng + badge -->
+            <FrameLayout
+                android:id="@+id/cart_btn_container"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/btnCart"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/cart"
+                    android:src="@drawable/ic_add_shopping_cart_black_24dp"
+                    app:tint="@color/black" />
+
+                <!-- Badge số lượng -->
+                <TextView
+                    android:id="@+id/top_cart_badge"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginTop="-4dp"
+                    android:layout_marginEnd="-4dp"
+                    android:background="@drawable/circle_red"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <!-- Thanh tìm kiếm -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Tìm kiếm: "
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/txtSearchName"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nhập tên sách ..."
+                android:inputType="text" />
+        </LinearLayout>
+
+        <!-- Bộ lọc -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F1F1F1"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <ImageButton
+                android:id="@+id/btnFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#F1F1F1"
+                android:contentDescription="@string/filter"
+                android:src="@drawable/filter_alt_24px" />
+
+            <ImageButton
+                android:id="@+id/btnSort"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#F1F1F1"
+                android:contentDescription="@string/sort"
+                app:srcCompat="@drawable/swap_vert_24px" />
+        </LinearLayout>
+
+        <!-- Loading -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Danh sách sách -->
+        <GridView
+            android:id="@+id/grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:numColumns="2"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- ✅ Floating chat button (nằm ngoài layout chính, overlay lên màn hình) -->
+    <ImageButton
+        android:id="@+id/btnChatFloating"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/fab_chat_background"
+        android:contentDescription="@string/chat"
+        android:elevation="6dp"
+        android:padding="12dp"
+        android:src="@drawable/ic_chat_bubble" />
+
+</RelativeLayout>

@@ -18,7 +18,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.data.AppNotification;
 import com.example.book_store_mobileapp.data.Book;
+import com.example.book_store_mobileapp.data.NotificationManager;
+import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -124,6 +127,24 @@ public class BookDetailActivity extends AppCompatActivity {
                             () -> {
                                 Log.d("BookDetailActivity", "Thêm thành công: " + book.getName());
                                 Toast.makeText(BookDetailActivity.this, book.getName() + " đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+
+                                // ✅ Thêm thông báo tại đây
+                                NotificationManager.getInstance().addNotification(
+                                        BookDetailActivity.this,
+                                        new AppNotification(
+                                                "cart_add_" + System.currentTimeMillis(),
+                                                "Item Added to Cart",
+                                                "You added \"" + book.getName() + "\" to your cart.",
+                                                "cart"
+                                        )
+                                );
+
+                                NotificationHelper.createCartChannel(BookDetailActivity.this);
+                                NotificationHelper.updateCartSystemNotification(BookDetailActivity.this);
+
+                                CartCountRepository.getInstance().refreshCartCount();
+                                // ✅ END add notification
+
                                 finish();
                             },
                             () -> {

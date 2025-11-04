@@ -79,7 +79,10 @@ public class CartAdapter extends BaseAdapter {
                 item.setQuantity(newQuantity);
                 txtQuantity.setText(String.valueOf(newQuantity));
                 cartService.updateQuantity(item.getCartId(), newQuantity,
-                        () -> {},
+                        () -> {
+                            NotificationHelper.updateCartSystemNotification(context);
+                            CartCountRepository.getInstance().refreshCartCount();
+                        },
                         () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
                 onUpdateTotal.run();
             } else if (stock == null) {
@@ -108,8 +111,11 @@ public class CartAdapter extends BaseAdapter {
                 txtQuantity.setText(String.valueOf(newQuantity));
 
                 cartService.updateQuantity(item.getCartId(), newQuantity,
-                        () -> {},
-//                        () -> Toast.makeText(context, "Cập nhật số lượng -1", Toast.LENGTH_SHORT).show(),
+                        () -> {
+                            NotificationHelper.updateCartSystemNotification(context);
+                            CartCountRepository.getInstance().refreshCartCount();
+                        },
+
                         () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
                 onUpdateTotal.run();
             }

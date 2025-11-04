@@ -11,10 +11,10 @@ public class BookStoreApplication extends Application implements LifecycleObserv
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         // Create notification channel on app start
         NotificationHelper.createCartChannel(this);
-        
+
         // Register lifecycle observer to track app background/foreground
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
     }

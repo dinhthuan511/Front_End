@@ -64,6 +64,22 @@ public class CartActivity extends AppCompatActivity {
 
         // ✅ Sự kiện nhấn nút xóa toàn bộ
         btnClearAll.setOnClickListener(v -> confirmClearCart());
+        // Add in-app notification
+        NotificationManager.getInstance().addNotification(
+                this,
+                new AppNotification(
+                        "cart_cleared_" + System.currentTimeMillis(),
+                        "Cart Cleared",
+                        "You cleared all items from your cart.",
+                        "cart_cleared"
+                )
+        );
+
+// Update system notification (cart is now empty, so it will be cancelled)
+        NotificationHelper.updateCartSystemNotification(this);
+
+// refresh repository so UI badges update immediately
+        CartCountRepository.getInstance().refreshCartCount();
     }
 
     /** 🔹 Kiểm tra đăng nhập để hiển thị/ẩn nút */

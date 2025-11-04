@@ -91,7 +91,7 @@ public class NotificationAdapter extends BaseAdapter {
     private String getTimeAgo(Date timestamp) {
         long now = System.currentTimeMillis();
         long diff = now - timestamp.getTime();
-        
+
         long minutes = diff / (1000 * 60);
         long hours = diff / (1000 * 60 * 60);
         long days = diff / (1000 * 60 * 60 * 24);
