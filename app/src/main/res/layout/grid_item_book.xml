@@ -61,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Out of Stock"
+            android:text="Hết hàng"
             android:textColor="#EF5350"
             android:textSize="24sp"
             android:textStyle="bold"
