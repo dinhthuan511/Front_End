@@ -23,7 +23,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
-        topAppBar.setTitle("Hello, Admin");
+        topAppBar.setTitle("Xin chào, Admin");
 
         // Logout qua service cho thống nhất
         topAppBar.setOnMenuItemClickListener(item -> {
@@ -37,12 +37,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
             return false;
         });
 
-//        btnAddProduct    = findViewById(R.id.btnAddProduct);
+        btnAddProduct    = findViewById(R.id.btnAddProduct);
         btnModifyProduct = findViewById(R.id.btnModifyProduct);
         btnManageOrders = findViewById(R.id.btnManageOrders);
 
-//        btnAddProduct.setOnClickListener(v ->
-//                startActivity(new Intent(this, AddEditProductActivity.class)));
+        btnAddProduct.setOnClickListener(v ->
+                startActivity(new Intent(this, AddProductActivity.class)));
         btnModifyProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductsActivity.class)));
         btnManageOrders.setOnClickListener(v ->

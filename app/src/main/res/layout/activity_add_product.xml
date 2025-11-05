@@ -46,7 +46,7 @@
                     android:hint="Tên sách / sản phẩm (productName)" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- author -->
+            <!-- Tác giả -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                     android:hint="Tác giả (author - tuỳ chọn)" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- price -->
+            <!-- Giá -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- categoryId -->
+            <!-- Mã danh mục -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- isbn -->
+            <!-- ISBN -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
                     android:hint="ISBN (tuỳ chọn)" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- imageURL -->
+            <!-- Mô tả ngắn -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

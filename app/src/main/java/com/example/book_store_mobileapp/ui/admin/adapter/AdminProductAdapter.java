@@ -1,5 +1,6 @@
 package com.example.book_store_mobileapp.ui.admin.adapter;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +35,8 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         setHasStableIds(true); // giúp RecyclerView mượt hơn khi cập nhật
     }
 
-    @Override public long getItemId(int position) {
-        // Dùng id tài liệu làm stable id nếu có
+    @Override
+    public long getItemId(int position) {
         return items.get(position).getId().hashCode();
     }
 
@@ -50,27 +51,44 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
     public void onBindViewHolder(@NonNull VH h, int pos) {
         DocumentSnapshot d = items.get(pos);
 
-        // 🔁 ĐỔI FIELD THEO SCHEMA MỚI
-        String title = d.getString("productName"); // trước đây là "name"
-        String img   = d.getString("imageURL");    // trước đây là "imageUrl"
-        Long price   = asLong(d.get("price"));     // có thể là Long/Double -> ép về Long
+        String title = d.getString("productName");
+        Long price   = asLong(d.get("price"));
 
-        h.tvName.setText(title != null ? title : "(no name)");
-
-        if (price != null) {
+        h.tvName.setText(!TextUtils.isEmpty(title) ? title : "(no name)");
+        if (price != null && price > 0) {
             NumberFormat f = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
             h.tvPrice.setText(f.format(price) + " đ");
         } else {
             h.tvPrice.setText("-");
         }
 
-        Glide.with(h.iv.getContext())
-                .load(img)
-                .placeholder(android.R.color.darker_gray)
-                .into(h.iv);
+        // ✅ Ưu tiên ảnh base64; fallback ảnh URL
+        String b64 = d.getString("imageBase64");
+        String url = d.getString("imageURL");
 
-        h.btnEdit.setOnClickListener(v -> action.onEdit(d));
-        h.btnDelete.setOnClickListener(v -> action.onDelete(d));
+        if (!TextUtils.isEmpty(b64)) {
+            String dataUrl = "data:image/jpeg;base64," + b64;
+            Glide.with(h.iv.getContext())
+                    .load(dataUrl)
+                    .placeholder(android.R.color.darker_gray)
+                    .error(android.R.color.darker_gray)
+                    .into(h.iv);
+        } else if (!TextUtils.isEmpty(url)) {
+            Glide.with(h.iv.getContext())
+                    .load(url)
+                    .placeholder(android.R.color.darker_gray)
+                    .error(android.R.color.darker_gray)
+                    .into(h.iv);
+        } else {
+            h.iv.setImageResource(android.R.color.darker_gray);
+        }
+
+        h.btnEdit.setOnClickListener(v -> {
+            if (action != null) action.onEdit(d);
+        });
+        h.btnDelete.setOnClickListener(v -> {
+            if (action != null) action.onDelete(d);
+        });
     }
 
     @Override public int getItemCount() { return items.size(); }
@@ -81,11 +99,11 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         ImageButton btnEdit, btnDelete;
         VH(@NonNull View v) {
             super(v);
-            iv       = v.findViewById(R.id.iv);
-            tvName   = v.findViewById(R.id.tvName);
-            tvPrice  = v.findViewById(R.id.tvPrice);
-            btnEdit  = v.findViewById(R.id.btnEdit);
-            btnDelete= v.findViewById(R.id.btnDelete);
+            iv        = v.findViewById(R.id.iv);          // giữ nguyên id layout của bạn
+            tvName    = v.findViewById(R.id.tvName);
+            tvPrice   = v.findViewById(R.id.tvPrice);
+            btnEdit   = v.findViewById(R.id.btnEdit);
+            btnDelete = v.findViewById(R.id.btnDelete);
         }
     }
 

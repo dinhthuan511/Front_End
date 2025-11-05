@@ -10,7 +10,6 @@ import android.widget.Toast;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.BaseActivity;
 import com.example.book_store_mobileapp.R;
@@ -25,7 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 
     private EditText edtUsername, edtEmail, edtPassword, edtPhone, edtAddress;
     private Button btnRegister;
@@ -75,93 +74,77 @@ public class RegisterActivity extends AppCompatActivity {
         final String address  = edtAddress.getText().toString().trim();
 
         // ===== Validate đầu vào =====
-        if (!isValidUsername(username)) {
-            toast("Username 3–20 ký tự, chỉ chữ/số/._");
-            return;
-        }
-        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            toast("Email không hợp lệ");
-            return;
-        }
-        if (TextUtils.isEmpty(pass) || pass.length() < 6) {
-            toast("Mật khẩu ≥ 6 ký tự");
-            return;
-        }
-        if (!TextUtils.isEmpty(phone) && phone.length() < 8) {
-            toast("Số điện thoại không hợp lệ");
-            return;
-        }
+        if (!isValidUsername(username)) { toast("Username 3–20 ký tự, chỉ chữ/số/._"); return; }
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) { toast("Email không hợp lệ"); return; }
+        if (TextUtils.isEmpty(pass) || pass.length() < 6) { toast("Mật khẩu ≥ 6 ký tự"); return; }
+        if (!TextUtils.isEmpty(phone) && phone.length() < 8) { toast("Số điện thoại không hợp lệ"); return; }
 
         setUiLoading(true);
 
-        // ✅ 1) Tạo tài khoản Auth qua service
-        authService.register(email, pass, res -> {
-            if (!res.isSuccess() || res.getData() == null) {
-                setUiLoading(false);
-                String msg = (res.getMessage() != null ? res.getMessage() : "Đăng ký thất bại");
-                toast("Đăng ký thất bại: " + msg);
-                return;
-            }
-            final String uid = res.getData().getUid();
+        // ✅ 0) Pre-check EMAIL đã tồn tại trong Firebase Auth chưa
+        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+                .addOnSuccessListener(methods -> {
+                    boolean emailExists = methods.getSignInMethods() != null && !methods.getSignInMethods().isEmpty();
+                    if (emailExists) {
+                        setUiLoading(false);
+                        toast("Email đã được sử dụng. Vui lòng đăng nhập hoặc dùng Quên mật khẩu.");
+                        return;
+                    }
 
-            final String key = username.toLowerCase(Locale.ROOT);
+                    // ✅ 0.5) Pre-check USERNAME trùng?
+                    final String key = username.toLowerCase(java.util.Locale.ROOT);
+                    final DocumentReference unameRef = db.collection("usernames").document(key);
 
-            // Payload ghi vào usernames/{key}
-            final Map<String, Object> usernameDoc = new HashMap<>();
-            usernameDoc.put("email", email);
-            usernameDoc.put("uid", uid);
-
-            final DocumentReference unameRef = db.collection("usernames").document(key);
-
-            // 2) Transaction: chỉ set khi doc CHƯA tồn tại
-            db.runTransaction(transaction -> {
-                DocumentSnapshot snap = transaction.get(unameRef);
-                if (snap.exists()) {
-                    throw new FirebaseFirestoreException(
-                            "ALREADY_EXISTS",
-                            FirebaseFirestoreException.Code.ALREADY_EXISTS
-                    );
-                }
-                transaction.set(unameRef, usernameDoc);
-                return null;
-            }).addOnSuccessListener(v -> {
-                // 3) Tạo hồ sơ tối thiểu users/{uid}
-                Map<String, Object> profile = new HashMap<>();
-                profile.put("username", username);
-                profile.put("email", email);
-                if (!TextUtils.isEmpty(phone))   profile.put("phone", phone);
-                if (!TextUtils.isEmpty(address)) profile.put("address", address);
-
-                db.collection("users").document(uid).set(profile)
-                        .addOnCompleteListener(t -> {
+                    unameRef.get().addOnSuccessListener(snap -> {
+                        if (snap.exists()) {
                             setUiLoading(false);
-                            // ✅ Sau khi đăng ký thành công, đăng xuất và quay lại Login
-                            // Có thể dùng: new FirebaseAuthService().logout();
-                            FirebaseAuth.getInstance().signOut();
-                            toast("Đăng ký thành công! Hãy đăng nhập để tiếp tục.");
-                            Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                            overridePendingTransition(0, 0);
-                            finish();
+                            toast("Username đã được dùng, chọn tên khác");
+                            return;
+                        }
+
+                        // ✅ 1) Tạo tài khoản Auth
+                        authService.register(email, pass, res -> {
+                            if (!res.isSuccess() || res.getData() == null) {
+                                setUiLoading(false);
+                                String msg = (res.getMessage() != null ? res.getMessage() : "Đăng ký thất bại");
+                                toast("Đăng ký thất bại: " + msg);
+                                return;
+                            }
+
+                            // ✅ 2) Gửi email xác minh NGAY
+                            authService.sendVerification(vRes -> {
+                                setUiLoading(false);
+                                if (!vRes.isSuccess()) {
+                                    toast("Không gửi được email xác minh: " + vRes.getMessage());
+                                } else {
+                                    toast("Đã gửi email xác minh. Vui lòng kiểm tra Hộp thư/Spam.");
+                                }
+
+                                // ✅ 3) Sang màn chờ xác minh (KHÔNG finish để form còn dữ liệu khi quay lại)
+                                Intent i = new Intent(RegisterActivity.this, VerifyEmailActivity.class);
+                                i.putExtra("username", username);
+                                i.putExtra("email", email);
+                                i.putExtra("password", pass);
+                                i.putExtra("phone", phone);
+                                i.putExtra("address", address);
+                                startActivity(i);
+                                overridePendingTransition(0, 0);
+                                // không finish() để quay lại giữ nguyên form
+                            });
                         });
 
-            }).addOnFailureListener(e -> {
-                setUiLoading(false);
-                // Nếu fail vì trùng username → xoá user Auth vừa tạo để tránh orphan account (tuỳ chọn)
-                FirebaseAuth.getInstance().getCurrentUser(); // không xoá ở đây vì service hiện không expose delete
-                FirebaseAuth.getInstance().signOut();
+                    }).addOnFailureListener(e -> {
+                        setUiLoading(false);
+                        toast("Lỗi kiểm tra username: " + (e.getMessage()!=null? e.getMessage():""));
+                    });
 
-                if (e instanceof FirebaseFirestoreException
-                        && ((FirebaseFirestoreException) e).getCode()
-                        == FirebaseFirestoreException.Code.ALREADY_EXISTS) {
-                    toast("Username đã được dùng, chọn tên khác");
-                } else {
-                    toast("Lỗi lưu username: " + (e.getMessage() != null ? e.getMessage() : ""));
-                }
-            });
-        });
+                })
+                .addOnFailureListener(e -> {
+                    setUiLoading(false);
+                    toast("Lỗi kiểm tra email: " + e.getMessage());
+                });
     }
+
 
     private boolean isValidUsername(String u) {
         return !(TextUtils.isEmpty(u) || u.length() < 3 || u.length() > 20)
@@ -175,5 +158,11 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected int getNavigationMenuItemId() {
+        // Đang ở cụm Profile → highlight icon Profile
+        return R.id.nav_profile;
     }
 }
