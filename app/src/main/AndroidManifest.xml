@@ -47,21 +47,47 @@
         <activity android:name=".HomeActivity" android:exported="false" />
         <activity android:name=".BookDetailActivity" android:exported="false" />
 
-        <!-- ✅ Checkout (no intent filter) -->
-
 
         <!-- ✅ Admin -->
-        <activity android:name=".ui.admin.AdminDashboardActivity" android:exported="false" />
-        <activity android:name=".AdminOrdersActivity" android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminDashboardActivity"
+            android:exported="false" />
 
-        <!-- ✅ Auth -->
-        <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
-        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
-        <activity android:name=".ui.auth.ProfileActivity" android:exported="false" />
-        <activity android:name=".ui.auth.AccountSecurityActivity" android:exported="false" />
-        <activity android:name=".ui.auth.ChangePasswordActivity" android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminOrdersActivity" android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminProductsActivity" android:exported="false" />
+        <activity
+            android:name=".ui.admin.EditProductActivity" android:exported="false"
+             />
+        <activity android:name=".ui.admin.AddProductActivity" android:exported="false"
+             />
+        <!-- ✅ Auth / Profile -->
+        <activity
+            android:name=".ui.auth.LoginActivity" android:exported="false" />
+
+        <activity
+            android:name=".ui.auth.RegisterActivity" android:exported="false" />
+
+        <activity
+            android:name=".ui.auth.ProfileActivity" android:exported="false"
+            />
+
+        <activity
+            android:name=".ui.auth.AccountSecurityActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.auth.ProfileActivity" />
+
+        <activity
+            android:name=".ui.auth.ChangePasswordActivity" android:exported="false" />
+
+        <activity
+            android:name=".ui.auth.VerifyEmailActivity" android:exported="false"
+            />
+
         <activity android:name=".NotificationCenterActivity" android:exported="false" />
-        <activity android:name=".ChatActivity"  android:exported="false" />
+        <activity android:name=".ChatActivity" android:exported="false" />
+
         <!-- ✅ StoreActivity là màn hình mở đầu -->
         <activity
             android:name=".StoreActivity"

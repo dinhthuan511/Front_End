@@ -2,12 +2,14 @@ package com.example.book_store_mobileapp.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +34,7 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
 
     public interface OnStatusChangeListener {
         void onStatusChange(Order order, String newStatus);
-        void onCancelOrder(Order order);
+        void onCancelOrder(Order order, String reason); // ✅ thêm lý do
     }
 
     public AdminOrderAdapter(Context context, List<Order> orderList, OnStatusChangeListener listener) {
@@ -67,11 +69,9 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         holder.spinnerStatus.setAdapter(spinnerAdapter);
 
-        // Hiển thị đúng trạng thái hiện tại
         int selectedPos = spinnerAdapter.getPosition(order.getStatus());
         if (selectedPos >= 0) holder.spinnerStatus.setSelection(selectedPos, false);
 
-        // Khi chọn thay đổi trạng thái
         holder.spinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             boolean firstCall = true;
 
@@ -85,7 +85,6 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                 String newStatus = parent.getItemAtPosition(pos).toString();
                 String currentStatus = order.getStatus();
 
-                // Ngăn không cho lùi trạng thái
                 if (currentStatus.equals("Đang giao") && newStatus.equals("Đang xử lý")) {
                     Toast.makeText(context, "Không thể quay lại 'Đang xử lý'", Toast.LENGTH_SHORT).show();
                     holder.spinnerStatus.setSelection(getStatusPosition(currentStatus));
@@ -98,7 +97,6 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                     return;
                 }
 
-                // Hợp lệ → cập nhật
                 if (!newStatus.equals(currentStatus)) {
                     listener.onStatusChange(order, newStatus);
                 }
@@ -108,14 +106,21 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Nút "Hủy đơn"
+        // Ẩn nút Hủy nếu đơn không thể hủy
+        if (order.getStatus().equals("Đang giao") || order.getStatus().equals("Đã giao") || order.getStatus().equals("Đã hủy")) {
+            holder.btnCancel.setVisibility(View.GONE);
+        } else {
+            holder.btnCancel.setVisibility(View.VISIBLE);
+        }
+
         holder.btnCancel.setOnClickListener(v -> {
-            new AlertDialog.Builder(context)
-                    .setTitle("Xác nhận hủy đơn")
-                    .setMessage("Bạn có chắc muốn hủy đơn hàng này không?")
-                    .setPositiveButton("Hủy đơn", (dialog, which) -> listener.onCancelOrder(order))
-                    .setNegativeButton("Không", null)
-                    .show();
+
+            if (order.getStatus().equals("Đang giao") || order.getStatus().equals("Đã giao")) {
+                Toast.makeText(context, "Không thể hủy đơn đang vận chuyển!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            showCancelReasonDialog(order);
         });
     }
 
@@ -138,6 +143,27 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
             spinnerStatus = itemView.findViewById(R.id.spinnerStatus);
             btnCancel = itemView.findViewById(R.id.btnCancel);
         }
+    }
+
+    private void showCancelReasonDialog(Order order) {
+        EditText input = new EditText(context);
+        input.setHint("Nhập lý do hủy đơn...");
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        new AlertDialog.Builder(context)
+                .setTitle("Xác nhận hủy đơn")
+                .setMessage("Vui lòng nhập lý do hủy đơn:")
+                .setView(input)
+                .setPositiveButton("Xác nhận", (dialog, which) -> {
+                    String reason = input.getText().toString().trim();
+                    if (reason.isEmpty()) {
+                        Toast.makeText(context, "Lý do không được để trống!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    listener.onCancelOrder(order, reason);
+                })
+                .setNegativeButton("Thoát", null)
+                .show();
     }
 
     private int getStatusPosition(String status) {

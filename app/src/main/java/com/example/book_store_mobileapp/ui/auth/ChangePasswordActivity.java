@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.BaseActivity;
 import com.example.book_store_mobileapp.R;
@@ -15,7 +16,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class ChangePasswordActivity extends BaseActivity {
+public class ChangePasswordActivity extends AppCompatActivity {
 
     private EditText edtOldPassword, edtNewPassword, edtConfirmPassword;
     private Button btnSubmit;
@@ -93,10 +94,5 @@ public class ChangePasswordActivity extends BaseActivity {
     public boolean onSupportNavigateUp() {
         getOnBackPressedDispatcher().onBackPressed();
         return true;
-    }
-
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
     }
 }

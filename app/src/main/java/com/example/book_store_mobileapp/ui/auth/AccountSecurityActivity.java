@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.book_store_mobileapp.BaseActivity;
@@ -24,7 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AccountSecurityActivity extends BaseActivity {
+public class AccountSecurityActivity extends AppCompatActivity {
 
     private EditText edtUsername, edtEmail, edtPhone, edtAddress;
     private Button btnChangePassword, btnSave;
@@ -123,10 +124,7 @@ public class AccountSecurityActivity extends BaseActivity {
                         Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_store;
-    }
+
 
     private static class SimpleWatcher implements TextWatcher {
         private final Runnable onChange;

@@ -44,7 +44,7 @@ public class AdminProductsActivity extends AppCompatActivity implements AdminPro
         MaterialToolbar tb = findViewById(R.id.topAppBar);
         if (tb != null) {
             setSupportActionBar(tb);
-                if (getSupportActionBar() != null) {
+            if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setTitle("Quản lý sản phẩm");
             }

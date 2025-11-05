@@ -1,12 +1,15 @@
 package com.example.book_store_mobileapp.network;
 
 import com.example.book_store_mobileapp.data.Order;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class FirebaseOrderService {
@@ -43,6 +46,18 @@ public class FirebaseOrderService {
         ordersRef.document(orderId)
                 .update("status", newStatus)
                 .addOnSuccessListener(unused -> onSuccess.run())
+                .addOnFailureListener(onError::accept);
+    }
+    public void updateOrderStatusWithReason(String orderId, String status, String reason,
+                                            Runnable onSuccess, Consumer<Exception> onError) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", status);
+        updates.put("cancelReason", reason); // 👈 Thêm lý do hủy
+        updates.put("cancelledAt", Timestamp.now());
+
+        ordersRef.document(orderId)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> onSuccess.run())
                 .addOnFailureListener(onError::accept);
     }
 }

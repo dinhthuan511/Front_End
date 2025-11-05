@@ -50,7 +50,6 @@ public class ProfileActivity extends AppCompatActivity {
         if (rowAccount != null) {
             ((TextView) rowAccount.findViewById(R.id.title)).setText("Tài khoản & bảo mật");
             ((ImageView) rowAccount.findViewById(R.id.icon)).setImageResource(R.drawable.outline_house_with_shield_24);
-
             rowAccount.setOnClickListener(v ->
                     startActivity(new Intent(this, AccountSecurityActivity.class))
             );

@@ -1,7 +1,6 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.admin;
 
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -9,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.adapter.AdminOrderAdapter;
 import com.example.book_store_mobileapp.data.Order;
 import com.example.book_store_mobileapp.network.FirebaseOrderService;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +23,25 @@ public class AdminOrdersActivity extends AppCompatActivity {
     private AdminOrderAdapter adapter;
     private FirebaseOrderService orderService;
     private List<Order> orderList = new ArrayList<>();
-    private ImageButton btnBack;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_orders);
 
+        // ===== Toolbar =====
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        }
+
+        // ===== RecyclerView =====
         recyclerOrders = findViewById(R.id.recyclerOrders);
         recyclerOrders.setLayoutManager(new LinearLayoutManager(this));
 
-        btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
-
         orderService = new FirebaseOrderService();
-
         loadOrders();
     }
 
@@ -49,7 +54,7 @@ public class AdminOrdersActivity extends AppCompatActivity {
                     AdminOrdersActivity.this,
                     orderList,
                     new AdminOrderAdapter.OnStatusChangeListener() {
-                        // ✅ Khi admin thay đổi trạng thái
+
                         @Override
                         public void onStatusChange(Order order, String newStatus) {
                             orderService.updateOrderStatus(
@@ -68,17 +73,17 @@ public class AdminOrdersActivity extends AppCompatActivity {
                             );
                         }
 
-                        // ✅ Khi admin chọn "Hủy đơn hàng"
                         @Override
-                        public void onCancelOrder(Order order) {
-                            orderService.updateOrderStatus(
+                        public void onCancelOrder(Order order, String reason) {
+                            orderService.updateOrderStatusWithReason(
                                     order.getOrderId(),
                                     "Đã hủy",
+                                    reason,
                                     () -> {
                                         order.setStatus("Đã hủy");
                                         adapter.notifyDataSetChanged();
                                         Toast.makeText(AdminOrdersActivity.this,
-                                                "Đơn hàng đã bị hủy!",
+                                                "Đã hủy đơn hàng thành công!",
                                                 Toast.LENGTH_SHORT).show();
                                     },
                                     e -> Toast.makeText(AdminOrdersActivity.this,
@@ -90,6 +95,8 @@ public class AdminOrdersActivity extends AppCompatActivity {
 
             recyclerOrders.setAdapter(adapter);
 
-        }, e -> Toast.makeText(this, "Lỗi tải đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }, e -> Toast.makeText(this,
+                "Lỗi tải đơn hàng: " + e.getMessage(),
+                Toast.LENGTH_SHORT).show());
     }
 }
