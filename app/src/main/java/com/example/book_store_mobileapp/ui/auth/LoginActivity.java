@@ -10,12 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.book_store_mobileapp.BaseActivity;
-//import com.example.book_store_mobileapp.ui.auth.PasswordRecoveryActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.StoreActivity;
-import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ import service đúng package
+import com.example.book_store_mobileapp.network.FirebaseAuthService;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -24,12 +23,19 @@ import java.util.Map;
 /**
  * Login:
  * - Hỗ trợ login bằng email hoặc username (lookup Firestore).
- * - Nếu đã đăng nhập: đọc claim 'admin' và điều hướng.
  * - Sau khi login:
  *      + Admin  -> AdminDashboardActivity
  *      + User   -> StoreActivity
+ * - ĐÃ tắt auto-route trong onStart() để tránh kẹt UI khi Play Services / mạng treo.
+ *
+ * Flow tổng:
+ *  - App mở = StoreActivity (guest xem trước)
+ *  - Nhấn Cart/Profile khi chưa login => sang LoginActivity
+ *  - Đăng nhập xong:
+ *      + Nếu admin => AdminDashboardActivity
+ *      + Nếu user  => StoreActivity (luôn quay về Store, KHÔNG quay lại Cart/Profile)
  */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
@@ -37,33 +43,17 @@ public class LoginActivity extends BaseActivity {
     private Button btnLogin;
     private TextView btnGoToRegister;
 
-    private FirebaseAuthService authService; // ✅ dùng service
+    private FirebaseAuthService authService;
     private FirebaseFirestore db;
 
-    // Ngăn điều hướng lặp do onStart() + lấy claims
+    // KEEP: Cờ tránh điều hướng lặp (để dành nếu sau này bạn bật auto-route ở onStart)
     private boolean alreadyRouted = false;
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        // ✅ Nếu đã có session → đọc claim và điều hướng luôn
-        FirebaseUser u = (authService != null) ? authService.currentUser() : null;
-        if (u != null && !alreadyRouted) {
-            setUiLoading(true);
-            // lấy claims (không ép refresh để nhanh)
-            authService.getIdTokenClaims(false, claimsRes -> {
-                if (!claimsRes.isSuccess()) {            // 🔧 dùng getter
-                    setUiLoading(false);
-                    toast("Không lấy được claim: " + claimsRes.getMessage()); // 🔧 dùng getter
-                    return;
-                }
-                boolean isAdmin = Boolean.TRUE.equals(claimsRes.getData().get("admin")); // 🔧 dùng getter
-                Log.d(TAG, "onStart -> isAdmin=" + isAdmin);
-                alreadyRouted = true;
-                routeAfterLogin(isAdmin);
-            });
-        }
+        // KEEP: ĐÃ TẮT auto-route để không khóa UI nếu callback không về.
+        // Nếu muốn tự vào thẳng sau khi đã đăng nhập, hãy làm ở màn splash riêng.
     }
 
     @Override
@@ -71,18 +61,13 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        authService = new FirebaseAuthService(); // ✅
-        db         = FirebaseFirestore.getInstance();
+        authService = new FirebaseAuthService();
+        db = FirebaseFirestore.getInstance();
 
         editUsernameOrEmail = findViewById(R.id.editUsernameOrEmail);
         editPassword        = findViewById(R.id.editPassword);
         btnLogin            = findViewById(R.id.btnLogin);
         btnGoToRegister     = findViewById(R.id.btnGoToRegister);
-
-//        // ✅ Quên mật khẩu
-//        TextView btnForgot = findViewById(R.id.btnForgotPassword);
-//        btnForgot.setOnClickListener(v ->
-//                startActivity(new Intent(this, PasswordRecoveryActivity.class)));
 
         btnLogin.setOnClickListener(v -> login());
 
@@ -95,6 +80,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void login() {
+        Log.d(TAG, "login(): click");
         String id   = editUsernameOrEmail.getText().toString().trim();
         String pass = editPassword.getText().toString().trim();
 
@@ -105,11 +91,20 @@ public class LoginActivity extends BaseActivity {
 
         setUiLoading(true);
 
+        // KEEP: DỰ PHÒNG - nếu service treo, tự bật lại nút sau 12s
+        btnLogin.postDelayed(() -> {
+            if (!btnLogin.isEnabled()) {
+                Log.e(TAG, "login(): timeout -> re-enable button");
+                setUiLoading(false);
+                toast("Mạng/Play services chậm. Thử lại.");
+            }
+        }, 12_000);
+
         if (id.contains("@")) {
-            // Đăng nhập bằng email
+            // KEEP: Đăng nhập bằng email
             signInWithEmail(id, pass);
         } else {
-            // Đăng nhập bằng username: tra email trong Firestore
+            // KEEP: Đăng nhập bằng username -> tra email Firestore
             db.collection("usernames").document(id.toLowerCase()).get()
                     .addOnSuccessListener(snap -> {
                         if (!snap.exists()) {
@@ -133,28 +128,51 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void signInWithEmail(String email, String pass) {
-        // ✅ Gọi service thay vì gọi trực tiếp FirebaseAuth
         authService.login(email, pass, res -> {
-            if (!res.isSuccess()) {                      // 🔧 dùng getter
+            if (!res.isSuccess()) {
                 setUiLoading(false);
                 toast("Sai thông tin đăng nhập");
                 return;
             }
 
-            // ✅ Ép refresh token để lấy custom claim 'admin' mới nhất
+            FirebaseUser u = authService.currentUser();
+            if (u == null) {
+                setUiLoading(false);
+                toast("User null");
+                return;
+            }
+
+            if (!u.isEmailVerified()) {
+                try { u.sendEmailVerification(); } catch (Exception ignore) {}
+                setUiLoading(false);
+                toast("Email chưa xác minh. Đã gửi lại email xác minh.");
+
+                authService.logout();
+                Intent toVerify = new Intent(this, VerifyEmailActivity.class);
+                toVerify.putExtra("email", u.getEmail());
+                startActivity(toVerify);
+                overridePendingTransition(0, 0);
+                finish();
+                return;
+            }
+
+            // KEEP: Ép refresh token để lấy claim 'admin' mới nhất
             authService.getIdTokenClaims(true, claimsRes -> {
-                if (!claimsRes.isSuccess()) {            // 🔧 dùng getter
-                    setUiLoading(false);
-                    toast("Không lấy được claim: " + claimsRes.getMessage()); // 🔧
+                setUiLoading(false);
+                if (!claimsRes.isSuccess()) {
+                    toast("Không lấy được claim: " + claimsRes.getMessage());
                     return;
                 }
-                Map<String, Object> claims = claimsRes.getData(); // 🔧
+                Map<String, Object> claims = claimsRes.getData();
                 boolean isAdmin = Boolean.TRUE.equals(claims.get("admin"));
+
                 Log.d(TAG, "claims=" + claims);
                 Log.d(TAG, "routeAfterLogin (login) isAdmin=" + isAdmin);
 
                 toast("Đăng nhập thành công!");
-                alreadyRouted = true; // tránh onStart() redirect thêm lần nữa
+                alreadyRouted = true;
+
+                // CHANGE: Luôn route theo role, KHÔNG còn quay lại Cart/Profile
                 routeAfterLogin(isAdmin);
             });
         });
@@ -167,7 +185,13 @@ public class LoginActivity extends BaseActivity {
      */
     private void routeAfterLogin(boolean isAdmin) {
         Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "StoreActivity"));
-        Intent i = new Intent(this, isAdmin ? com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class : StoreActivity.class);
+        Intent i = new Intent(
+                this,
+                isAdmin
+                        ? com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class
+                        : StoreActivity.class
+        );
+        // KEEP: Clear back stack để không quay lại Login
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
         overridePendingTransition(0, 0);
@@ -182,9 +206,5 @@ public class LoginActivity extends BaseActivity {
     private void toast(String m) {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
-    }
 }
+

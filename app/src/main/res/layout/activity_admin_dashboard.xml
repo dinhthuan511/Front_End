@@ -5,13 +5,11 @@
     android:id="@+id/rootAdmin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EFF5FB"
-    android:fitsSystemWindows="true">
+    android:background="#EFF5FB">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.Material3.ActionBar">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -19,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#28527A"
-            app:title="Hello, Admin"
+            app:title="Xin chào, Admin"
             app:titleTextColor="@android:color/white"
             app:menu="@menu/menu_admin_toolbar" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -35,44 +33,52 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Tiêu đề section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Services"
+                android:text="Chức năng"
                 android:textStyle="bold"
                 android:textColor="#14213D"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" />
+                android:textSize="18sp"
+                android:layout_marginBottom="12dp" />
 
+            <!-- Thêm sản phẩm (Primary – nền đậm, chữ trắng) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddProduct"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Add new product"
-                android:textAllCaps="false"
-                app:cornerRadius="16dp"
-                android:layout_marginBottom="12dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnModifyProduct"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Modify product"
+                android:text="Thêm sản phẩm mới"
                 android:textAllCaps="false"
                 app:cornerRadius="16dp"
                 app:backgroundTint="#274C77"
                 android:textColor="@android:color/white"
                 android:layout_marginBottom="12dp" />
 
-            <!-- ✅ Nút Quản lý đơn hàng -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModifyProduct"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Chỉnh sửa sản phẩm"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:strokeColor="#274C77"
+                app:strokeWidth="2dp"
+                android:textColor="#274C77"
+                android:layout_marginBottom="12dp" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnManageOrders"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:text="Quản lý đơn hàng"
-                android:drawableStart="@drawable/outline_orders_24"
-                android:layout_marginTop="12dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:backgroundTint="#274C77"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="12dp" />
+
 
         </LinearLayout>
     </ScrollView>

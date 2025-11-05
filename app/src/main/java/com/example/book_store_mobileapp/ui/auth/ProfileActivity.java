@@ -11,18 +11,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.AddressActivity;
+import com.example.book_store_mobileapp.OrderListActivity; // ✅ Thêm import cho màn xem đơn hàng
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.network.FirebaseAuthService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Màn Profile (Tài khoản của tôi)
- * - Show greeting: "Xin chào, username"
- * - Điều hướng đến các màn quản lý account
- * - Logout
+ * - Hiển thị greeting: "Xin chào, username"
+ * - Điều hướng tới các trang quản lý thông tin user
+ * - Bao gồm: Tài khoản & bảo mật, Địa chỉ, Đơn hàng của tôi, Logout
  */
 public class ProfileActivity extends AppCompatActivity {
 
@@ -33,49 +34,72 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // ✅ Setup toolbar & back button
+        // ✅ Setup toolbar + nút back
         MaterialToolbar bar = findViewById(R.id.topAppBar);
         if (bar != null) {
             setSupportActionBar(bar);
             if (getSupportActionBar() != null) {
-                // ❌ Không set title cứng nữa
+                // ❌ Không set title cứng — để set bằng username
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
             bar.setNavigationOnClickListener(v -> finish());
-        } else {
-            Log.e(TAG, "topAppBar == null");
         }
 
-        // ✅ Đặt tiêu đề động: "Xin chào, username"
+        // ✅ Hiển thị "Xin chào, username"
         setGreetingTitle();
 
-        // ✅ Row: Tài khoản & bảo mật
+        /**
+         * ========================
+         * 1) Tài khoản & bảo mật
+         * ========================
+         */
         View rowAccount = findViewById(R.id.rowAccountSecurity);
         if (rowAccount != null) {
-            TextView title = rowAccount.findViewById(R.id.title);
-            ImageView icon = rowAccount.findViewById(R.id.icon);
-
-            if (title != null) title.setText("Tài khoản & bảo mật");
-            if (icon != null) icon.setImageResource(R.drawable.outline_house_with_shield_24);
+            ((TextView) rowAccount.findViewById(R.id.title)).setText("Tài khoản & bảo mật");
+            ((ImageView) rowAccount.findViewById(R.id.icon)).setImageResource(R.drawable.outline_house_with_shield_24);
 
             rowAccount.setOnClickListener(v ->
-                    startActivity(new Intent(this, AccountSecurityActivity.class)));
+                    startActivity(new Intent(this, AccountSecurityActivity.class))
+            );
         }
 
-        // ✅ Row: Địa chỉ
-        View rowAddress = findViewById(R.id.rowAddress);
-        if (rowAddress != null) {
-            TextView title = rowAddress.findViewById(R.id.title);
-            ImageView icon = rowAddress.findViewById(R.id.icon);
+        /**
+         * ========================
+         * 2) Địa chỉ giao hàng
+         * ========================
+         */
+//        View rowAddress = findViewById(R.id.rowAddress);
+//        if (rowAddress != null) {
+//            ((TextView) rowAddress.findViewById(R.id.title)).setText("Địa chỉ");
+//            ((ImageView) rowAddress.findViewById(R.id.icon)).setImageResource(R.drawable.outline_location_on_24);
+//
+//            rowAddress.setOnClickListener(v ->
+//                    startActivity(new Intent(this, AddressActivity.class))
+//            );
+//        }
 
-            if (title != null) title.setText("Địa chỉ");
-            if (icon != null) icon.setImageResource(R.drawable.outline_location_on_24);
+        /**
+         * ==============================
+         * 3) ✅ Xem đơn hàng của tôi
+         * ==============================
+         * 🔥 Thêm từ file 2
+         */
+        View rowMyOrders = findViewById(R.id.rowMyOrders);
+        if (rowMyOrders != null) {
+            ((TextView) rowMyOrders.findViewById(R.id.title)).setText("Xem đơn hàng của tôi");
+            ((ImageView) rowMyOrders.findViewById(R.id.icon)).setImageResource(R.drawable.outline_orders_24);
 
-            rowAddress.setOnClickListener(v ->
-                    startActivity(new Intent(this, AddressActivity.class)));
+            // 👉 Điều hướng đến trang danh sách đơn hàng
+            rowMyOrders.setOnClickListener(v ->
+                    startActivity(new Intent(this, OrderListActivity.class))
+            );
         }
 
-        // ✅ Logout
+        /**
+         * ===============
+         * 4) Logout
+         * ===============
+         */
         View btnLogoutBottom = findViewById(R.id.btnLogoutBottom);
         if (btnLogoutBottom != null) {
             btnLogoutBottom.setOnClickListener(v -> {
@@ -111,7 +135,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(doc -> {
                     String name = (doc != null) ? doc.getString("username") : null;
 
-                    // Nếu user chưa có username → fallback tên email
+                    // Nếu user chưa đặt username → lấy phần trước @ trong email
                     if (TextUtils.isEmpty(name)) {
                         String email = user.getEmail();
                         if (!TextUtils.isEmpty(email) && email.contains("@")) {

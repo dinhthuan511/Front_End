@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#274C77"
-            app:title="Thêm sản phẩm"
+            app:title="Chỉnh sửa sản phẩm"
             app:titleTextColor="@android:color/white"
             app:navigationIcon="@drawable/ic_round_arrow_back_24"
             app:navigationIconTint="@android:color/white"/>
@@ -36,7 +36,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Khu ảnh: Preview + nút chọn/xoá (giống màn sửa) -->
+            <!-- Khu ảnh: Preview + nút chọn/xoá -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,9 +52,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:background="#E6E6E6"
-                        android:contentDescription="@string/abc_action_bar_up_description"/>
+                        android:background="#E6E6E6"/>
 
+                    <!-- Nút thay ảnh nổi góc phải -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/btnPickImage"
                         android:layout_width="wrap_content"
@@ -65,6 +65,7 @@
                         app:backgroundTint="@android:color/white"
                         app:tint="#274C77"
                         app:srcCompat="@drawable/ic_round_image_24"/>
+
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -83,6 +84,7 @@
                     android:text="Xoá ảnh"
                     android:textColor="#274C77"
                     android:textAllCaps="false"/>
+
             </LinearLayout>
 
             <!-- Tên -->
@@ -229,12 +231,22 @@
                 android:gravity="end"
                 android:layout_marginTop="16dp">
 
-                <!-- KHÔNG có nút Xoá (chỉ dùng khi sửa) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDelete"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Xoá"
+                    android:textAllCaps="false"
+                    android:textColor="#274C77"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSave"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="48dp"
-                    android:text="Lưu"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Lưu thay đổi"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     app:backgroundTint="#274C77"

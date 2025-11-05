@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.book_store_mobileapp.AdminOrdersActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ dùng service cho đồng bộ
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
@@ -23,7 +22,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
-        topAppBar.setTitle("Hello, Admin");
+        topAppBar.setTitle("Xin chào, Admin");
 
         // Logout qua service cho thống nhất
         topAppBar.setOnMenuItemClickListener(item -> {
@@ -42,7 +41,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnManageOrders = findViewById(R.id.btnManageOrders);
 
         btnAddProduct.setOnClickListener(v ->
-                startActivity(new Intent(this, AddEditProductActivity.class)));
+                startActivity(new Intent(this, AddProductActivity.class)));
         btnModifyProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductsActivity.class)));
         btnManageOrders.setOnClickListener(v ->

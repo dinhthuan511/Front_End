@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,47 +15,56 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Book_Store_MobileApp">
-        <activity
-            android:name=".OrderDetailActivity"
-            android:exported="false" />
-        <!-- API Key Map -->
+
+        <!-- ====== Google Maps API Key (nhớ đổi YOUR_API_KEY) ====== -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" /> <!-- Activities người dùng -->
-        <activity
-            android:name=".VNPayActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OrderStatusActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentSuccessActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentProcessingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CheckoutActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StoreActivity"
-            android:exported="false" />
-        <activity
-            android:name=".BookDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CartActivity"
-            android:exported="false" />
-        <activity android:name=".OrderListActivity" /> <!-- Admin -->
+            android:value="YOUR_API_KEY" />
+
+        <!-- ====== Flows người dùng ====== -->
+        <activity android:name=".VNPayActivity" android:exported="false" />
+        <activity android:name=".OrderStatusActivity" android:exported="false" />
+        <activity android:name=".PaymentSuccessActivity" android:exported="false" />
+        <activity android:name=".PaymentProcessingActivity" android:exported="false" />
+        <activity android:name=".CheckoutActivity" android:exported="false" />
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".BookDetailActivity" android:exported="false" />
+        <activity android:name=".CartActivity" android:exported="false" />
+        <activity android:name=".OrderDetailActivity" android:exported="false" />
+        <!-- Khai báo rõ ràng (không có intent-filter nên không cần exported=true) -->
+        <activity android:name=".OrderListActivity" android:exported="false" />
+
+        <!-- ====== Admin dashboard & các màn quản trị ====== -->
         <activity
             android:name=".ui.admin.AdminDashboardActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".StoreActivity" />
+
+        <!-- Danh sách/quản lý sản phẩm (nếu bạn có màn riêng) -->
         <activity
-            android:name=".AdminOrdersActivity"
-            android:exported="false" /> <!-- User flows -->
+            android:name=".ui.admin.AdminProductsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.admin.AdminDashboardActivity" />
+
+        <!-- Màn thêm sản phẩm -->
+        <activity
+            android:name=".ui.admin.AddProductActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.admin.AdminDashboardActivity" />
+
+        <!-- Màn sửa sản phẩm -->
+        <activity
+            android:name=".ui.admin.EditProductActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.admin.AdminDashboardActivity"/>
+
+        <!-- (tuỳ bạn có dùng) Danh sách đơn hàng Admin -->
+        <activity
+            android:name=".ui.admin.AdminOrdersActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.admin.AdminDashboardActivity" />
+
+        <!-- ====== Auth / Profile ====== -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="false" />
@@ -63,24 +72,30 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.SettingsActivity"
-            android:exported="false" />
+            android:name=".ui.auth.ProfileActivity"
+            android:exported="false"
+            android:parentActivityName=".StoreActivity" />
         <activity
             android:name=".ui.auth.AccountSecurityActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".ui.auth.ProfileActivity" />
         <activity
             android:name=".ui.auth.ChangePasswordActivity"
-            android:exported="false" /> <!-- Splash (Main entry point) -->
+            android:exported="false"
+            android:parentActivityName=".ui.auth.AccountSecurityActivity" />
         <activity
-            android:name=".SplashActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Book_Store_MobileApp.Splash">
+            android:name=".ui.auth.VerifyEmailActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.auth.RegisterActivity" />
+
+        <!-- Store là entry point -->
+        <activity
+            android:name=".StoreActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

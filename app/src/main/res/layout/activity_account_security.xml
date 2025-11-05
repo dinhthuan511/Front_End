@@ -20,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             app:title="Tài khoản &amp; Bảo mật"
             app:titleTextColor="@android:color/black"
-            app:navigationIcon="@drawable/outline_arrow_back_24"
+            app:navigationIcon="@drawable/ic_arrow_back_24"
             app:navigationIconTint="@android:color/black" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -90,15 +90,15 @@
                     android:textSize="14sp"
                     android:hint="Chưa có email" />
 
-                <TextView
-                    android:id="@+id/tvChangeEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Thay đổi"
-                    android:textColor="#1976D2"
-                    android:textStyle="bold"
-                    android:padding="8dp"
-                    android:textSize="14sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/tvChangeEmail"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Thay đổi"-->
+<!--                    android:textColor="#1976D2"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:padding="8dp"-->
+<!--                    android:textSize="14sp" />-->
             </LinearLayout>
 
             <!-- Phone -->
