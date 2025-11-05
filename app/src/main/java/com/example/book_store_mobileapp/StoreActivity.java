@@ -45,10 +45,7 @@ public class StoreActivity extends BaseActivity {
     private ImageButton btnCart, btnFilter, btnSort, btnChatFloating;
     private BookAdapter bookAdapter;
     private BookFilter bookFilter;
-    private List<Book> initialBookList = new ArrayList<>();
-    private List<Book> displayedBookList = new ArrayList<>();
-    private String currentSearchQuery = "";
-    private int activePriceFilter = -1;
+
     private List<Long> activeCategoryFilters = new ArrayList<>();
 
     private FrameLayout cartBtnContainer;
@@ -62,7 +59,10 @@ public class StoreActivity extends BaseActivity {
             cartBadge.setVisibility(View.GONE);
         }
     });
-
+    private List<Book> initialBookList = new ArrayList<>();
+    private List<Book> displayedBookList = new ArrayList<>();
+    private String currentSearchQuery = "";
+    private int activePriceFilter = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,17 +133,6 @@ public class StoreActivity extends BaseActivity {
 
         // Filtering
         btnFilter.setOnClickListener(v -> showFilterDialog());
-//        btnFilter.setOnClickListener(v -> {
-//            final CharSequence[] options = {"Under 100,000 VNĐ", "100,000 - 200,000 VNĐ", "Over 200,000 VNĐ", "Clear Filter"};
-//            new AlertDialog.Builder(StoreActivity.this)
-//                    .setTitle("Filter by Price Range")
-//                    .setItems(options, (dialog, item) -> {
-//                        if (item == 3) activePriceFilter = -1;
-//                        else activePriceFilter = item;
-//                        applyFiltersAndSearch();
-//                    })
-//                    .show();
-//        });
 
         bookAdapter = new BookAdapter(this, displayedBookList);
         gridView.setAdapter(bookAdapter);
@@ -296,6 +285,18 @@ public class StoreActivity extends BaseActivity {
                 Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // register with shared repository so we get realtime cart updates
+        CartCountRepository.getInstance().registerListener(cartCountCallback);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // unregister from repository when not visible
+        CartCountRepository.getInstance().unregisterListener(cartCountCallback);
     }
 
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào

@@ -115,4 +115,3 @@ public class NotificationAdapter extends BaseAdapter {
         View unreadIndicator;
     }
 }
-

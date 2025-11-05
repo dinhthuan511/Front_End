@@ -7,14 +7,17 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.data.NotificationManager;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected BottomNavigationView bottomNavigationView;
+    private BadgeDrawable notificationBadge;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,28 +26,24 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void setContentView(int layoutResID) {
-        // Sử dụng layout cơ sở activity_base.xml
+        // Load layout cha trước
         super.setContentView(R.layout.activity_base);
 
-        // Ánh xạ FrameLayout và BottomNavigationView từ layout cơ sở
         FrameLayout contentFrame = findViewById(R.id.content_frame);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // Cho layout của Activity con vào FrameLayout
+        // Load layout con vào khung chứa
         getLayoutInflater().inflate(layoutResID, contentFrame, true);
 
-        // Thiết lập listener cho BottomNavigationView
         setupBottomNavigation();
+        setupNotificationBadge(); // ✅ Khởi tạo badge tại đây (trước onResume)
     }
 
     private void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            // Nếu người dùng nhấn vào mục đang được chọn thì không làm gì
-            if (itemId == bottomNavigationView.getSelectedItemId()) {
-                return false;
-            }
+            if (itemId == bottomNavigationView.getSelectedItemId()) return false;
 
             Intent intent = null;
 
@@ -52,7 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 intent = new Intent(this, HomeActivity.class);
             } else if (itemId == R.id.nav_store) {
                 intent = new Intent(this, StoreActivity.class);
-            }  else if (itemId == R.id.nav_notifications) {
+            } else if (itemId == R.id.nav_notifications) {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     intent = new Intent(this, NotificationCenterActivity.class);
                 } else {
@@ -67,29 +66,49 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
 
             if (intent != null) {
-                // Cải tiến quan trọng: Dùng flag để không tạo lại Activity đã có
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
-
-            // Return true để mục được chọn hiển thị là active
             return true;
         });
     }
 
+    private void setupNotificationBadge() {
+        // ✅ Luôn dùng getOrCreateBadge() để không bao giờ null
+        notificationBadge = bottomNavigationView.getOrCreateBadge(R.id.nav_notifications);
+        notificationBadge.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+        notificationBadge.setBadgeTextColor(getResources().getColor(android.R.color.white));
+        notificationBadge.setVisible(false); // ẩn mặc định
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Cập nhật mục được chọn trên BottomNav dựa trên Activity hiện tại
         updateNavigationBarState();
+        updateNotificationBadge();
     }
 
-    // Phương thức này sẽ được các Activity con override để cho biết mục nào cần highlight
+    protected void updateNotificationBadge() {
+        if (notificationBadge == null) {
+            // ✅ Phòng ngừa nếu vì lý do nào đó chưa init
+            setupNotificationBadge();
+        }
+
+        NotificationManager manager = NotificationManager.getInstance();
+        int unreadCount = manager.getUnreadCount();
+
+        if (unreadCount > 0) {
+            notificationBadge.setVisible(true);
+            notificationBadge.setNumber(unreadCount);
+        } else {
+            notificationBadge.clearNumber();
+            notificationBadge.setVisible(false);
+        }
+    }
+
     protected abstract int getNavigationMenuItemId();
 
     private void updateNavigationBarState() {
-        int menuItemId = getNavigationMenuItemId();
-        bottomNavigationView.setSelectedItemId(menuItemId);
+        bottomNavigationView.setSelectedItemId(getNavigationMenuItemId());
     }
 }
