@@ -33,6 +33,8 @@ import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.example.book_store_mobileapp.network.FirebaseBookService;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,15 +91,8 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Giỏ hàng
         btnCart.setOnClickListener(v -> {
-            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                // Chuyển hướng đến trang đăng nhập
-                Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
-                startActivity(intent);
-            } else {
-                // Chuyển hướng đến giỏ hàng
-                Intent intent = new Intent(StoreActivity.this, CartActivity.class);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(StoreActivity.this, CartActivity.class);
+            startActivity(intent);
 
         });
         // Setup simple top-right cart badge TextView
@@ -145,7 +140,41 @@ public class StoreActivity extends BaseActivity {
         });
 
         fetchBooksFromFirebase();
+        maybeRedirectAdminOnColdStart();
+
     }
+
+
+    // ✅ ADD: Detect admin when cold start
+    private void maybeRedirectAdminOnColdStart() {
+        boolean launchedFromLauncher =
+                Intent.ACTION_MAIN.equals(getIntent().getAction()) &&
+                        getIntent().hasCategory(Intent.CATEGORY_LAUNCHER);
+
+        boolean isRoot = isTaskRoot();
+        if (!launchedFromLauncher && !isRoot) return;
+
+        FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
+        if (current == null) return;
+
+        current.getIdToken(false)
+                .addOnSuccessListener((GetTokenResult res) -> {
+                    Object adminFlag = res.getClaims().get("admin");
+                    boolean isAdmin = Boolean.TRUE.equals(adminFlag);
+                    if (isAdmin) {
+                        Intent i = new Intent(
+                                StoreActivity.this,
+                                com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class
+                        );
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        overridePendingTransition(0, 0);
+                        finish();
+                    }
+                });
+    }
+
+
 
     private void showFilterDialog() {
         LayoutInflater inflater = this.getLayoutInflater();
@@ -291,12 +320,15 @@ public class StoreActivity extends BaseActivity {
         super.onResume();
         // register with shared repository so we get realtime cart updates
         CartCountRepository.getInstance().registerListener(cartCountCallback);
+
     }
     @Override
     protected void onPause() {
         super.onPause();
         // unregister from repository when not visible
         CartCountRepository.getInstance().unregisterListener(cartCountCallback);
+
+
     }
 
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào

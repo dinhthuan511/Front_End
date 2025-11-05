@@ -13,13 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import android.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-
 import com.example.book_store_mobileapp.BaseActivity;
 import com.example.book_store_mobileapp.R;
-import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ service
+import com.example.book_store_mobileapp.network.FirebaseAuthService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,10 +27,8 @@ import java.util.Map;
 public class AccountSecurityActivity extends BaseActivity {
 
     private EditText edtUsername, edtEmail, edtPhone, edtAddress;
-    private TextView tvChangeEmail;
     private Button btnChangePassword, btnSave;
 
-    private FirebaseAuthService authService; // ✅
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private boolean dirty = false;
@@ -53,14 +47,11 @@ public class AccountSecurityActivity extends BaseActivity {
         }
         bar.setNavigationOnClickListener(v -> finish());
 
-        authService = new FirebaseAuthService(); // ✅
-
         // Views
         edtUsername = findViewById(R.id.edtUsername);
         edtEmail    = findViewById(R.id.edtEmail);
         edtPhone    = findViewById(R.id.edtPhone);
         edtAddress  = findViewById(R.id.edtAddress);
-        tvChangeEmail = findViewById(R.id.tvChangeEmail);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnSave = findViewById(R.id.btnSave);
 
@@ -71,9 +62,8 @@ public class AccountSecurityActivity extends BaseActivity {
         edtAddress.addTextChangedListener(watcher);
 
         btnChangePassword.setOnClickListener(
-                v -> startActivity(new Intent(this, ChangePasswordActivity.class)));
-
-        tvChangeEmail.setOnClickListener(v -> showChangeEmailDialog());
+                v -> startActivity(new Intent(this, ChangePasswordActivity.class))
+        );
 
         btnSave.setOnClickListener(v -> saveProfile());
     }
@@ -87,13 +77,13 @@ public class AccountSecurityActivity extends BaseActivity {
         }
 
         edtEmail.setText(user.getEmail() != null ? user.getEmail() : "");
+        edtUsername.setText(""); // 🔄 username chỉ hiển thị để xem, không chỉnh tại đây
+
         db.collection("users").document(user.getUid()).get()
                 .addOnSuccessListener(snap -> {
                     if (snap.exists()) {
-                        String username = snap.getString("username");
                         String phone = snap.getString("phone");
                         String address = snap.getString("address");
-                        if (!TextUtils.isEmpty(username)) edtUsername.setText(username);
                         if (!TextUtils.isEmpty(phone)) edtPhone.setText(phone);
                         if (!TextUtils.isEmpty(address)) edtAddress.setText(address);
                     }
@@ -133,95 +123,9 @@ public class AccountSecurityActivity extends BaseActivity {
                         Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    // ========= ĐỔI EMAIL (flow rút gọn): re-auth -> changeEmail -> sync Firestore =========
-    private void showChangeEmailDialog() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || TextUtils.isEmpty(user.getEmail())) {
-            Toast.makeText(this, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Inflate layout dialog từ XML: res/layout/dialog_change_email.xml
-        View view = LayoutInflater.from(this).inflate(R.layout.dialog_change_email, null, false);
-        EditText edtNewEmail = view.findViewById(R.id.edtNewEmail);                 // Email mới
-        EditText edtCurrentPassword = view.findViewById(R.id.edtCurrentPassword);   // Mật khẩu hiện tại
-        Button btnSendVerify = view.findViewById(R.id.btnSendVerify);               // nút chính sẽ dùng để đổi email NGAY
-        Button btnIHaveVerified = view.findViewById(R.id.btnIHaveVerified);         // không dùng ở flow rút gọn
-
-        // 🔁 Đổi nhãn cho rõ ý (không gửi mail verify)
-        btnSendVerify.setText("Đổi email");
-        btnIHaveVerified.setVisibility(View.GONE);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Đổi email (cần mật khẩu hiện tại)")
-                .setView(view)
-                .setCancelable(true)
-                .create();
-        dialog.show();
-
-        // 1) Re-auth + đổi email ngay
-        btnSendVerify.setOnClickListener(v -> {
-            String newEmail = edtNewEmail.getText().toString().trim();
-            String pwd = edtCurrentPassword.getText().toString();
-
-            if (TextUtils.isEmpty(newEmail) || !android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
-                Toast.makeText(this, "Email mới không hợp lệ", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (TextUtils.isEmpty(pwd)) {
-                Toast.makeText(this, "Nhập mật khẩu hiện tại", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // ✅ Re-auth qua service
-            authService.reAuthenticate(user.getEmail(), pwd, step1 -> {
-                if (!step1.isSuccess()) {
-                    Toast.makeText(this, step1.getMessage() != null ? step1.getMessage() : "Xác thực lại thất bại", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                // ✅ Đổi email qua service
-                authService.changeEmail(newEmail, step2 -> {
-                    if (step2.isSuccess()) {
-                        // Cập nhật UI & Firestore
-                        edtEmail.setText(newEmail);
-                        syncEmailToFirestore();
-                        Toast.makeText(this, "Đổi email thành công", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(this, "Không thể đổi email: " + step2.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-            });
-        });
-    }
-
-    // 🆕 Đồng bộ email mới sang Firestore + collection mapping "usernames" (nếu có).
-    private void syncEmailToFirestore() {
-        FirebaseUser u = FirebaseAuth.getInstance().getCurrentUser();
-        if (u == null) return;
-
-        String uid = u.getUid();
-        String newEmail = u.getEmail();
-        if (TextUtils.isEmpty(newEmail)) return;
-
-        // Cập nhật users/{uid}.email
-        db.collection("users").document(uid)
-                .update("email", newEmail);
-
-        // Nếu có mapping username -> email, update luôn
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(snap -> {
-                    String username = snap.getString("username");
-                    if (!TextUtils.isEmpty(username)) {
-                        db.collection("usernames").document(username.toLowerCase())
-                                .update("email", newEmail);
-                    }
-                });
-    }
-
     @Override
     protected int getNavigationMenuItemId() {
-        return R.id.nav_profile;
+        return R.id.nav_store;
     }
 
     private static class SimpleWatcher implements TextWatcher {

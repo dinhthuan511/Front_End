@@ -2,14 +2,13 @@ package com.example.book_store_mobileapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.book_store_mobileapp.data.NotificationManager;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
-import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
+import com.example.book_store_mobileapp.ui.auth.ProfileActivity;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             } else if (itemId == R.id.nav_profile) {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    intent = new Intent(this, SettingsActivity.class);
+                    intent = new Intent(this, ProfileActivity.class);
                 } else {
                     intent = new Intent(this, LoginActivity.class);
                 }

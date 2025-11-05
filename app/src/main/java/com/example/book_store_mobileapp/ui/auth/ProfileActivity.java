@@ -11,19 +11,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 //import com.example.book_store_mobileapp.AddressActivity;
 import com.example.book_store_mobileapp.OrderListActivity;
-import com.example.book_store_mobileapp.OrderStatusActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ service
 import com.google.android.material.appbar.MaterialToolbar;
 
-public class SettingsActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "SETTINGS_DEBUG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_profile);
 
         // 1) Thiết lập Toolbar làm ActionBar để tiêu đề hiển thị ổn định
         MaterialToolbar bar = findViewById(R.id.topAppBar);
@@ -38,19 +37,14 @@ public class SettingsActivity extends AppCompatActivity {
             Log.e(TAG, "topAppBar == null");
         }
 
-        // 2) Row: Tài khoản & Bảo mật
         View rowAccount = findViewById(R.id.rowAccountSecurity);
         if (rowAccount != null) {
-            TextView title = rowAccount.findViewById(R.id.title);
-            ImageView icon = rowAccount.findViewById(R.id.icon);
-
-            if (title != null) title.setText("Tài khoản & bảo mật");
-            if (icon != null) icon.setImageResource(R.drawable.outline_house_with_shield_24);
+            ((TextView) rowAccount.findViewById(R.id.title)).setText("Tài khoản & bảo mật");
+            ((ImageView) rowAccount.findViewById(R.id.icon)).setImageResource(R.drawable.outline_house_with_shield_24);
 
             rowAccount.setOnClickListener(v ->
-                    startActivity(new Intent(this, AccountSecurityActivity.class)));
-        } else {
-            Log.e(TAG, "Không tìm thấy rowAccountSecurity");
+                    startActivity(new Intent(this, AccountSecurityActivity.class))
+            );
         }
 
 // 3) Row: Xem đơn hàng của tôi

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View; // Thêm import này
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,7 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
-import com.example.book_store_mobileapp.ui.auth.SettingsActivity;
+import com.example.book_store_mobileapp.ui.auth.ProfileActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -110,7 +109,7 @@ public class HomeActivity extends BaseActivity implements OnMapReadyCallback {
             if(FirebaseAuth.getInstance().getCurrentUser() == null)
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
             else{
-                startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
+                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             }
         });
     }

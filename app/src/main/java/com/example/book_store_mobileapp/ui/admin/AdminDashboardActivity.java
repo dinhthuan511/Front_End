@@ -37,12 +37,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
             return false;
         });
 
-        btnAddProduct    = findViewById(R.id.btnAddProduct);
+//        btnAddProduct    = findViewById(R.id.btnAddProduct);
         btnModifyProduct = findViewById(R.id.btnModifyProduct);
         btnManageOrders = findViewById(R.id.btnManageOrders);
 
-        btnAddProduct.setOnClickListener(v ->
-                startActivity(new Intent(this, AddEditProductActivity.class)));
+//        btnAddProduct.setOnClickListener(v ->
+//                startActivity(new Intent(this, AddEditProductActivity.class)));
         btnModifyProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductsActivity.class)));
         btnManageOrders.setOnClickListener(v ->

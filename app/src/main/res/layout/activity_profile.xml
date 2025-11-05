@@ -34,6 +34,8 @@
         android:clipToPadding="false"
         android:paddingBottom="96dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,6 +56,8 @@
                 android:background="#F6F7FB" />
         </LinearLayout>
     </ScrollView>
+
+
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"

@@ -50,7 +50,7 @@ public class CartActivity extends AppCompatActivity {
 
         adapter = new CartAdapter(this, cartItems, this::updateTotal);
         listView.setAdapter(adapter);
-
+        checkLoginStatus();
         loadCartFromFirebase();
 
         // ✅ Sự kiện nhấn nút thanh toán
@@ -80,6 +80,8 @@ public class CartActivity extends AppCompatActivity {
 
 // refresh repository so UI badges update immediately
         CartCountRepository.getInstance().refreshCartCount();
+
+
     }
 
     /** 🔹 Kiểm tra đăng nhập để hiển thị/ẩn nút */
@@ -87,13 +89,9 @@ public class CartActivity extends AppCompatActivity {
         boolean isLoggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
         btnCheckout.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
         btnClearAll.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
-
-        if (!isLoggedIn) {
-            Toast.makeText(this, "Vui lòng đăng nhập để xem và thanh toán giỏ hàng.", Toast.LENGTH_SHORT).show();
-        }
     }
 
-    /** 🔹 Tải giỏ hàng từ Firebase */
+
     private void loadCartFromFirebase() {
         Log.d("CartActivity", "🔄 Bắt đầu tải giỏ hàng từ Firebase...");
 

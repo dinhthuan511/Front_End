@@ -75,8 +75,7 @@ dependencies {
         )
     ))
 
-
-
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     // Add this line for Firebase Realtime Database
     implementation("com.google.firebase:firebase-database")
     // (Tuỳ chọn) Realtime Database – chỉ giữ nếu bạn thật sự dùng
