@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.book_store_mobileapp.adapter.CheckoutAdapter;
 import com.example.book_store_mobileapp.data.CartItem;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -17,7 +20,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private ArrayList<CartItem> cartItems;
     private TextView txtTotal;
-    private EditText edtName, edtPhone, edtAddress;
+    private EditText edtName, edtPhone, edtAddress, edtEmail ;
     private RadioGroup paymentMethodGroup;
     private Button btnConfirm;
     private ImageButton btnBack;
@@ -33,6 +36,7 @@ public class CheckoutActivity extends AppCompatActivity {
         edtName = findViewById(R.id.edtName);
         edtPhone = findViewById(R.id.edtPhone);
         edtAddress = findViewById(R.id.edtAddress);
+        edtEmail = findViewById(R.id.edtEmail);
         paymentMethodGroup = findViewById(R.id.paymentMethodGroup);
         btnConfirm = findViewById(R.id.btnConfirm);
         btnBack = findViewById(R.id.btnBack);
@@ -53,11 +57,30 @@ public class CheckoutActivity extends AppCompatActivity {
             total += item.getBook().getPrice() * item.getQuantity();
         }
         txtTotal.setText("Tổng cộng: " + FormatUtils.formatCurrency(total));
-
+        loadUserInfo();
         btnBack.setOnClickListener(v -> finish());
         btnConfirm.setOnClickListener(v -> handleConfirm());
     }
+    private void loadUserInfo() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
 
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        edtName.setText(doc.getString("username") != null ? doc.getString("username") : "");
+                        edtPhone.setText(doc.getString("phone") != null ? doc.getString("phone") : "");
+                        edtAddress.setText(doc.getString("address") != null ? doc.getString("address") : "");
+                        edtEmail.setText(doc.getString("email") != null ? doc.getString("email") : "");
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Log.e("CHECKOUT", "❌ Lỗi lấy thông tin: " + e.getMessage())
+                );
+    }
     private void handleConfirm() {
         String name = edtName.getText().toString().trim();
         String phone = edtPhone.getText().toString().trim();

@@ -17,7 +17,7 @@
         android:id="@+id/tvStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đang xử lý thanh toán..."
+        android:text="Đang xử lý đơn hàng..."
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#333" />

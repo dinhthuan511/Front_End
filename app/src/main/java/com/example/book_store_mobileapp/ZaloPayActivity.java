@@ -52,7 +52,7 @@ public class ZaloPayActivity extends AppCompatActivity {
                         checkoutIntent.getStringExtra("phone"),
                         checkoutIntent.getStringExtra("address"),
                         "ZaloPay",
-                        "Thành công",
+                        "Đã thanh toán",
                         transactionId,
                         appTransId,
                         transToken

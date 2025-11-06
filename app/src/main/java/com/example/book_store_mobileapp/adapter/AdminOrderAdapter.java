@@ -28,13 +28,13 @@ import java.util.Locale;
 
 public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.ViewHolder> {
 
-    private Context context;
-    private List<Order> orderList;
-    private OnStatusChangeListener listener;
+    private final Context context;
+    private final List<Order> orderList;
+    private final OnStatusChangeListener listener;
 
     public interface OnStatusChangeListener {
         void onStatusChange(Order order, String newStatus);
-        void onCancelOrder(Order order, String reason); // ✅ thêm lý do
+        void onCancelOrder(Order order, String reason);
     }
 
     public AdminOrderAdapter(Context context, List<Order> orderList, OnStatusChangeListener listener) {
@@ -60,7 +60,7 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
         holder.tvCreatedAt.setText("Ngày tạo: " + formatDate(order.getCreatedAt()));
 
         // Danh sách trạng thái
-        String[] statusOptions = {"Đang xử lý", "Đang giao", "Đã giao"};
+        String[] statusOptions = {"Đang xử lý", "Đang giao", "Đã giao", "Đã hủy"};
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 context,
                 android.R.layout.simple_spinner_item,
@@ -71,6 +71,19 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
 
         int selectedPos = spinnerAdapter.getPosition(order.getStatus());
         if (selectedPos >= 0) holder.spinnerStatus.setSelection(selectedPos, false);
+
+        // Làm mờ và vô hiệu hóa nếu đã hủy
+        if ("Đã hủy".equals(order.getStatus())) {
+            holder.itemView.setAlpha(0.4f);
+            holder.spinnerStatus.setEnabled(false);
+            holder.btnCancel.setEnabled(false);
+            holder.btnCancel.setVisibility(View.GONE);
+        } else {
+            holder.itemView.setAlpha(1.0f);
+            holder.spinnerStatus.setEnabled(true);
+            holder.btnCancel.setEnabled(true);
+            holder.btnCancel.setVisibility(View.VISIBLE);
+        }
 
         holder.spinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             boolean firstCall = true;
@@ -85,11 +98,18 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                 String newStatus = parent.getItemAtPosition(pos).toString();
                 String currentStatus = order.getStatus();
 
+                if ("Đã hủy".equals(currentStatus)) {
+                    Toast.makeText(context, "Đơn đã hủy, không thể chỉnh sửa!", Toast.LENGTH_SHORT).show();
+                    holder.spinnerStatus.setSelection(getStatusPosition(currentStatus));
+                    return;
+                }
+
                 if (currentStatus.equals("Đang giao") && newStatus.equals("Đang xử lý")) {
                     Toast.makeText(context, "Không thể quay lại 'Đang xử lý'", Toast.LENGTH_SHORT).show();
                     holder.spinnerStatus.setSelection(getStatusPosition(currentStatus));
                     return;
                 }
+
                 if (currentStatus.equals("Đã giao") &&
                         (newStatus.equals("Đang giao") || newStatus.equals("Đang xử lý"))) {
                     Toast.makeText(context, "Đơn đã hoàn tất, không thể thay đổi!", Toast.LENGTH_SHORT).show();
@@ -106,20 +126,11 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Ẩn nút Hủy nếu đơn không thể hủy
-        if (order.getStatus().equals("Đang giao") || order.getStatus().equals("Đã giao") || order.getStatus().equals("Đã hủy")) {
-            holder.btnCancel.setVisibility(View.GONE);
-        } else {
-            holder.btnCancel.setVisibility(View.VISIBLE);
-        }
-
         holder.btnCancel.setOnClickListener(v -> {
-
             if (order.getStatus().equals("Đang giao") || order.getStatus().equals("Đã giao")) {
                 Toast.makeText(context, "Không thể hủy đơn đang vận chuyển!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             showCancelReasonDialog(order);
         });
     }
@@ -160,6 +171,8 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
                         Toast.makeText(context, "Lý do không được để trống!", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
+                    // Animation mờ dần khi hủy
                     listener.onCancelOrder(order, reason);
                 })
                 .setNegativeButton("Thoát", null)
@@ -171,6 +184,7 @@ public class AdminOrderAdapter extends RecyclerView.Adapter<AdminOrderAdapter.Vi
             case "Đang xử lý": return 0;
             case "Đang giao": return 1;
             case "Đã giao": return 2;
+            case "Đã hủy": return 3;
             default: return 0;
         }
     }

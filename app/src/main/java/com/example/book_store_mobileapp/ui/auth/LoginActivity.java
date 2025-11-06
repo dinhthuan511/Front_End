@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.book_store_mobileapp.HomeActivity;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.StoreActivity;
 import com.example.book_store_mobileapp.network.FirebaseAuthService;
@@ -178,18 +179,14 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Điều hướng sau đăng nhập:
-     * - Admin  -> AdminDashboardActivity
-     * - User   -> StoreActivity
-     */
+
     private void routeAfterLogin(boolean isAdmin) {
-        Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "StoreActivity"));
+        Log.d(TAG, "Starting " + (isAdmin ? "AdminDashboardActivity" : "HomeActivity"));
         Intent i = new Intent(
                 this,
                 isAdmin
                         ? com.example.book_store_mobileapp.ui.admin.AdminDashboardActivity.class
-                        : StoreActivity.class
+                        : HomeActivity.class
         );
         // KEEP: Clear back stack để không quay lại Login
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -29,7 +29,6 @@ public class AdminOrdersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_orders);
 
-        // ===== Toolbar =====
         MaterialToolbar toolbar = findViewById(R.id.topAppBar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -37,7 +36,6 @@ public class AdminOrdersActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(v -> onBackPressed());
         }
 
-        // ===== RecyclerView =====
         recyclerOrders = findViewById(R.id.recyclerOrders);
         recyclerOrders.setLayoutManager(new LinearLayoutManager(this));
 
@@ -82,6 +80,16 @@ public class AdminOrdersActivity extends AppCompatActivity {
                                     () -> {
                                         order.setStatus("Đã hủy");
                                         adapter.notifyDataSetChanged();
+
+                                        // Animation mờ dần
+                                        int pos = orderList.indexOf(order);
+                                        if (pos >= 0) {
+                                            RecyclerView.ViewHolder vh = recyclerOrders.findViewHolderForAdapterPosition(pos);
+                                            if (vh != null) {
+                                                vh.itemView.animate().alpha(0.4f).setDuration(500).start();
+                                            }
+                                        }
+
                                         Toast.makeText(AdminOrdersActivity.this,
                                                 "Đã hủy đơn hàng thành công!",
                                                 Toast.LENGTH_SHORT).show();

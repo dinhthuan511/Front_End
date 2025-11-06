@@ -19,7 +19,7 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         tvMessage = findViewById(R.id.tvMessage);
         btnViewOrder = findViewById(R.id.btnViewOrder);
 
-        tvMessage.setText("Thanh toán thành công 🎉\nCảm ơn bạn đã mua hàng!");
+        tvMessage.setText("Đặt hàng thành công 🎉\nCảm ơn bạn đã mua hàng!");
 
         btnViewOrder.setOnClickListener(v -> {
             String orderId = getIntent().getStringExtra("orderId");

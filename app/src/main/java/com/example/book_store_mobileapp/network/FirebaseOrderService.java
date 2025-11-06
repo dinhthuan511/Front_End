@@ -48,11 +48,13 @@ public class FirebaseOrderService {
                 .addOnSuccessListener(unused -> onSuccess.run())
                 .addOnFailureListener(onError::accept);
     }
+
+    // 🔹 Cập nhật hủy đơn (lưu lý do + thời gian)
     public void updateOrderStatusWithReason(String orderId, String status, String reason,
                                             Runnable onSuccess, Consumer<Exception> onError) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("status", status);
-        updates.put("cancelReason", reason); // 👈 Thêm lý do hủy
+        updates.put("cancelReason", reason);
         updates.put("cancelledAt", Timestamp.now());
 
         ordersRef.document(orderId)

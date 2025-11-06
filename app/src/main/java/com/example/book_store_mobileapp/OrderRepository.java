@@ -57,7 +57,6 @@ public class OrderRepository {
 
                 Map<String, Object> bookMap = new HashMap<>();
                 bookMap.put("bookId", item.getBook().getBookId());
-                // adapt your Book getters (name/title)
                 bookMap.put("name", item.getBook().getName());
                 bookMap.put("price", item.getBook().getPrice());
                 bookMap.put("imageUrl", item.getBook().getImageUrl());
@@ -70,14 +69,17 @@ public class OrderRepository {
 
         db.collection("orders").add(order)
                 .addOnSuccessListener(docRef -> {
-                    // clear cart if user logged in
                     if (user != null) {
                         new FirebaseCartService().clearCart(user.getUid(), () -> {
-                            // open PaymentSuccessActivity
-                            Intent intent = new Intent(context, PaymentSuccessActivity.class);
-                            intent.putExtra("orderId", docRef.getId());
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
+
+                            // ✅ Sau khi tạo đơn hàng thành công (mọi loại thanh toán)
+                            Intent processingIntent = new Intent(context, PaymentProcessingActivity.class);
+                            processingIntent.putExtra("orderId", docRef.getId());
+                            processingIntent.putExtra("total", total);
+                            processingIntent.putExtra("paymentMethod", paymentMethod);
+                            processingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(processingIntent);
+
                         });
                     } else {
                         Toast.makeText(context, "Order saved but user not logged in", Toast.LENGTH_SHORT).show();

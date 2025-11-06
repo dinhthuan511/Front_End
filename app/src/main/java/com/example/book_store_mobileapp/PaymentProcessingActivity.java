@@ -20,7 +20,7 @@ public class PaymentProcessingActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvStatus = findViewById(R.id.tvStatus);
 
-        tvStatus.setText("Đang xử lý thanh toán...");
+        tvStatus.setText("Đang xử lý đơn hàng...");
 
         // Giả lập xử lý 3 giây
         new Handler().postDelayed(() -> {
