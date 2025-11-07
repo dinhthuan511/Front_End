@@ -1,77 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Phạm vi giá"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"/>
-
-    <RadioGroup
-        android:id="@+id/rg_price_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-
-        <RadioButton
-            android:id="@+id/rb_price_0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất cả" />
-
-        <RadioButton
-            android:id="@+id/rb_price_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dưới 100,000 VNĐ" />
-
-        <RadioButton
-            android:id="@+id/rb_price_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="100,000 - 200,000 VNĐ" />
-
-        <RadioButton
-            android:id="@+id/rb_price_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Trên 200,000 VNĐ" />
-    </RadioGroup>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="?android:attr/listDivider" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thể loại"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"/>
-
-    <!-- LinearLayout để chứa các CheckBox thể loại (sẽ được thêm bằng code) -->
     <LinearLayout
-        android:id="@+id/ll_category_checkboxes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="8dp">
-        <!-- Ví dụ:
-        <CheckBox
+        android:padding="24dp">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tiểu thuyết"/>
-        -->
-    </LinearLayout>
+            android:text="Phạm vi giá"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
-</LinearLayout>
+        <RadioGroup
+            android:id="@+id/rg_price_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <RadioButton
+                android:id="@+id/rb_price_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tất cả" />
+
+            <RadioButton
+                android:id="@+id/rb_price_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dưới 100,000 VNĐ" />
+
+            <RadioButton
+                android:id="@+id/rb_price_2"
+                android.layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100,000 - 200,000 VNĐ" />
+
+            <RadioButton
+                android:id="@+id/rb_price_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trên 200,000 VNĐ" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tùy chọn mức giá"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/et_min_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="min"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/et_max_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="max"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thể loại"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <!-- LinearLayout để chứa các CheckBox thể loại (sẽ được thêm bằng code) -->
+        <LinearLayout
+            android:id="@+id/ll_category_checkboxes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+            <!-- Ví dụ:
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiểu thuyết"/>
+            -->
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

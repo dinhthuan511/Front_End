@@ -1,9 +1,18 @@
 package com.example.book_store_mobileapp.data;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class BookFilter {
+    private String removeAccents(String text) {
+        if (text == null) return "";
+        String nfdNormalizedString = Normalizer.normalize(text, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("");
+    }
+
     public List<Book> searchBooks(List<Book> bookList, String query){
         // Return full book list if query is null or empty
         if(query == null || query.trim().isEmpty()){
@@ -11,9 +20,10 @@ public class BookFilter {
         }
         //
         List<Book> filteredList = new ArrayList<>();
-        String lowerCaseQuery = query.toLowerCase();
+        String normalizedQuery = removeAccents(query.toLowerCase());
         for(Book book : bookList){
-            if(book.getName().toLowerCase().contains(lowerCaseQuery)){
+            String normalizedBookName = removeAccents(book.getName().toLowerCase());
+            if(normalizedBookName.contains(normalizedQuery)){
                 filteredList.add(book);
             }
         }

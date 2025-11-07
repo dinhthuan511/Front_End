@@ -2,9 +2,12 @@ package com.example.book_store_mobileapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,7 +35,8 @@ import java.util.Locale;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView detailBookImage;
-    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications, txtQuantity;
+    private TextView detailBookName, detailBookAuthor, detailBookDescription,detailBookPrice, detailBookTechnicalSpecifications;
+    private EditText etxtQuantity;
     private TextView imageOutOfStockOverlay;
     private LinearLayout addToCartRow;
     private Button btnAddToCart;
@@ -61,7 +65,7 @@ public class BookDetailActivity extends AppCompatActivity {
         detailBookTechnicalSpecifications = findViewById(R.id.bookTechnicalSpecifications);
         detailBookPrice = findViewById(R.id.bookPrice);
         addToCartRow = findViewById(R.id.addToCartRow);
-        txtQuantity = findViewById(R.id.txtQuantity);
+        etxtQuantity = findViewById(R.id.etxtQuantity);
         btnMinus = findViewById(R.id.btnMinus);
         btnPlus = findViewById(R.id.btnPlus);
         btnAddToCart = findViewById(R.id.btnAddToCart);
@@ -77,7 +81,7 @@ public class BookDetailActivity extends AppCompatActivity {
         if(book != null){
             // Set book data
             detailBookName.setText(book.getName());
-            detailBookAuthor.setText("Author: " + book.getAuthor());
+            detailBookAuthor.setText("Tác giả: " + book.getAuthor());
             detailBookDescription.setText(book.getFullDescription());
             detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
             // Format the price
@@ -99,17 +103,53 @@ public class BookDetailActivity extends AppCompatActivity {
                 imageOutOfStockOverlay.setVisibility(View.GONE);
             }
 
+            etxtQuantity.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String quantityStr = s.toString();
+                    if (quantityStr.isEmpty()) {
+                        currentQuantity = 1;
+                        return;
+                    }
+                    try {
+                        int quantity = Integer.parseInt(quantityStr);
+                        if (quantity < 1) {
+                            currentQuantity = 1;
+                            etxtQuantity.setText(String.valueOf(currentQuantity));
+                            etxtQuantity.setSelection(etxtQuantity.getText().length());
+                        } else if (book.getStock() != null && quantity > book.getStock()) {
+                            currentQuantity = book.getStock().intValue();
+                            etxtQuantity.setText(String.valueOf(currentQuantity));
+                            etxtQuantity.setSelection(etxtQuantity.getText().length());
+//                            Toast.makeText(BookDetailActivity.this, "Số lượng không được vượt quá số lượng trong kho", Toast.LENGTH_SHORT).show();
+                        } else {
+                            currentQuantity = quantity;
+                        }
+                    } catch (NumberFormatException e) {
+                        currentQuantity = 1;
+                        etxtQuantity.setText(String.valueOf(currentQuantity));
+                        etxtQuantity.setSelection(etxtQuantity.getText().length());
+                    }
+                }
+            });
+
             btnMinus.setOnClickListener(v -> {
                 if (currentQuantity > 1) {
                     currentQuantity--;
-                    txtQuantity.setText(String.valueOf(currentQuantity));
+                    etxtQuantity.setText(String.valueOf(currentQuantity));
                 }
             });
 
             btnPlus.setOnClickListener(v -> {
-                if(currentQuantity < book.getStock()){
+                if(book.getStock() != null && currentQuantity < book.getStock()){
                     currentQuantity++;
-                    txtQuantity.setText(String.valueOf(currentQuantity));
+                    etxtQuantity.setText(String.valueOf(currentQuantity));
                 }
             });
 
