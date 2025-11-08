@@ -10,8 +10,9 @@ import android.widget.Toast;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.book_store_mobileapp.BaseActivity;
+
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.network.FirebaseAuthService; // ✅ dùng service
 import com.google.firebase.auth.FirebaseAuth; // chỉ dùng signOut cuối flow (có thể dùng service.logout nếu thích)
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private EditText edtUsername, edtEmail, edtPassword, edtPhone, edtAddress;
     private Button btnRegister;
@@ -37,7 +38,6 @@ public class RegisterActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // BaseActivity sẽ nạp activity_base.xml và inflate layout con vào content_frame
         setContentView(R.layout.activity_register);
 
         authService = new FirebaseAuthService(); // ✅
@@ -160,9 +160,4 @@ public class RegisterActivity extends BaseActivity {
         Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected int getNavigationMenuItemId() {
-        // Đang ở cụm Profile → highlight icon Profile
-        return R.id.nav_profile;
-    }
 }

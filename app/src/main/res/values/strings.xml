@@ -6,8 +6,8 @@
     <string name="enter_book_name">Enter book name...</string>
     <string name="filter">Filter</string>
     <string name="sort">Sort</string>
-    <string name="notification_center">Notification Center</string>
-    <string name="no_notifications">No notifications yet</string>
+    <string name="notification_center">Thông báo</string>
+        <string name="no_notifications">No notifications yet</string>
     <string name="chat">Chat</string>
     <string name="user">User</string>
     <string name="change_email">Đổi email</string>

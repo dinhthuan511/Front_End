@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.book_store_mobileapp.adapter.BookAdapter;
 import com.example.book_store_mobileapp.data.Book;
@@ -50,8 +51,10 @@ public class StoreActivity extends BaseActivity {
 
     private List<Long> activeCategoryFilters = new ArrayList<>();
 
-    private FrameLayout cartBtnContainer;
+
     private TextView cartBadge;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private final CartCountRepository.CartCountCallback cartCountCallback = count -> runOnUiThread(() -> {
         if (cartBadge == null) return;
         if (count > 0) {
@@ -79,7 +82,6 @@ public class StoreActivity extends BaseActivity {
 
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
-        cartBtnContainer = findViewById(R.id.cart_btn_container);
         btnFilter = findViewById(R.id.btnFilter);
         btnSort = findViewById(R.id.btnSort);
         txtSearchName = findViewById(R.id.txtSearchName);
@@ -87,6 +89,24 @@ public class StoreActivity extends BaseActivity {
         progressBar = findViewById(R.id.progressBar);
         btnChatFloating = findViewById(R.id.btnChatFloating);
 
+        // Reload trang bằng cách kéo xuống
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        // Kéo để reload
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchBooksFromFirebase();
+        });
+
+// ✅ Chat button - open chat with admin
+        btnChatFloating.setOnClickListener(v -> {
+            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                Toast.makeText(StoreActivity.this, "Please login to use chat", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(StoreActivity.this, LoginActivity.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(StoreActivity.this, ChatActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
         // ✅ Giỏ hàng
@@ -303,6 +323,8 @@ public class StoreActivity extends BaseActivity {
             @Override
             public void onSuccess(List<Book> data) {
                 progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false); // 🔹 Tắt icon loading khi xong
+
                 initialBookList.clear();
                 initialBookList.addAll(data);
                 updateDisplayedBooks(initialBookList);
@@ -311,10 +333,12 @@ public class StoreActivity extends BaseActivity {
             @Override
             public void onError(String message) {
                 progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false); // 🔹 Tắt icon loading khi lỗi
                 Toast.makeText(StoreActivity.this, "Lỗi tải sách: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     @Override
     protected void onResume() {
         super.onResume();

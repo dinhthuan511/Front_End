@@ -32,10 +32,9 @@ import java.util.Map;
 
 public class AddProductActivity extends AppCompatActivity {
 
-    // Giới hạn để ảnh + các field khác không vượt 1MiB/doc của Firestore
-    private static final int MAX_IMAGE_BYTES = 900 * 1024;      // 900 KB
-    private static final int MAX_DIMENSION   = 1200;            // px cạnh dài
-    private static final int JPEG_QUALITY    = 85;              // %
+    private static final int MAX_IMAGE_BYTES = 900 * 1024;
+    private static final int MAX_DIMENSION   = 1200;
+    private static final int JPEG_QUALITY    = 85;
 
     private TextInputEditText edtProductName, edtAuthor, edtPrice, edtStock,
             edtCategoryId, edtIsbn, edtBrief, edtFull, edtSpecs;
@@ -47,8 +46,7 @@ public class AddProductActivity extends AppCompatActivity {
     private FirebaseAdminService adminService;
     private ActivityResultLauncher<String> pickImageLauncher;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
 
@@ -63,14 +61,7 @@ public class AddProductActivity extends AppCompatActivity {
 
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
-                uri -> {
-                    if (uri != null) {
-                        pickedImageUri = uri;
-                        // preview
-                        Glide.with(this).load(uri).into(ivPreview);
-                    }
-                });
-
+                uri -> { if (uri != null) { pickedImageUri = uri; Glide.with(this).load(uri).centerCrop().into(ivPreview); }});
         btnPickImage.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
         btnSave.setOnClickListener(v -> save());
     }
@@ -92,20 +83,17 @@ public class AddProductActivity extends AppCompatActivity {
 
     private void setupPriceFormatter() {
         edtPrice.addTextChangedListener(new TextWatcher() {
-            private String current = "";
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            private String cur = "";
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {}
             @Override public void afterTextChanged(Editable s) {
-                if (!s.toString().equals(current)) {
+                if (!s.toString().equals(cur)) {
                     edtPrice.removeTextChangedListener(this);
                     String clean = s.toString().replace(".", "");
                     if (!clean.isEmpty()) {
                         try {
-                            String formatted = NumberFormat.getInstance(new Locale("vi","VN"))
-                                    .format(Long.parseLong(clean));
-                            current = formatted;
-                            edtPrice.setText(formatted);
-                            edtPrice.setSelection(formatted.length());
+                            String f = NumberFormat.getInstance(new Locale("vi","VN")).format(Long.parseLong(clean));
+                            cur = f; edtPrice.setText(f); edtPrice.setSelection(f.length());
                         } catch (NumberFormatException ignore) {}
                     }
                     edtPrice.addTextChangedListener(this);
@@ -126,15 +114,13 @@ public class AddProductActivity extends AppCompatActivity {
 
         long price = parseLongOr(priceS, -1);
         if (price <= 0) { toast("Giá phải > 0"); return; }
-
         long stock = parseLongOr(stockS, 0);
         if (stock < 0)  { toast("Tồn kho phải ≥ 0"); return; }
-
         long categoryId = parseLongOr(catS, 0);
 
-        // chuyển ảnh -> base64 và lưu Firestore
         String b64 = imageToBase64(pickedImageUri, MAX_DIMENSION, JPEG_QUALITY, MAX_IMAGE_BYTES);
         if (b64 == null) { toast("Ảnh quá lớn hoặc lỗi chuyển ảnh"); return; }
+        String dataUri = "data:image/jpeg;base64," + b64;
 
         Map<String, Object> doc = new HashMap<>();
         doc.put("productName", name);
@@ -143,6 +129,8 @@ public class AddProductActivity extends AppCompatActivity {
         doc.put("stock", stock);
         doc.put("categoryId", categoryId);
         doc.put("isbn", empty(edtIsbn));
+        // lưu cả hai cho chắc
+        doc.put("imageUrl", dataUri);
         doc.put("imageBase64", b64);
         doc.put("briefDescription", empty(edtBrief));
         doc.put("fullDescription", empty(edtFull));
@@ -150,48 +138,29 @@ public class AddProductActivity extends AppCompatActivity {
         doc.put("createdAt", System.currentTimeMillis());
 
         adminService.addProduct(doc, res -> {
-            if (!res.isSuccess()) {
-                toast("Lỗi thêm: " + res.getMessage());
-                return;
-            }
-            toast("✅ Đã thêm sản phẩm");
-            finish();
+            if (!res.isSuccess()) { toast("Lỗi thêm: " + res.getMessage()); return; }
+            toast("✅ Đã thêm sản phẩm"); finish();
         });
     }
 
-    /** Convert Uri -> base64 (JPEG), có resize + giới hạn kích thước */
     private @Nullable String imageToBase64(Uri uri, int maxDim, int quality, int maxBytes) {
         try (InputStream in = getContentResolver().openInputStream(uri)) {
-            Bitmap src = BitmapFactory.decodeStream(in);
-            if (src == null) return null;
-
-            Bitmap bmp = downscaleIfNeeded(src, maxDim);
+            Bitmap bmp = BitmapFactory.decodeStream(in);
+            if (bmp == null) return null;
+            int w = bmp.getWidth(), h = bmp.getHeight(), longSide = Math.max(w, h);
+            if (longSide > maxDim) {
+                float sc = maxDim * 1f / longSide;
+                bmp = Bitmap.createScaledBitmap(bmp, Math.round(w*sc), Math.round(h*sc), true);
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.JPEG, quality, baos);
             byte[] bytes = baos.toByteArray();
-
-            if (bytes.length > maxBytes) return null; // quá to
-
+            if (bytes.length > maxBytes) return null;
             return Base64.encodeToString(bytes, Base64.NO_WRAP);
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (Exception e) { return null; }
     }
 
-    private Bitmap downscaleIfNeeded(Bitmap src, int maxDim) {
-        int w = src.getWidth(), h = src.getHeight();
-        int longSide = Math.max(w, h);
-        if (longSide <= maxDim) return src;
-        float scale = (float) maxDim / longSide;
-        int nw = Math.round(w * scale), nh = Math.round(h * scale);
-        return Bitmap.createScaledBitmap(src, nw, nh, true);
-    }
-
-    private long parseLongOr(String s, long fallback) {
-        try { return TextUtils.isEmpty(s) ? fallback : Long.parseLong(s); }
-        catch (Exception ignore) { return fallback; }
-    }
-
+    private long parseLongOr(String s, long fb){ try { return TextUtils.isEmpty(s)? fb : Long.parseLong(s);} catch(Exception e){return fb;}}
     private String t(TextInputEditText e){ return e.getText()==null? "": e.getText().toString().trim(); }
     private String empty(TextInputEditText e){ return TextUtils.isEmpty(t(e)) ? null : t(e); }
     private void toast(String m){ Toast.makeText(this, m, Toast.LENGTH_SHORT).show(); }

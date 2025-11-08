@@ -41,7 +41,7 @@
             android:id="@+id/btnMarkAllRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mark All Read"
+            android:text="Đánh dấu tất cả đã đọc"
             android:textSize="12sp"
             android:background="@android:color/transparent"
             android:textColor="@color/black" />

@@ -81,6 +81,18 @@
                 android:textColor="@android:color/white"
                 android:layout_marginBottom="12dp" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManageChats"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Quản lý Chat với khách hàng"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"
+                app:strokeColor="#274C77"
+                app:strokeWidth="2dp"
+                android:textColor="#274C77"
+                android:layout_marginBottom="12dp" />
 
         </LinearLayout>
     </ScrollView>

@@ -14,7 +14,7 @@ import com.google.android.material.button.MaterialButton;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private MaterialButton btnAddProduct, btnModifyProduct,btnManageOrders;
+    private MaterialButton btnAddProduct, btnModifyProduct,btnManageOrders, btnManageChats;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,12 +39,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnAddProduct    = findViewById(R.id.btnAddProduct);
         btnModifyProduct = findViewById(R.id.btnModifyProduct);
         btnManageOrders = findViewById(R.id.btnManageOrders);
+        btnManageChats = findViewById(R.id.btnManageChats);
+
 
         btnAddProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AddProductActivity.class)));
         btnModifyProduct.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminProductsActivity.class)));
         btnManageOrders.setOnClickListener(v ->
-                startActivity(new Intent(this, AdminOrdersActivity.class))); // 👈 mở trang quản lý đơn hàng
+                startActivity(new Intent(this, AdminOrdersActivity.class)));
+        btnManageChats.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminChatListActivity.class)));
     }
 }

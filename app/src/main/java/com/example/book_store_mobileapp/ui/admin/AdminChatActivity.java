@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp;
+package com.example.book_store_mobileapp.ui.admin;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.adapter.ChatAdapter;
 import com.example.book_store_mobileapp.data.chat.Message;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity {
+public class AdminChatActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ChatAdapter chatAdapter;
@@ -35,19 +36,31 @@ public class ChatActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private DatabaseReference databaseReference;
-    private String currentUserId;
+    private String targetUsername;
+    private String userEmail;
+    private String adminId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        // Get user info from intent (userId is now username/sanitized email)
+        targetUsername = getIntent().getStringExtra("userId"); // This is actually the username now
+        userEmail = getIntent().getStringExtra("userEmail");
+
+        if (targetUsername == null) {
+            Toast.makeText(this, "Error: Username not provided", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         // Setup toolbar
         toolbar = findViewById(R.id.toolbar_chat);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Chat with Store");
+            getSupportActionBar().setTitle("Chat with " + (userEmail != null ? userEmail : "User"));
         }
         toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -60,35 +73,29 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(chatAdapter);
 
-        // Check if user is logged in
+        // Get admin ID
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            // Use email as username, sanitize it for Firebase key
-            String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-            String username = userEmail != null ? userEmail.replace(".", "_").replace("@", "_at_") : currentUserId;
-
-            databaseReference = FirebaseDatabase.getInstance().getReference("chat").child(username);
-
-            sendButton.setOnClickListener(v -> sendMessage());
-            attachDatabaseReadListener();
+            adminId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
-            Toast.makeText(this, "You must be logged in to use chat", Toast.LENGTH_SHORT).show();
-            finish();
+            adminId = "admin";
         }
+
+        // Reference to the user's chat using username
+        databaseReference = FirebaseDatabase.getInstance().getReference("chat").child(targetUsername);
+
+        sendButton.setOnClickListener(v -> sendMessage());
+        attachDatabaseReadListener();
     }
 
     private void sendMessage() {
         String messageText = editText.getText().toString().trim();
         if (!TextUtils.isEmpty(messageText) && databaseReference != null) {
-            // Get username from email
-            String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-            String username = userEmail != null ? userEmail.split("@")[0] : "User";
-
-            Message message = new Message(currentUserId, username, messageText);
+            // Send message as admin with "Admin" as sender name
+            Message message = new Message(adminId, "Admin", messageText);
             databaseReference.push().setValue(message)
                     .addOnSuccessListener(aVoid -> editText.setText(""))
                     .addOnFailureListener(e ->
-                            Toast.makeText(ChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(AdminChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show()
                     );
         }
     }
@@ -107,7 +114,7 @@ public class ChatActivity extends AppCompatActivity {
                         recyclerView.scrollToPosition(messageList.size() - 1);
                     }
                 } catch (Exception e) {
-                    Toast.makeText(ChatActivity.this, "Error loading message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AdminChatActivity.this, "Error loading message", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -122,7 +129,7 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ChatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminChatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

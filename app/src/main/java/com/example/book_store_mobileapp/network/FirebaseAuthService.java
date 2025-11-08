@@ -71,19 +71,9 @@ public class FirebaseAuthService {
                 .addOnFailureListener(e -> cb.onResult(ApiResponse.error(safeMsg(e))));
     }
 
-    /** Đổi email tài khoản (cần re-auth trước) */
-    public void changeEmail(String newEmail, Callback<Void> cb) {
-        FirebaseUser u = auth.getCurrentUser();
-        if (u == null) { cb.onResult(ApiResponse.error("User not logged in")); return; }
-        u.updateEmail(newEmail)
-                .addOnSuccessListener(v -> cb.onResult(ApiResponse.success(null)))
-                .addOnFailureListener(e -> cb.onResult(ApiResponse.error(safeMsg(e))));
-    }
 
-    /**
-     * Lấy claims từ ID token.
-     * @param refresh true để ép refresh token (khi cần claim 'admin' mới nhất sau khi thay đổi)
-     */
+
+
     public void getIdTokenClaims(boolean refresh, Callback<Map<String, Object>> cb) {
         FirebaseUser u = auth.getCurrentUser();
         if (u == null) { cb.onResult(ApiResponse.error("User not logged in")); return; }

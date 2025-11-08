@@ -96,8 +96,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void bind(Message message) {
             messageText.setText(message.getText());
-            // Here you could set the name of the sender, if you have that info
-            nameText.setText("Admin");
+            // Display sender name from message, default to "Admin" if not set
+            String senderName = message.getSenderName();
+            nameText.setText(senderName != null ? senderName : "Admin");
         }
     }
 }
