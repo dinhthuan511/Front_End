@@ -69,6 +69,8 @@ dependencies {
     // Firestore (để map username -> email và login bằng username)
     implementation("com.google.firebase:firebase-firestore")
 
+    implementation("com.google.firebase:firebase-storage:21.0.0")
+
 
     implementation(fileTree(
         mapOf(

@@ -1,4 +1,4 @@
-package com.example.book_store_mobileapp.ui.components;
+package com.example.book_store_mobileapp.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.R;
 
 import java.util.List;
@@ -33,34 +34,42 @@ public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        String base64 = imageBase64List.get(position);
-        if (base64 != null && !base64.isEmpty()) {
-            // Nếu có prefix, bỏ đi
-            if (base64.startsWith("data:image")) {
-                int commaIndex = base64.indexOf(',');
+        String img = imageBase64List.get(position);
+
+        if (img == null || img.isEmpty()) {
+            holder.imageView.setImageResource(android.R.drawable.ic_menu_report_image);
+            return;
+        }
+
+        // Nếu là URL (bắt đầu bằng http hoặc https)
+        if (img.startsWith("http")) {
+            Glide.with(holder.imageView.getContext())
+                    .load(img)
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_report_image)
+                    .into(holder.imageView);
+        } else {
+            // Decode Base64
+            if (img.startsWith("data:image")) {
+                int commaIndex = img.indexOf(',');
                 if (commaIndex != -1) {
-                    base64 = base64.substring(commaIndex + 1);
+                    img = img.substring(commaIndex + 1);
                 }
             }
-
             try {
-                byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
+                byte[] decodedString = Base64.decode(img, Base64.DEFAULT);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                if(decodedByte != null){
+                if (decodedByte != null) {
                     holder.imageView.setImageBitmap(decodedByte);
                 } else {
                     holder.imageView.setImageResource(android.R.drawable.ic_menu_report_image);
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 holder.imageView.setImageResource(android.R.drawable.ic_menu_report_image);
             }
-
-        } else {
-            holder.imageView.setImageResource(android.R.drawable.ic_menu_report_image);
         }
     }
-
 
     @Override
     public int getItemCount() {
@@ -71,8 +80,7 @@ public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.
         ImageView imageView;
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.slider_image); // ✅ sửa id
+            imageView = itemView.findViewById(R.id.slider_image);
         }
     }
-
 }

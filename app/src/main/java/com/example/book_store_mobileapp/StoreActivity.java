@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -390,6 +391,10 @@ public class StoreActivity extends BaseActivity {
         FirebaseBookService.getInstance().getAllBooks(new FirebaseBookService.FirestoreCallback<List<Book>>() {
             @Override
             public void onSuccess(List<Book> data) {
+                Log.d("BOOKS", "Tải được " + data.size() + " sách");
+                for (Book b : data) {
+                    Log.d("BOOKS", b.getName() + " - " + b.getPrice());
+                }
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false); // 🔹 Tắt icon loading khi xong
 

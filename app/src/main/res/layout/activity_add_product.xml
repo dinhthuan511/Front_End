@@ -47,13 +47,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp">
 
-                    <ImageView
-                        android:id="@+id/ivPreview"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvImages"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:background="#E6E6E6"
-                        android:contentDescription="@string/abc_action_bar_up_description"/>
+                        android:layout_height="120dp"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"/>
+
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/btnPickImage"

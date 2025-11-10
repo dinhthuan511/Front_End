@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.adapter.ImageSliderAdapter;
 import com.example.book_store_mobileapp.data.AppNotification;
 import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.NotificationManager;
@@ -32,7 +33,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import me.relex.circleindicator.CircleIndicator3;
 import androidx.viewpager2.widget.ViewPager2;
-import com.example.book_store_mobileapp.ui.components.ImageSliderAdapter;
 
 import java.text.NumberFormat;
 import java.util.Locale;

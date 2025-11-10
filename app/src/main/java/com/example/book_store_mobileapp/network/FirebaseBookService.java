@@ -1,5 +1,7 @@
 package com.example.book_store_mobileapp.network;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.book_store_mobileapp.data.Book;
@@ -29,27 +31,25 @@ public class FirebaseBookService {
     }
 
     private CollectionReference getBookRef() {
-        return db.collection("products");
+        return db.collection("products"); // ✅ đúng tên collection của bạn
     }
 
     private CollectionReference getCategoryRef() {
         return db.collection("categories");
     }
 
-    // ===== Helpers ============================================================
+    // ============================================================
 
-    /**
-     * ✅ Trích xuất danh sách ảnh (có thể là imageBase64 array hoặc imageUrl string)
-     */
+    /** ✅ Trích xuất danh sách ảnh (mảng URL hoặc base64) */
     private List<String> resolveImages(DocumentSnapshot doc) {
         List<String> images = new ArrayList<>();
 
-        // 1️⃣ Nếu có imageBase64 là mảng
         Object rawImages = doc.get("imageBase64");
         if (rawImages instanceof List<?>) {
             for (Object o : (List<?>) rawImages) {
                 if (o instanceof String && !((String) o).isEmpty()) {
                     String img = (String) o;
+                    // Nếu là URL thì giữ nguyên, nếu là base64 thì thêm prefix
                     if (!img.startsWith("http") && !img.startsWith("data:")) {
                         img = "data:image/jpeg;base64," + img;
                     }
@@ -58,30 +58,10 @@ public class FirebaseBookService {
             }
         }
 
-        // 2️⃣ fallback nếu có imageUrl / imageURL / ImageUrl
-        String singleUrl = doc.getString("imageUrl");
-        if (singleUrl == null || singleUrl.isEmpty()) singleUrl = doc.getString("imageURL");
-        if (singleUrl == null || singleUrl.isEmpty()) singleUrl = doc.getString("ImageUrl");
-        if (singleUrl != null && !singleUrl.isEmpty()) {
-            if (!singleUrl.startsWith("http") && !singleUrl.startsWith("data:")) {
-                singleUrl = "data:image/jpeg;base64," + singleUrl;
-            }
-            images.add(singleUrl);
-        }
-
-        // ❌ Xóa phần này, vì `imageBase64` không còn là string:
-        // String singleBase64 = doc.getString("imageBase64");
-        // if (singleBase64 != null && !singleBase64.isEmpty()) {
-        //     if (!singleBase64.startsWith("http") && !singleBase64.startsWith("data:")) {
-        //         singleBase64 = "data:image/jpeg;base64," + singleBase64;
-        //     }
-        //     images.add(singleBase64);
-        // }
-
         return images;
     }
 
-    // ===== API ================================================================
+    // ============================================================
 
     /** 🟢 Lấy tất cả sách từ Firestore */
     public void getAllBooks(@NonNull FirestoreCallback<List<Book>> listener) {
@@ -89,7 +69,14 @@ public class FirebaseBookService {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Book> books = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {
+                    Log.d("BOOK_FIRESTORE", "Doc: " + doc.getData());
+
                     List<String> images = resolveImages(doc);
+
+                    // ✅ Sử dụng đúng field name trong Firestore
+                    Double price = doc.getDouble("price");
+                    Long stock = doc.getLong("stock");
+                    Long categoryId = doc.getLong("categoryId");
 
                     Book book = new Book(
                             doc.getId(),
@@ -97,32 +84,33 @@ public class FirebaseBookService {
                             doc.getString("author"),
                             doc.getString("briefDescription"),
                             doc.getString("fullDescription"),
-                            doc.getLong("categoryId"),
-                            images, // ✅ TRUYỀN MẢNG ẢNH
+                            categoryId != null ? categoryId : 0,
+                            images,
                             doc.getString("isbn"),
-                            doc.getDouble("price"),
-                            doc.getLong("stock"),
+                            price != null ? price : 0.0,
+                            stock != null ? stock : 0,
                             doc.getString("technicalSpecifications")
                     );
                     books.add(book);
                 }
                 listener.onSuccess(books);
             } else {
+                Log.e("BOOK_FIRESTORE", "Error loading books", task.getException());
                 listener.onError("Không thể tải danh sách sách");
             }
         });
     }
 
-    /** 🟡 Lấy tất cả thể loại từ Firestore */
+    /** 🟡 Lấy tất cả thể loại */
     public void getAllCategories(@NonNull FirestoreCallback<List<BookCategory>> listener) {
         getCategoryRef().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<BookCategory> categories = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {
-                    BookCategory category = new BookCategory(
+                    categories.add(new BookCategory(
                             doc.getId(),
-                            doc.getString("categoryName"));
-                    categories.add(category);
+                            doc.getString("categoryName")
+                    ));
                 }
                 listener.onSuccess(categories);
             } else {
@@ -131,13 +119,16 @@ public class FirebaseBookService {
         });
     }
 
-    /** 🟡 Lấy chi tiết 1 sách theo ID */
+    /** 🟢 Lấy chi tiết 1 sách */
     public void getBookById(String bookId, @NonNull FirestoreCallback<Book> listener) {
         getBookRef().document(bookId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 DocumentSnapshot doc = task.getResult();
+                List<String> images = resolveImages(doc);
 
-                List<String> images = resolveImages(doc); // ✅ cập nhật
+                Double price = doc.getDouble("price");
+                Long stock = doc.getLong("stock");
+                Long categoryId = doc.getLong("categoryId");
 
                 Book book = new Book(
                         doc.getId(),
@@ -145,11 +136,11 @@ public class FirebaseBookService {
                         doc.getString("author"),
                         doc.getString("briefDescription"),
                         doc.getString("fullDescription"),
-                        doc.getLong("categoryId"),
-                        images, // ✅ truyền mảng
+                        categoryId != null ? categoryId : 0,
+                        images,
                         doc.getString("isbn"),
-                        doc.getDouble("price"),
-                        doc.getLong("stock"),
+                        price != null ? price : 0.0,
+                        stock != null ? stock : 0,
                         doc.getString("technicalSpecifications")
                 );
                 listener.onSuccess(book);
@@ -159,7 +150,9 @@ public class FirebaseBookService {
         });
     }
 
-    // 🔵 Callback chung cho Firestore
+    // ============================================================
+
+    /** 🔵 Callback chung cho Firestore */
     public interface FirestoreCallback<T> {
         void onSuccess(T data);
         void onError(String message);
