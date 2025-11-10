@@ -67,6 +67,37 @@ public class CartAdapter extends BaseAdapter {
         txtBookPrice.setText(formattedPrice + " VNĐ");
 
         txtQuantity.setText(String.valueOf(quantity));
+        if(quantity > book.getStock()){
+            String cartItemId = item.getCartId();
+            if(book.getStock() <= 0){
+                cartService.removeCartItemById(cartItemId,
+                        () -> {
+                            // Xóa trong danh sách hiển thị
+                            items.remove(position);
+                            notifyDataSetChanged();
+                            onUpdateTotal.run();
+
+//                            Toast.makeText(context, "Đã xóa sản phẩm khỏi giỏ", Toast.LENGTH_SHORT).show();
+
+                            // Update system notification
+                            NotificationHelper.updateCartSystemNotification(context);
+                            // refresh shared repository so UI badges update immediately
+                            CartCountRepository.getInstance().refreshCartCount();
+                        },
+                        () -> Toast.makeText(context, "Lỗi khi xóa sản phẩm", Toast.LENGTH_SHORT).show());
+            } else {
+                int newQuantity = book.getStock().intValue();
+                item.setQuantity(newQuantity);
+                txtQuantity.setText(String.valueOf(newQuantity));
+                cartService.updateQuantity(item.getCartId(), newQuantity,
+                        ()  -> {
+                            NotificationHelper.updateCartSystemNotification(context);
+                            CartCountRepository.getInstance().refreshCartCount();
+                        },
+                        () -> Toast.makeText(context, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
+                onUpdateTotal.run();
+            }
+        }
         Glide.with(context).load(book.getImageUrl()).into(imgBook);
 
         // Nút tăng

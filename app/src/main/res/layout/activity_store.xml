@@ -33,13 +33,18 @@
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
 
-            <!-- ✅ FrameLayout chứa nút giỏ hàng + badge -->
+            <!-- ✅ Giữ FrameLayout chứa nút giỏ hàng và badge -->
             <FrameLayout
                 android:id="@+id/cart_btn_container"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
-                android:gravity="center">
+                android:gravity="center"
+                android:layout_marginTop="4dp">
+
+                <!-- Nút giỏ hàng -->
+
+                <!-- Badge hiển thị số lượng -->
 
                 <ImageButton
                     android:id="@+id/btnCart"
@@ -50,7 +55,6 @@
                     android:src="@drawable/ic_add_shopping_cart_black_24dp"
                     app:tint="@color/black" />
 
-                <!-- Badge số lượng -->
                 <TextView
                     android:id="@+id/top_cart_badge"
                     android:layout_width="18dp"
@@ -62,9 +66,9 @@
                     android:gravity="center"
                     android:textColor="@android:color/white"
                     android:textSize="10sp"
+                    android:textStyle="bold"
                     android:visibility="gone" />
             </FrameLayout>
-
         </RelativeLayout>
 
         <!-- Thanh tìm kiếm -->
@@ -131,16 +135,26 @@
             android:visibility="gone" />
 
         <!-- Danh sách sách -->
-        <GridView
-            android:id="@+id/grid_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:numColumns="2"
-            android:padding="8dp" />
+            android:layout_height="match_parent">
+
+            <GridView
+                android:id="@+id/grid_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:numColumns="2"
+                android:verticalSpacing="8dp"
+                android:horizontalSpacing="8dp"
+                android:stretchMode="columnWidth"
+                android:clipToPadding="false"
+                android:padding="8dp" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
     </LinearLayout>
 
-    <!-- ✅ Floating chat button (nằm ngoài layout chính, overlay lên màn hình) -->
+    <!-- ✅ Nút chat nổi -->
     <ImageButton
         android:id="@+id/btnChatFloating"
         android:layout_width="56dp"

@@ -71,6 +71,7 @@ public class BookDetailActivity extends AppCompatActivity {
         btnAddToCart = findViewById(R.id.btnAddToCart);
         btnBack = findViewById(R.id.btnBack);
 
+
         // Initialize FirebaseCartService
         cartService = new FirebaseCartService();
 
@@ -160,6 +161,14 @@ public class BookDetailActivity extends AppCompatActivity {
                     Toast.makeText(BookDetailActivity.this, "Bạn cần đăng nhập để thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
                     startActivity(intent);
                 } else {
+
+                    if (book.getStock() != null && currentQuantity > book.getStock()) {
+                        Toast.makeText(BookDetailActivity.this,
+                                "Số lượng vượt quá tồn kho! Chỉ còn " + book.getStock() + " cuốn.",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     btnAddToCart.setEnabled(false);
                     btnAddToCart.setText("Adding...");
                     Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
@@ -191,7 +200,7 @@ public class BookDetailActivity extends AppCompatActivity {
                                 Log.e("BookDetailActivity", "Thêm thất bại: " + book.getName());
                                 btnAddToCart.setEnabled(true);
                                 btnAddToCart.setText("Add to cart");
-                                Toast.makeText(BookDetailActivity.this, "Lỗi khi thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BookDetailActivity.this, "Hết hàng", Toast.LENGTH_SHORT).show();
                             }
                     );
                 }

@@ -86,7 +86,12 @@
             />
 
         <activity android:name=".NotificationCenterActivity" android:exported="false" />
+
         <activity android:name=".ChatActivity" android:exported="false" />
+
+        <!-- ✅ Admin Chat Management -->
+        <activity android:name=".ui.admin.AdminChatListActivity" android:exported="false" />
+        <activity android:name=".ui.admin.AdminChatActivity" android:exported="false" />
 
         <!-- ✅ StoreActivity là màn hình mở đầu -->
         <activity

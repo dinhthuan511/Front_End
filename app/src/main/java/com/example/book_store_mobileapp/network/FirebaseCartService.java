@@ -62,6 +62,16 @@ public class FirebaseCartService {
                     if (!query.isEmpty()) {
                         // Nếu có rồi => tăng số lượng
                         DocumentSnapshot existing = query.getDocuments().get(0);
+                        long currentQty = existing.getLong("quantity");
+                        long newQty = currentQty + quantity;
+
+                        // ✅ CHẶN VƯỢT STOCK
+                        if (newQty > book.getStock()) {
+                            Log.e(TAG, "❌ Không thể thêm vào giỏ hàng: Số lượng vượt quá tồn kho!");
+                            if (onFailure != null) onFailure.run();
+                            return;
+                        }
+
                         existing.getReference().update("quantity", FieldValue.increment(quantity))
                                 .addOnSuccessListener(unused -> {
                                     Log.d(TAG, "✅ Cập nhật số lượng thành công.");
