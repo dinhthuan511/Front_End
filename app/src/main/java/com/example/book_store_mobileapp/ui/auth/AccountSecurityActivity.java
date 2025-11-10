@@ -110,8 +110,15 @@ public class AccountSecurityActivity extends AppCompatActivity {
         String phone = edtPhone.getText().toString().trim();
         String address = edtAddress.getText().toString().trim();
 
-        if (!TextUtils.isEmpty(phone) && phone.length() < 8) {
+        // Validate phone nếu có nhập
+        if (!TextUtils.isEmpty(phone) && !isValidPhone(phone)) {
             Toast.makeText(this, "Số điện thoại không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate address nếu có nhập
+        if (!TextUtils.isEmpty(address) && !isValidAddress(address)) {
+            Toast.makeText(this, "Địa chỉ không hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -126,7 +133,24 @@ public class AccountSecurityActivity extends AppCompatActivity {
                     setDirty(false);
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+    private boolean isValidPhone(String p) {
+        if (p == null) return false;
+        String digits = p.replaceAll("\\s+", "");
+        return digits.matches("^0\\d{9}$");
+    }
+
+    // Địa chỉ: tối thiểu 10 ký tự, có chữ, có số, có khoảng trắng
+    private boolean isValidAddress(String a) {
+        if (a == null) return false;
+        String trimmed = a.trim();
+        if (trimmed.length() < 10) return false;
+        if (!trimmed.matches(".*[A-Za-zÀ-ỹ].*")) return false; // có chữ
+        if (!trimmed.matches(".*\\d.*")) return false;         // có số
+        if (!trimmed.contains(" ")) return false;              // có khoảng trắng
+        return true;
     }
 
 

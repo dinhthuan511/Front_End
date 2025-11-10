@@ -93,7 +93,6 @@
                     android:id="@+id/tvChangeEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thay đổi"
                     android:textColor="#1976D2"
                     android:textStyle="bold"
                     android:padding="8dp"
