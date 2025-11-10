@@ -115,9 +115,9 @@ public class CartActivity extends AppCompatActivity {
                                     : 1;
 
                             List<String> imageList = new ArrayList<>();
-                            String imageUrl = doc.getString("imageURL");
-                            if (imageUrl != null && !imageUrl.isEmpty()) {
-                                imageList.add(imageUrl);
+                            List<String> storedImages = (List<String>) doc.get("imageBase64"); // lấy array từ Firestore
+                            if (storedImages != null && !storedImages.isEmpty()) {
+                                imageList.addAll(storedImages); // copy tất cả, hoặc chỉ storedImages.get(0) nếu chỉ cần ảnh đầu
                             }
 
                             Book book = new Book(

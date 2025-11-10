@@ -104,9 +104,6 @@ public class CartAdapter extends BaseAdapter {
         if (book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
             Log.d("CartAdapter", "Images: " + book.getImageBase64());
             String base64 = book.getImageBase64().get(0);
-            if(!base64.startsWith("data:image")) {
-                base64 = "data:image/jpeg;base64," + base64;
-            }
             Glide.with(context)
                     .load(base64)
                     .placeholder(android.R.drawable.dark_header)
