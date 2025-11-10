@@ -82,7 +82,7 @@ public class OrderStatusActivity extends AppCompatActivity {
 
         tvOrderId.setText("Mã đơn hàng: " + snapshot.getId());
         tvCustomerInfo.setText("Tên: " + name + "\nSĐT: " + phone + "\nĐịa chỉ: " + address);
-        tvTotalAmount.setText("Tổng tiền: " + FormatUtils.formatCurrency(total));
+        tvTotalAmount.setText("Số tiền phải trả: " + FormatUtils.formatCurrency(total));
 
         // ✅ Hiển thị màu chữ theo trạng thái
         String paymentText = "Thanh toán: " + paymentStatus;

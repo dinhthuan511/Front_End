@@ -78,17 +78,22 @@ public class AccountSecurityActivity extends AppCompatActivity {
         }
 
         edtEmail.setText(user.getEmail() != null ? user.getEmail() : "");
-        edtUsername.setText(""); // 🔄 username chỉ hiển thị để xem, không chỉnh tại đây
 
         db.collection("users").document(user.getUid()).get()
                 .addOnSuccessListener(snap -> {
                     if (snap.exists()) {
+                        String username = snap.getString("username");
                         String phone = snap.getString("phone");
                         String address = snap.getString("address");
+
+                        if (!TextUtils.isEmpty(username)) edtUsername.setText(username);
                         if (!TextUtils.isEmpty(phone)) edtPhone.setText(phone);
                         if (!TextUtils.isEmpty(address)) edtAddress.setText(address);
                     }
-                });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi tải thông tin: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 
     private void setDirty(boolean value) {

@@ -62,7 +62,6 @@
                 android:background="@android:color/transparent"
                 android:textColor="#222"
                 android:paddingHorizontal="12dp"
-                android:hint="Không thể thay đổi"
                 android:textSize="14sp" />
 
             <!-- Email -->

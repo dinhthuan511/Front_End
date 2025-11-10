@@ -130,7 +130,6 @@ public class BookDetailActivity extends AppCompatActivity {
                     }
 
                     btnAddToCart.setEnabled(false);
-                    btnAddToCart.setText("Adding...");
                     Log.d("BookDetailActivity", "Người dùng bấm Thêm vào giỏ hàng: " + book.getName());
                     cartService.addToCart(book, currentQuantity,
                             () -> {
