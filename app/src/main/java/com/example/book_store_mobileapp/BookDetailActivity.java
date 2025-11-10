@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.book_store_mobileapp.data.AppNotification;
@@ -28,6 +29,10 @@ import com.example.book_store_mobileapp.network.CartCountRepository;
 import com.example.book_store_mobileapp.network.FirebaseCartService;
 import com.example.book_store_mobileapp.ui.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
+
+import me.relex.circleindicator.CircleIndicator3;
+import androidx.viewpager2.widget.ViewPager2;
+import com.example.book_store_mobileapp.ui.components.ImageSliderAdapter;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -40,6 +45,9 @@ public class BookDetailActivity extends AppCompatActivity {
     private TextView imageOutOfStockOverlay;
     private LinearLayout addToCartRow;
     private Button btnAddToCart;
+    private ViewPager2 viewPagerImages;
+    private CircleIndicator3 indicator;
+
     private ImageButton btnBack, btnMinus, btnPlus;
     private FirebaseCartService cartService;
 
@@ -58,7 +66,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
         // Initialize views
         imageOutOfStockOverlay = findViewById(R.id.imageOutOfStockOverlay);
-        detailBookImage = findViewById(R.id.bookImage);
+//        detailBookImage = findViewById(R.id.bookImage);
         detailBookName = findViewById(R.id.bookName);
         detailBookAuthor = findViewById(R.id.bookAuthor);
         detailBookDescription = findViewById(R.id.bookDescription);
@@ -70,6 +78,8 @@ public class BookDetailActivity extends AppCompatActivity {
         btnPlus = findViewById(R.id.btnPlus);
         btnAddToCart = findViewById(R.id.btnAddToCart);
         btnBack = findViewById(R.id.btnBack);
+        viewPagerImages = findViewById(R.id.viewPagerImages);
+        indicator = findViewById(R.id.indicator);
 
 
         // Initialize FirebaseCartService
@@ -86,14 +96,23 @@ public class BookDetailActivity extends AppCompatActivity {
             detailBookDescription.setText(book.getFullDescription());
             detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
             // Format the price
-            NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
-            String formattedPrice = format.format(book.getPrice());
-            detailBookPrice.setText(formattedPrice + " VNĐ");
+            detailBookPrice.setText(FormatUtils.formatCurrency(book.getPrice()));
+
             // Set image with Glide
-            Glide.with(this)
-                    .load(book.getImageUrl())
-                    .error(android.R.drawable.dark_header)
-                    .into(detailBookImage);
+//            Glide.with(this)
+//                    .load(book.getImageUrl())
+//                    .error(android.R.drawable.dark_header)
+//                    .into(detailBookImage);
+            if (book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
+                ImageSliderAdapter adapter = new ImageSliderAdapter(book.getImageBase64());
+                viewPagerImages.setAdapter(adapter);
+
+                // ✅ Liên kết indicator với ViewPager
+                indicator.setViewPager(viewPagerImages);
+            } else {
+                Toast.makeText(this, "Không có hình ảnh cho sách này!", Toast.LENGTH_SHORT).show();
+            }
+
 
             if(book.getStock() != null && book.getStock() <= 0) {
                 addToCartRow.setVisibility(View.GONE);

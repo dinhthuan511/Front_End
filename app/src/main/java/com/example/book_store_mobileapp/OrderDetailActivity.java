@@ -86,7 +86,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                     if (bookMap.get("price") instanceof Number) {
                         book.setPrice(((Number) bookMap.get("price")).doubleValue());
                     }
-                    book.setImageUrl((String) bookMap.get("imageUrl"));
+//                    book.setImageUrl((String) bookMap.get("imageUrl"));
 
                     int quantity = 1;
                     if (itemMap.get("quantity") instanceof Number) {

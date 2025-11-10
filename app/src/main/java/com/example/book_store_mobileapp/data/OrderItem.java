@@ -38,7 +38,10 @@ public class OrderItem {
         return (book != null) ? book.getPrice() : 0.0;
     }
 
-    public String getImageUrl() {
-        return (book != null) ? book.getImageUrl() : null;
+    public String getFirstImageBase64() {
+        if (book != null && book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
+            return book.getImageBase64().get(0);
+        }
+        return null;
     }
 }

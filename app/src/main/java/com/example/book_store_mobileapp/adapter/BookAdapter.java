@@ -49,11 +49,15 @@ public class BookAdapter extends ArrayAdapter<Book> {
             String formattedPrice = format.format(currentBook.getPrice());
             bookPrice.setText(formattedPrice + " VNĐ");
             // Set image with Glide
-            Glide.with(getContext())
-                    .load(currentBook.getImageUrl())
-                    .placeholder(android.R.drawable.dark_header)
-                    .error(android.R.drawable.dark_header)
-                    .into(bookImage);
+            if (currentBook.getImageBase64() != null && !currentBook.getImageBase64().isEmpty()) {
+                Glide.with(getContext())
+                        .load(currentBook.getImageBase64().get(0)) // ✅ chỉ lấy ảnh đầu tiên
+                        .placeholder(android.R.drawable.dark_header)
+                        .error(android.R.drawable.dark_header)
+                        .into(bookImage);
+            } else {
+                bookImage.setImageResource(android.R.drawable.dark_header);
+            }
 
             // Check if the book is out of stock
             if (currentBook.getStock() != null && currentBook.getStock() <= 0) {

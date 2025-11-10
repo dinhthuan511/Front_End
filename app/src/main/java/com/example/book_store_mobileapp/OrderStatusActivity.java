@@ -123,7 +123,7 @@ public class OrderStatusActivity extends AppCompatActivity {
                     Book book = new Book();
                     book.setBookId((String) bookMap.get("bookId"));
                     book.setName((String) bookMap.get("name"));
-                    book.setImageUrl((String) bookMap.get("imageUrl"));
+                    book.setImageBase64((List<String>) bookMap.get("imageUrl"));
 
                     Object priceObj = bookMap.get("price");
                     if (priceObj instanceof Double)

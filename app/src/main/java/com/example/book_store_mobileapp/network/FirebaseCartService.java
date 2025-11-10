@@ -48,7 +48,9 @@ public class FirebaseCartService {
         cartItem.put("briefDescription", book.getBriefDescription());
         cartItem.put("fullDescription", book.getFullDescription());
         cartItem.put("categoryId", book.getCategoryId());
-        cartItem.put("imageURL", book.getImageUrl());
+        if (book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
+            cartItem.put("imageBase64", book.getImageBase64()); // hoặc .get(0) nếu chỉ muốn ảnh đầu tiên
+        }
         cartItem.put("isbn", book.getIsbn());
         cartItem.put("price", book.getPrice());
         cartItem.put("stock", book.getStock());
