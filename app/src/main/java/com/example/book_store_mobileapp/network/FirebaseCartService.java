@@ -188,15 +188,10 @@ public class FirebaseCartService {
 
         getCartRef().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                int totalCount = 0;
-                for (DocumentSnapshot doc : task.getResult()) {
-                    Long quantity = doc.getLong("quantity");
-                    if (quantity != null) {
-                        totalCount += quantity.intValue();
-                    }
-                }
-                callback.onCartCount(totalCount);
-            } else {
+                int uniqueItemCount = task.getResult().size();
+                callback.onCartCount(uniqueItemCount);
+            }
+            else {
                 callback.onCartCount(0);
             }
         });
@@ -223,13 +218,11 @@ public class FirebaseCartService {
                 return;
             }
 
-            int totalCount = 0;
-            for (DocumentSnapshot doc : value.getDocuments()) {
-                Long quantity = doc.getLong("quantity");
-                if (quantity != null) totalCount += quantity.intValue();
-            }
-            callback.onCartCount(totalCount);
+                    // Count unique items (types of books), not total quantity
+                    int uniqueItemCount = value.size();
+                    callback.onCartCount(uniqueItemCount);
         });
+
     }
 
     /**

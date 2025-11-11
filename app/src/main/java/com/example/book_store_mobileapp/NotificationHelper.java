@@ -20,8 +20,8 @@ public class NotificationHelper {
     // Create a single channel for all cart-related notifications
     public static void createCartChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Cart";
-            String description = "Notifications for cart updates";
+            CharSequence name = "Giỏ hàng";
+            String description = "Thông báo cập nhật giỏ hàng";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CART_CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -52,14 +52,17 @@ public class NotificationHelper {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
+        // Use proper Vietnamese grammar: "sách" (books)
+        String itemText = cartItemCount == 1 ? "sách" : "sách";
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CART_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_shopping_cart_black_24dp)
-                .setContentTitle("Cart Update")
-                .setContentText(cartItemCount + " items in your cart")
+                .setContentTitle("Cập nhật giỏ hàng")
+                .setContentText("Bạn đang có " + cartItemCount + " " + itemText + " trong giỏ hàng")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .setNumber(cartItemCount) // Badge shows CART count
+                .setNumber(cartItemCount) // Badge shows unique item count
                 .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);

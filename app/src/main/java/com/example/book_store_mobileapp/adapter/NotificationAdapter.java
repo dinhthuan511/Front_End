@@ -97,13 +97,13 @@ public class NotificationAdapter extends BaseAdapter {
         long days = diff / (1000 * 60 * 60 * 24);
 
         if (minutes < 1) {
-            return "Just now";
+            return "Vừa xong";
         } else if (minutes < 60) {
-            return minutes + " minutes ago";
+            return minutes + " phúc trước";
         } else if (hours < 24) {
-            return hours + " hours ago";
+            return hours + " giờ trước";
         } else {
-            return days + " days ago";
+            return days + " ngày trước";
         }
     }
 

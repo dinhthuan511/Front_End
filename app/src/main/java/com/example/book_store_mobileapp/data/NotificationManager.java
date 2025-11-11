@@ -80,8 +80,8 @@ public class NotificationManager {
     public void addPurchaseNotification(Context context, String bookTitle, double totalPrice) {
         AppNotification notification = new AppNotification(
                 "purchase_" + System.currentTimeMillis(),
-                "Purchase Successful",
-                "You purchased \"" + bookTitle + "\" for $" + String.format("%.2f", totalPrice),
+                "Thanh tóan thành công",
+                "Bạn đã mua \"" + bookTitle + "\" với $" + String.format("%.2f", totalPrice),
                 "purchase"
         );
         addNotification(context, notification);
@@ -90,8 +90,8 @@ public class NotificationManager {
     public void addNewBookNotification(Context context, String bookTitle, String author) {
         AppNotification notification = new AppNotification(
                 "new_book_" + System.currentTimeMillis(),
-                "New Book Available",
-                "\"" + bookTitle + "\" by " + author + " is now available in our store!",
+                "Sách mới có mặt",
+                "\"" + bookTitle + "\" bởi tác giả " + author + " đã có mặt trong cửa hàng!",
                 "new_book"
         );
         addNotification(context, notification);
@@ -100,7 +100,7 @@ public class NotificationManager {
     public void addPromotionNotification(Context context, String promotionTitle, String description) {
         AppNotification notification = new AppNotification(
                 "promotion_" + System.currentTimeMillis(),
-                "Special Promotion",
+                "Khuyến mãi mới",
                 promotionTitle + ": " + description,
                 "promotion"
         );

@@ -206,7 +206,7 @@ public class BookDetailActivity extends AppCompatActivity {
             });
         } else {
             // Handle book data null
-            Toast.makeText(this, "Book data is not found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Không tìm thấy dữ liệu sách!", Toast.LENGTH_LONG).show();
             finish(); // Close activity
         }
 

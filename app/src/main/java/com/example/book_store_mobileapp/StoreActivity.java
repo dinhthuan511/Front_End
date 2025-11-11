@@ -1,6 +1,9 @@
 package com.example.book_store_mobileapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,8 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -71,6 +77,19 @@ public class StoreActivity extends BaseActivity {
     private Double minPriceFilter = null;
     private Double maxPriceFilter = null;
 
+
+    // Notification permission launcher for Android 13+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission granted - notifications can now be shown
+                    Toast.makeText(this, "Thông báo đã được bật", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Permission denied
+                    Toast.makeText(this, "Cần cấp quyền thông báo để nhận cập nhật giỏ hàng", Toast.LENGTH_LONG).show();
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +101,11 @@ public class StoreActivity extends BaseActivity {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // Initialize notification channel for cart notifications
+        NotificationHelper.createCartChannel(this);
 
+        // Request notification permission for Android 13+
+        requestNotificationPermission();
         // ✅ Khởi tạo view
         btnCart = findViewById(R.id.btnCart);
         btnFilter = findViewById(R.id.btnFilter);
@@ -290,8 +313,6 @@ public class StoreActivity extends BaseActivity {
                 }
             }
         });
-
-
         // --- Tạo động các CheckBox cho thể loại ---
         FirebaseBookService.getInstance().getAllCategories(new FirebaseBookService.FirestoreCallback<List<BookCategory>>() {
             @Override
@@ -453,10 +474,21 @@ public class StoreActivity extends BaseActivity {
         super.onPause();
         // unregister from repository when not visible
         CartCountRepository.getInstance().unregisterListener(cartCountCallback);
-
-
     }
 
+    /**
+     * Request notification permission for Android 13+ (API 33+)
+     */
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission not granted - request it
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+        // For Android 12 and below, notification permission is granted automatically
+    }
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào
     @Override
     protected int getNavigationMenuItemId() {

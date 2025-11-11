@@ -174,6 +174,20 @@ public class CartActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             updateTotal();
             Toast.makeText(this, "Đã xóa toàn bộ giỏ hàng.", Toast.LENGTH_SHORT).show();
+            // Add in-app notification
+            NotificationManager.getInstance().addNotification(
+                    this,
+                    new AppNotification(
+                            "cart_cleared_" + System.currentTimeMillis(),
+                            "Giỏ hàng đã xóa",
+                            "Bạn đã xóa tất cả sản phẩm khỏi giỏ hàng.",
+                            "cart_cleared"
+                    )
+            );
+            // Update system notification (cart is now empty, so it will be cancelled)
+            NotificationHelper.updateCartSystemNotification(this);
+            // refresh repository so UI badges update immediately
+            CartCountRepository.getInstance().refreshCartCount();
         });
     }
 

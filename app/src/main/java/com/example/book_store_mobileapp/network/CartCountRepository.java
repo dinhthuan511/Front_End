@@ -86,12 +86,9 @@ public class CartCountRepository {
                 return;
             }
 
-            int total = 0;
-            for (DocumentSnapshot doc : value.getDocuments()) {
-                Long q = doc.getLong("quantity");
-                if (q != null) total += q.intValue();
-            }
-            notifyAllListeners(total);
+            // Count unique items (types of books), not total quantity
+            int uniqueItemCount = value.size();
+            notifyAllListeners(uniqueItemCount);
         });
     }
 
@@ -103,12 +100,9 @@ public class CartCountRepository {
         }
         cartRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                int total = 0;
-                for (DocumentSnapshot doc : task.getResult()) {
-                    Long q = doc.getLong("quantity");
-                    if (q != null) total += q.intValue();
-                }
-                cb.onCartCount(total);
+                // Count unique items (types of books), not total quantity
+                int uniqueItemCount = task.getResult().size();
+                cb.onCartCount(uniqueItemCount);
             } else {
                 cb.onCartCount(0);
             }
@@ -156,12 +150,9 @@ public class CartCountRepository {
 
         cartRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
-                int total = 0;
-                for (DocumentSnapshot doc : task.getResult()) {
-                    Long q = doc.getLong("quantity");
-                    if (q != null) total += q.intValue();
-                }
-                notifyAllListeners(total);
+                // Count unique items (types of books), not total quantity
+                int uniqueItemCount = task.getResult().size();
+                notifyAllListeners(uniqueItemCount);
             } else {
                 notifyAllListeners(0);
             }
