@@ -43,6 +43,20 @@
                 tools:text="This is a Very Long Book Title That Wraps to Two Lines" />
 
             <TextView
+                android:id="@+id/book_brief_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:minLines="3"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:textColor="#757575"
+                android:textSize="13sp"
+                android:textStyle="italic"
+                tools:text="Top 100 sản phẩm Manga Khác bán chạy của tháng" />
+
+            <TextView
                 android:id="@+id/book_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

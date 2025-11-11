@@ -1,9 +1,14 @@
 package com.example.book_store_mobileapp;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -93,7 +98,25 @@ public class BookDetailActivity extends AppCompatActivity {
             // Set book data
             detailBookName.setText(book.getName());
             detailBookAuthor.setText("Tác giả: " + book.getAuthor());
-            detailBookDescription.setText(book.getFullDescription());
+
+            if (book.getBriefDescription() != null && !book.getBriefDescription().isEmpty()) {
+                SpannableStringBuilder sb = new SpannableStringBuilder();
+
+                // Tạo đoạn mô tả ngắn in đậm
+                SpannableString brief = new SpannableString(book.getBriefDescription() + "\n\n");
+                brief.setSpan(new StyleSpan(Typeface.BOLD), 0, brief.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                // Thêm cả mô tả đầy đủ
+                SpannableString full = new SpannableString(book.getFullDescription() != null ? book.getFullDescription() : "");
+
+                sb.append(brief);
+                sb.append(full);
+
+                detailBookDescription.setText(sb);
+            } else {
+                detailBookDescription.setText(book.getFullDescription());
+            }
+
             detailBookTechnicalSpecifications.setText(book.getTechnicalSpecifications() + "\nISBN: " + book.getIsbn());
             // Format the price
             detailBookPrice.setText(FormatUtils.formatCurrency(book.getPrice()));
@@ -117,11 +140,13 @@ public class BookDetailActivity extends AppCompatActivity {
             if(book.getStock() != null && book.getStock() <= 0) {
                 addToCartRow.setVisibility(View.GONE);
                 imageOutOfStockOverlay.setVisibility(View.VISIBLE);
-                detailBookImage.setAlpha(0.25f);
+                viewPagerImages.setAlpha(0.25f); // ✅ Làm mờ carousel thay vì ImageView
             } else {
                 addToCartRow.setVisibility(View.VISIBLE);
                 imageOutOfStockOverlay.setVisibility(View.GONE);
+                viewPagerImages.setAlpha(1f);
             }
+
 
             etxtQuantity.addTextChangedListener(new TextWatcher() {
                 @Override
