@@ -47,7 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Chat with Store");
+            getSupportActionBar().setTitle("Trò chuyện với cửa hàng");
         }
         toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -72,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
             sendButton.setOnClickListener(v -> sendMessage());
             attachDatabaseReadListener();
         } else {
-            Toast.makeText(this, "You must be logged in to use chat", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bạn phải đăng nhập để sử dụng trò chuyện", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -88,7 +88,7 @@ public class ChatActivity extends AppCompatActivity {
             databaseReference.push().setValue(message)
                     .addOnSuccessListener(aVoid -> editText.setText(""))
                     .addOnFailureListener(e ->
-                            Toast.makeText(ChatActivity.this, "Failed to send message", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(ChatActivity.this, "Gửi tin nhắn thất bại", Toast.LENGTH_SHORT).show()
                     );
         }
     }
@@ -107,7 +107,7 @@ public class ChatActivity extends AppCompatActivity {
                         recyclerView.scrollToPosition(messageList.size() - 1);
                     }
                 } catch (Exception e) {
-                    Toast.makeText(ChatActivity.this, "Error loading message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Lỗi khi tải tin nhắn", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -122,7 +122,7 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ChatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

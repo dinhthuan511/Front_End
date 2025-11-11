@@ -117,10 +117,11 @@ public class BookDetailActivity extends AppCompatActivity {
             if(book.getStock() != null && book.getStock() <= 0) {
                 addToCartRow.setVisibility(View.GONE);
                 imageOutOfStockOverlay.setVisibility(View.VISIBLE);
-                detailBookImage.setAlpha(0.25f);
+                viewPagerImages.setAlpha(0.25f); // ✅ Làm mờ carousel thay vì ImageView
             } else {
                 addToCartRow.setVisibility(View.VISIBLE);
                 imageOutOfStockOverlay.setVisibility(View.GONE);
+                viewPagerImages.setAlpha(1f);
             }
 
             etxtQuantity.addTextChangedListener(new TextWatcher() {

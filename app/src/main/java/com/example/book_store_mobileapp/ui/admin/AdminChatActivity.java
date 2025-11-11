@@ -60,7 +60,7 @@ public class AdminChatActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Chat with " + (userEmail != null ? userEmail : "User"));
+            getSupportActionBar().setTitle("Nhắn với " + (userEmail != null ? userEmail : "User"));
         }
         toolbar.setNavigationOnClickListener(v -> finish());
 

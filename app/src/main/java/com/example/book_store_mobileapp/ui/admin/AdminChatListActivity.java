@@ -40,7 +40,7 @@ public class AdminChatListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("User Chats");
+            getSupportActionBar().setTitle("Trò chuyện");
         }
         toolbar.setNavigationOnClickListener(v -> finish());
 
