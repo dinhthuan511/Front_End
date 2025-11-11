@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.book_store_mobileapp.FormatUtils;
 import com.example.book_store_mobileapp.R;
 import com.example.book_store_mobileapp.data.Book;
 
@@ -45,15 +46,17 @@ public class BookAdapter extends ArrayAdapter<Book> {
             // Set book data
             bookName.setText(currentBook.getName());
             // Format the price
-            NumberFormat format = NumberFormat.getNumberInstance(Locale.getDefault());
-            String formattedPrice = format.format(currentBook.getPrice());
-            bookPrice.setText(formattedPrice + " VNĐ");
+            bookPrice.setText(FormatUtils.formatCurrency(currentBook.getPrice()));
             // Set image with Glide
-            Glide.with(getContext())
-                    .load(currentBook.getImageUrl())
-                    .placeholder(android.R.drawable.dark_header)
-                    .error(android.R.drawable.dark_header)
-                    .into(bookImage);
+            if (currentBook.getImageBase64() != null && !currentBook.getImageBase64().isEmpty()) {
+                Glide.with(getContext())
+                        .load(currentBook.getImageBase64().get(0)) // ✅ chỉ lấy ảnh đầu tiên
+                        .placeholder(android.R.drawable.dark_header)
+                        .error(android.R.drawable.dark_header)
+                        .into(bookImage);
+            } else {
+                bookImage.setImageResource(android.R.drawable.dark_header);
+            }
 
             // Check if the book is out of stock
             if (currentBook.getStock() != null && currentBook.getStock() <= 0) {

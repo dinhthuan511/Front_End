@@ -114,6 +114,12 @@ public class CartActivity extends AppCompatActivity {
                                     ? doc.getLong("quantity").intValue()
                                     : 1;
 
+                            List<String> imageList = new ArrayList<>();
+                            List<String> storedImages = (List<String>) doc.get("imageBase64"); // lấy array từ Firestore
+                            if (storedImages != null && !storedImages.isEmpty()) {
+                                imageList.addAll(storedImages); // copy tất cả, hoặc chỉ storedImages.get(0) nếu chỉ cần ảnh đầu
+                            }
+
                             Book book = new Book(
                                     bookId,
                                     doc.getString("productName"),
@@ -121,12 +127,13 @@ public class CartActivity extends AppCompatActivity {
                                     doc.getString("briefDescription"),
                                     doc.getString("fullDescription"),
                                     doc.getLong("categoryId"),
-                                    doc.getString("imageURL"),
+                                    imageList, // ✅ dùng List<String>
                                     doc.getString("isbn"),
                                     doc.getDouble("price"),
                                     doc.getLong("stock"),
                                     doc.getString("technicalSpecifications")
                             );
+
 
                             CartItem item = new CartItem(cartItemId, book, quantity);
                             item.setCartId(cartItemId);

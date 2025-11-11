@@ -1,5 +1,7 @@
 package com.example.book_store_mobileapp.network;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.book_store_mobileapp.data.Book;
@@ -29,62 +31,52 @@ public class FirebaseBookService {
     }
 
     private CollectionReference getBookRef() {
-        return db.collection("products");
+        return db.collection("products"); // ✅ đúng tên collection của bạn
     }
 
-    private CollectionReference getCategoryRef() { return db.collection("categories");}
-
-    // ===== Helpers ============================================================
-
-    // CHANGED: Resolve ảnh từ nhiều kiểu field khác nhau
-    private String resolveImage(DocumentSnapshot doc) {                        // NEW
-        // 1) imageUrl (đúng chuẩn camelCase)
-        String url = doc.getString("imageUrl");
-        if (url == null || url.isEmpty()) {
-            // 2) imageURL (viết hoa L)
-            url = doc.getString("imageURL");                                   // NEW
-        }
-        if (url == null || url.isEmpty()) {
-            // 3) ImageUrl (I hoa đầu)
-            url = doc.getString("ImageUrl");                                   // NEW
-        }
-
-        // Nếu "url" thực ra chứa base64 thô (không có prefix data:)
-        if (url != null && !url.isEmpty()
-                && !url.startsWith("http") && !url.startsWith("data:")
-                && looksLikeBase64(url)) {                                     // NEW
-            return "data:image/jpeg;base64," + url;
-        }
-
-        if (url != null && !url.isEmpty()) return url;
-
-        // 4) Fallback: imageBase64
-        String b64 = doc.getString("imageBase64");                             // NEW
-        if (b64 != null && !b64.isEmpty()) {
-            return "data:image/jpeg;base64," + b64;
-        }
-
-        return null; // không có ảnh
+    private CollectionReference getCategoryRef() {
+        return db.collection("categories");
     }
 
-    private boolean looksLikeBase64(String s) {                                 // NEW
-        if (s == null) return false;
-        if (s.length() < 50) return false; // base64 ảnh thường khá dài
-        return s.matches("^[A-Za-z0-9+/=\\r\\n]+$");
+    // ============================================================
+
+    /** ✅ Trích xuất danh sách ảnh (mảng URL hoặc base64) */
+    private List<String> resolveImages(DocumentSnapshot doc) {
+        List<String> images = new ArrayList<>();
+
+        Object rawImages = doc.get("imageBase64");
+        if (rawImages instanceof List<?>) {
+            for (Object o : (List<?>) rawImages) {
+                if (o instanceof String && !((String) o).isEmpty()) {
+                    String img = (String) o;
+                    // Nếu là URL thì giữ nguyên, nếu là base64 thì thêm prefix
+                    if (!img.startsWith("http") && !img.startsWith("data:")) {
+                        img = "data:image/jpeg;base64," + img;
+                    }
+                    images.add(img);
+                }
+            }
+        }
+
+        return images;
     }
 
-    // ===== API ================================================================
+    // ============================================================
 
-    /**
-     * 🟢 Lấy tất cả sách từ Firestore
-     */
+    /** 🟢 Lấy tất cả sách từ Firestore */
     public void getAllBooks(@NonNull FirestoreCallback<List<Book>> listener) {
         getBookRef().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Book> books = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {
+                    Log.d("BOOK_FIRESTORE", "Doc: " + doc.getData());
 
-                    String image = resolveImage(doc);                           // CHANGED
+                    List<String> images = resolveImages(doc);
+
+                    // ✅ Sử dụng đúng field name trong Firestore
+                    Double price = doc.getDouble("price");
+                    Long stock = doc.getLong("stock");
+                    Long categoryId = doc.getLong("categoryId");
 
                     Book book = new Book(
                             doc.getId(),
@@ -92,34 +84,33 @@ public class FirebaseBookService {
                             doc.getString("author"),
                             doc.getString("briefDescription"),
                             doc.getString("fullDescription"),
-                            doc.getLong("categoryId"),
-                            image,                                              // CHANGED
+                            categoryId != null ? categoryId : 0,
+                            images,
                             doc.getString("isbn"),
-                            doc.getDouble("price"),
-                            doc.getLong("stock"),
+                            price != null ? price : 0.0,
+                            stock != null ? stock : 0,
                             doc.getString("technicalSpecifications")
                     );
                     books.add(book);
                 }
                 listener.onSuccess(books);
             } else {
+                Log.e("BOOK_FIRESTORE", "Error loading books", task.getException());
                 listener.onError("Không thể tải danh sách sách");
             }
         });
     }
 
-    /**
-     * 🟡 Lấy tất cả thể loại từ Firestore
-     */
+    /** 🟡 Lấy tất cả thể loại */
     public void getAllCategories(@NonNull FirestoreCallback<List<BookCategory>> listener) {
         getCategoryRef().get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 List<BookCategory> categories = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {
-                    BookCategory category = new BookCategory(
+                    categories.add(new BookCategory(
                             doc.getId(),
-                            doc.getString("categoryName"));
-                    categories.add(category);
+                            doc.getString("categoryName")
+                    ));
                 }
                 listener.onSuccess(categories);
             } else {
@@ -128,15 +119,16 @@ public class FirebaseBookService {
         });
     }
 
-    /**
-     * 🟡 Lấy chi tiết 1 sách theo ID
-     */
+    /** 🟢 Lấy chi tiết 1 sách */
     public void getBookById(String bookId, @NonNull FirestoreCallback<Book> listener) {
         getBookRef().document(bookId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 DocumentSnapshot doc = task.getResult();
+                List<String> images = resolveImages(doc);
 
-                String image = resolveImage(doc);                               // CHANGED
+                Double price = doc.getDouble("price");
+                Long stock = doc.getLong("stock");
+                Long categoryId = doc.getLong("categoryId");
 
                 Book book = new Book(
                         doc.getId(),
@@ -144,11 +136,11 @@ public class FirebaseBookService {
                         doc.getString("author"),
                         doc.getString("briefDescription"),
                         doc.getString("fullDescription"),
-                        doc.getLong("categoryId"),
-                        image,                                                  // CHANGED
+                        categoryId != null ? categoryId : 0,
+                        images,
                         doc.getString("isbn"),
-                        doc.getDouble("price"),
-                        doc.getLong("stock"),
+                        price != null ? price : 0.0,
+                        stock != null ? stock : 0,
                         doc.getString("technicalSpecifications")
                 );
                 listener.onSuccess(book);
@@ -158,7 +150,9 @@ public class FirebaseBookService {
         });
     }
 
-    // 🔵 Callback chung cho Firestore
+    // ============================================================
+
+    /** 🔵 Callback chung cho Firestore */
     public interface FirestoreCallback<T> {
         void onSuccess(T data);
         void onError(String message);

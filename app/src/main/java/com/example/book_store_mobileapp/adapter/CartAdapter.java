@@ -1,6 +1,7 @@
 package com.example.book_store_mobileapp.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,7 +99,20 @@ public class CartAdapter extends BaseAdapter {
                 onUpdateTotal.run();
             }
         }
-        Glide.with(context).load(book.getImageUrl()).into(imgBook);
+
+
+        if (book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
+            Log.d("CartAdapter", "Images: " + book.getImageBase64());
+            String base64 = book.getImageBase64().get(0);
+            Glide.with(context)
+                    .load(base64)
+                    .placeholder(android.R.drawable.dark_header)
+                    .error(android.R.drawable.dark_header)
+                    .into(imgBook);
+        } else {
+            imgBook.setImageResource(android.R.drawable.dark_header);
+        }
+
 
         // Nút tăng
         btnPlus.setOnClickListener(v -> {

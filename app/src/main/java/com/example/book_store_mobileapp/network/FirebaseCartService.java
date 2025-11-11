@@ -6,6 +6,8 @@ import com.example.book_store_mobileapp.data.Book;
 import com.example.book_store_mobileapp.data.CartItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,14 @@ public class FirebaseCartService {
         cartItem.put("briefDescription", book.getBriefDescription());
         cartItem.put("fullDescription", book.getFullDescription());
         cartItem.put("categoryId", book.getCategoryId());
-        cartItem.put("imageURL", book.getImageUrl());
+        if (book.getImageBase64() != null && !book.getImageBase64().isEmpty()) {
+            List<String> images = new ArrayList<>();
+            images.add(book.getImageBase64().get(0)); // chỉ lấy ảnh đầu tiên
+            cartItem.put("imageBase64", images);      // lưu dưới dạng List<String>
+        } else {
+            cartItem.put("imageBase64", new ArrayList<>()); // tránh null, lưu mảng rỗng
+        }
+
         cartItem.put("isbn", book.getIsbn());
         cartItem.put("price", book.getPrice());
         cartItem.put("stock", book.getStock());

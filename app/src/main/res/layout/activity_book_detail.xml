@@ -46,17 +46,23 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp">
 
-                <!-- ✅ Sử dụng FrameLayout để có thể đặt overlay lên trên ảnh -->
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="350dp">
 
-                    <ImageView
-                        android:id="@+id/bookImage"
+                    <!-- ✅ ViewPager hiển thị ảnh -->
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/viewPagerImages"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
-                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                        android:layout_height="match_parent" />
+
+                    <!-- ✅ Indicator chấm tròn -->
+                    <me.relex.circleindicator.CircleIndicator3
+                        android:id="@+id/indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="12dp" />
 
                     <!-- ✅ Lớp phủ HẾT HÀNG -->
                     <TextView
@@ -68,11 +74,11 @@
                         android:textColor="#EF5350"
                         android:textSize="32sp"
                         android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:visibility="visible"/>
-
+                        android:visibility="gone" />
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
+
+
 
             <!-- Book Title and Author -->
             <TextView

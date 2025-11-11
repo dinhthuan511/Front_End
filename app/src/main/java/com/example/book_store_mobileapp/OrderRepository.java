@@ -59,7 +59,7 @@ public class OrderRepository {
                 bookMap.put("bookId", item.getBook().getBookId());
                 bookMap.put("name", item.getBook().getName());
                 bookMap.put("price", item.getBook().getPrice());
-                bookMap.put("imageUrl", item.getBook().getImageUrl());
+                bookMap.put("imageUrl", item.getBook().getImageBase64());
 
                 itemMap.put("book", bookMap);
                 itemsList.add(itemMap);

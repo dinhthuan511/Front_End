@@ -46,8 +46,9 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.ViewHo
         NumberFormat format = NumberFormat.getInstance(new Locale("vi", "VN"));
         holder.tvPrice.setText("Giá: " + format.format(item.getBook().getPrice()) + " VND");
 
+        String firstImage = item.getBook().getImageBase64().get(0);
         Glide.with(context)
-                .load(item.getBook().getImageUrl())
+                .load(firstImage)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.imgBook);
     }

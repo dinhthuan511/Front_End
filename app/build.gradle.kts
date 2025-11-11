@@ -58,6 +58,7 @@ dependencies {
 
     // Image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("me.relex:circleindicator:2.1.6")
 
     // ===== Firebase (dùng BoM để đồng bộ version) =====
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
@@ -67,6 +68,8 @@ dependencies {
 
     // Firestore (để map username -> email và login bằng username)
     implementation("com.google.firebase:firebase-firestore")
+
+    implementation("com.google.firebase:firebase-storage:21.0.0")
 
 
     implementation(fileTree(

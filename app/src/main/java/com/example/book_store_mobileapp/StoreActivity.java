@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -232,19 +233,16 @@ public class StoreActivity extends BaseActivity {
         final EditText etMaxPrice = dialogView.findViewById(R.id.et_max_price);
 
         // --- Thiết lập trạng thái hiện tại cho các nút lọc ---
-        if (minPriceFilter != null) {
-            etMinPrice.setText(String.valueOf(minPriceFilter.intValue()));
-        }
-        if (maxPriceFilter != null && maxPriceFilter < Double.MAX_VALUE) {
+        if (minPriceFilter != null) etMinPrice.setText(String.valueOf(minPriceFilter.intValue()));
+        if (maxPriceFilter != null && maxPriceFilter < Double.MAX_VALUE)
             etMaxPrice.setText(String.valueOf(maxPriceFilter.intValue()));
-        }
 
         if (activePriceFilter != -1) {
             if (activePriceFilter == 0) rgPriceFilter.check(R.id.rb_price_1);
             else if (activePriceFilter == 1) rgPriceFilter.check(R.id.rb_price_2);
             else if (activePriceFilter == 2) rgPriceFilter.check(R.id.rb_price_3);
-        } else if (minPriceFilter == null) { // if min/max are not set
-            rgPriceFilter.check(R.id.rb_price_0); // check "All"
+        } else if (minPriceFilter == null) {
+            rgPriceFilter.check(R.id.rb_price_0);
         }
 
         rgPriceFilter.setOnCheckedChangeListener((group, checkedId) -> {
@@ -257,103 +255,78 @@ public class StoreActivity extends BaseActivity {
         });
 
         etMinPrice.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) {
                     rgPriceFilter.clearCheck();
                     activePriceFilter = -1;
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+            @Override public void afterTextChanged(Editable s) {
                 try {
                     if (s.length() > 0 && Double.parseDouble(s.toString()) < 0) {
                         etMinPrice.setText("0");
                         etMinPrice.setSelection(etMinPrice.getText().length());
                     }
-                } catch (NumberFormatException e) {
-                    // Do nothing
-                }
+                } catch (NumberFormatException ignored) {}
             }
         });
 
         etMaxPrice.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0) {
                     rgPriceFilter.clearCheck();
                     activePriceFilter = -1;
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                 try {
+            @Override public void afterTextChanged(Editable s) {
+                try {
                     String minPriceStr = etMinPrice.getText().toString();
                     String maxPriceStr = s.toString();
-
                     if (!minPriceStr.isEmpty() && !maxPriceStr.isEmpty()) {
                         double minPrice = Double.parseDouble(minPriceStr);
                         double maxPrice = Double.parseDouble(maxPriceStr);
-
-                        if (maxPrice < minPrice) {
-                            etMaxPrice.setText(minPriceStr);
-                            etMaxPrice.setSelection(etMaxPrice.getText().length());
-                        }
                     }
-                } catch (NumberFormatException e) {
-                    // Do nothing
-                }
+                } catch (NumberFormatException ignored) {}
             }
         });
+
+
         // --- Tạo động các CheckBox cho thể loại ---
         FirebaseBookService.getInstance().getAllCategories(new FirebaseBookService.FirestoreCallback<List<BookCategory>>() {
             @Override
             public void onSuccess(List<BookCategory> categories) {
-                llCategoryCheckboxes.removeAllViews(); // Xóa các checkbox cũ
-
+                llCategoryCheckboxes.removeAllViews();
                 if (categories == null || categories.isEmpty()) {
                     Toast.makeText(StoreActivity.this, "Không có thể loại nào.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 for (BookCategory category : categories) {
                     try {
-                        // Chuyển đổi ID từ String (Firestore doc ID) sang Long để so sánh với categoryId trong Book
                         long categoryId = Long.parseLong(category.getId());
                         CheckBox cb = new CheckBox(StoreActivity.this);
                         cb.setText(category.getCategoryName());
-                        cb.setTag(categoryId); // Gắn ID (dạng Long) vào tag để lấy lại sau
-                        // Kiểm tra xem thể loại này đã được chọn trong lần lọc trước chưa
-                        if (activeCategoryFilters.contains(categoryId)) {
-                            cb.setChecked(true);
-                        }
+                        cb.setTag(categoryId);
+                        if (activeCategoryFilters.contains(categoryId)) cb.setChecked(true);
                         llCategoryCheckboxes.addView(cb);
                     } catch (NumberFormatException e) {
-                        // Ghi log và bỏ qua nếu ID của category trong Firestore không phải là một số
                         System.err.println("Lỗi định dạng ID thể loại: " + category.getId());
                     }
                 }
             }
+
             @Override
             public void onError(String message) {
-                // Hiển thị lỗi cho người dùng nếu không tải được thể loại
                 Toast.makeText(StoreActivity.this, "Lỗi tải thể loại: " + message, Toast.LENGTH_SHORT).show();
             }
         });
 
-        // --- Xây dựng và hiển thị Dialog ---
-        new AlertDialog.Builder(this)
+        // --- Build dialog ---
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Bộ lọc")
                 .setView(dialogView)
-                .setNeutralButton("Xóa bộ lọc", (dialog, which) -> {
+                .setNeutralButton("Xóa bộ lọc", (d, which) -> {
                     activePriceFilter = -1;
                     minPriceFilter = null;
                     maxPriceFilter = null;
@@ -362,47 +335,44 @@ public class StoreActivity extends BaseActivity {
                     Toast.makeText(this, "Đã xóa bộ lọc", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Hủy", null)
-                .setPositiveButton("Áp dụng", (dialog, which) -> {
-                    String minPriceStr = etMinPrice.getText().toString();
-                    String maxPriceStr = etMaxPrice.getText().toString();
+                .setPositiveButton("Áp dụng", null) // tạm null để override
+                .create();
 
-                    if (!minPriceStr.isEmpty() || !maxPriceStr.isEmpty()) {
-                        try {
-                            minPriceFilter = minPriceStr.isEmpty() ? 0 : Double.parseDouble(minPriceStr);
-                            maxPriceFilter = maxPriceStr.isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxPriceStr);
-                            activePriceFilter = -1; // Ignore radio buttons if min/max is used
-                        } catch (NumberFormatException e) {
-                            Toast.makeText(StoreActivity.this, "Giá trị min/max không hợp lệ", Toast.LENGTH_SHORT).show();
-                            minPriceFilter = null;
-                            maxPriceFilter = null;
-                        }
-                    } else {
-                        minPriceFilter = null;
-                        maxPriceFilter = null;
-                        int selectedPriceId = rgPriceFilter.getCheckedRadioButtonId();
-                        if (selectedPriceId == R.id.rb_price_0) activePriceFilter = -1;
-                        else if (selectedPriceId == R.id.rb_price_1) activePriceFilter = 0;
-                        else if (selectedPriceId == R.id.rb_price_2) activePriceFilter = 1;
-                        else if (selectedPriceId == R.id.rb_price_3) activePriceFilter = 2;
-                        else activePriceFilter = -1;
-                    }
+        dialog.show();
 
-                    // 2. Lấy giá trị lọc thể loại
-                    activeCategoryFilters.clear();
-                    for (int i = 0; i < llCategoryCheckboxes.getChildCount(); i++) {
-                        View child = llCategoryCheckboxes.getChildAt(i);
-                        if (child instanceof CheckBox) {
-                            CheckBox cb = (CheckBox) child;
-                            if (cb.isChecked()) {
-                                activeCategoryFilters.add((Long) cb.getTag());
-                            }
-                        }
-                    }
+        // Override nút Áp dụng để kiểm tra min/max
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String minPriceStr = etMinPrice.getText().toString();
+            String maxPriceStr = etMaxPrice.getText().toString();
 
-                    applyFiltersAndSearch();
-                })
-                .show();
+            Double minPrice = minPriceStr.isEmpty() ? null : Double.parseDouble(minPriceStr);
+            Double maxPrice = maxPriceStr.isEmpty() ? null : Double.parseDouble(maxPriceStr);
+
+            if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+                Toast.makeText(StoreActivity.this, "Giá trị min không được lớn hơn giá trị max", Toast.LENGTH_SHORT).show();
+                return; // dialog vẫn mở
+            }
+
+            // Áp dụng filter
+            minPriceFilter = minPrice;
+            maxPriceFilter = maxPrice;
+            activePriceFilter = -1;
+
+            // Lấy giá trị lọc thể loại
+            activeCategoryFilters.clear();
+            for (int i = 0; i < llCategoryCheckboxes.getChildCount(); i++) {
+                View child = llCategoryCheckboxes.getChildAt(i);
+                if (child instanceof CheckBox) {
+                    CheckBox cb = (CheckBox) child;
+                    if (cb.isChecked()) activeCategoryFilters.add((Long) cb.getTag());
+                }
+            }
+
+            applyFiltersAndSearch();
+            dialog.dismiss();
+        });
     }
+
 
     private void applyFiltersAndSearch() {
         List<Book> filteredList = new ArrayList<>(initialBookList);
@@ -445,6 +415,10 @@ public class StoreActivity extends BaseActivity {
         FirebaseBookService.getInstance().getAllBooks(new FirebaseBookService.FirestoreCallback<List<Book>>() {
             @Override
             public void onSuccess(List<Book> data) {
+                Log.d("BOOKS", "Tải được " + data.size() + " sách");
+                for (Book b : data) {
+                    Log.d("BOOKS", b.getName() + " - " + b.getPrice());
+                }
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false); // 🔹 Tắt icon loading khi xong
 
@@ -489,6 +463,7 @@ public class StoreActivity extends BaseActivity {
         }
         // For Android 12 and below, notification permission is granted automatically
     }
+
     // Override phương thức này để cho BaseActivity biết cần highlight mục nào
     @Override
     protected int getNavigationMenuItemId() {
