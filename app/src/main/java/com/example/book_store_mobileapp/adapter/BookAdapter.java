@@ -38,6 +38,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
         // Initialize views
         ImageView bookImage = listItemView.findViewById(R.id.book_image);
         TextView bookName = listItemView.findViewById(R.id.book_name);
+        TextView bookBriefDescription = listItemView.findViewById(R.id.book_brief_description);
         TextView bookPrice = listItemView.findViewById(R.id.book_price);
         TextView overlayOutOfStock = listItemView.findViewById(R.id.overlay_out_of_stock);
         LinearLayout mainContent = listItemView.findViewById(R.id.main_content);
@@ -45,6 +46,14 @@ public class BookAdapter extends ArrayAdapter<Book> {
         if (currentBook != null) {
             // Set book data
             bookName.setText(currentBook.getName());
+
+            if (currentBook.getBriefDescription() != null && !currentBook.getBriefDescription().isEmpty()) {
+                bookBriefDescription.setText(currentBook.getBriefDescription());
+                bookBriefDescription.setVisibility(View.VISIBLE);
+            } else {
+                bookBriefDescription.setVisibility(View.GONE);
+            }
+
             // Format the price
             bookPrice.setText(FormatUtils.formatCurrency(currentBook.getPrice()));
             // Set image with Glide
